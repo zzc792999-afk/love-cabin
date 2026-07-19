@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Days of Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rose-gold: #e8b4b8;
+            --soft-pink: #f0c4cc;
+            --gold: #d4a574;
+            --deep-bg: #0d0b1a;
+            --card-bg: rgba(22, 18, 38, 0.55);
+            --text-primary: #f0e6e8;
+            --text-secondary: #c5b8bb;
+            --glow-rose: rgba(232, 180, 184, 0.25);
+            --glow-gold: rgba(212, 165, 116, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Noto Sans SC', sans-serif;
+            background: radial-gradient(ellipse at 50% 30%, #1a1030 0%, #0d0b1a 50%, #080616 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* 星空画布 */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 主卡片容器 */
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 48px 40px 44px;
+            border-radius: 28px;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.06),
+                0 0 60px var(--glow-rose),
+                0 0 120px rgba(180, 140, 160, 0.06),
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            max-width: 92vw;
+            width: 480px;
+            animation: cardFloat 6s ease-in-out infinite;
+            transition: box-shadow 0.8s ease;
+        }
+
+        .container:hover {
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.09),
+                0 0 80px var(--glow-rose),
+                0 0 160px rgba(180, 140, 160, 0.1),
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        @keyframes cardFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            25% {
+                transform: translateY(-6px);
+            }
+            50% {
+                transform: translateY(-2px);
+            }
+            75% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* 装饰光点 */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(232, 180, 184, 0.5), rgba(212, 165, 116, 0.4), transparent);
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: shimmerLine 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmerLine {
+            0%,
+            100% {
+                opacity: 0.5;
+                width: 100px;
+            }
+            50% {
+                opacity: 1;
+                width: 150px;
+            }
+        }
+
+        /* 标题 */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #f0d0d6 0%, #e8b4b8 30%, #d4a574 60%, #e8b4b8 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+            animation: titleShimmer 5s ease-in-out infinite;
+            filter: drop-shadow(0 0 18px rgba(232, 180, 184, 0.35));
+        }
+
+        @keyframes titleShimmer {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 30%;
+            }
+            50% {
+                background-position: 80% 70%;
+            }
+            75% {
+                background-position: 20% 60%;
+            }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        /* 计时器 */
+        .timer {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 16px;
+            border-radius: 16px;
+            min-width: 62px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-box::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .time-box:hover::after {
+            left: 120%;
+        }
+        .time-box:hover {
+            transform: translateY(-4px);
+            border-color: rgba(232, 180, 184, 0.35);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), 0 0 24px rgba(232, 180, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 2rem;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Noto Sans SC', 'SF Mono', 'Menlo', monospace;
+            color: #f5dede;
+            letter-spacing: 0.03em;
+            transition: color 0.3s;
+        }
+        .time-box:hover span {
+            color: #ffe8ec;
+        }
+        .time-box label {
+            display: block;
+            font-size: 0.7rem;
+            color: #a09498;
+            letter-spacing: 0.08em;
+            margin-top: 2px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* 打字机区域 */
+        #typewriter-wrapper {
+            margin-top: 28px;
+            min-height: 2.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #typewriter {
+            font-size: 1rem;
+            color: #d5c8cb;
+            line-height: 1.7;
+            font-weight: 300;
+            letter-spacing: 0.03em;
+            display: inline;
+        }
+
+        #cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: #e8b4b8;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: cursorBlink 0.8s step-end infinite;
+            border-radius: 1px;
+            box-shadow: 0 0 6px rgba(232, 180, 184, 0.6);
+        }
+
+        @keyframes cursorBlink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* 爱心按钮 */
+        .big-heart {
+            font-size: 52px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 22px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: heartPulse 2.2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 140, 160, 0.45));
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .big-heart:hover {
+            animation: heartPulse 0.6s ease-in-out infinite;
+            filter: drop-shadow(0 0 35px rgba(255, 140, 160, 0.7));
+            transform: scale(1.18);
+        }
+        .big-heart:active {
+            transform: scale(0.9);
+            transition: transform 0.15s ease;
+        }
+
+        @keyframes heartPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            12% {
+                transform: scale(1.08);
+            }
+            24% {
+                transform: scale(1);
+            }
+            36% {
+                transform: scale(1.06);
+            }
+            48% {
+                transform: scale(1);
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 520px) {
+            .container {
+                padding: 32px 20px 28px;
+                border-radius: 22px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .time-box {
+                padding: 10px 10px;
+                min-width: 48px;
+                border-radius: 12px;
+            }
+            .time-box span {
+                font-size: 1.4rem;
+            }
+            .time-box label {
+                font-size: 0.62rem;
+            }
+            .timer {
+                gap: 7px;
+            }
+            #typewriter {
+                font-size: 0.88rem;
+            }
+            .big-heart {
+                font-size: 40px;
+                margin-top: 16px;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .timer {
+                gap: 5px;
+            }
+            .time-box {
+                padding: 8px 7px;
+                min-width: 40px;
+                border-radius: 10px;
+            }
+            .time-box span {
+                font-size: 1.15rem;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 星空画布 -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- 主卡片 -->
+    <div class="container">
+        <h1>100 Days of Love</h1>
+        <p class="subtitle">我们已经一起走过了...</p>
+
+        <div class="timer">
+            <div class="time-box"><span id="days">00</span><label>天</label></div>
+            <div class="time-box"><span id="hours">00</span><label>时</label></div>
+            <div class="time-box"><span id="minutes">00</span><label>分</label></div>
+            <div class="time-box"><span id="seconds">00</span><label>秒</label></div>
+        </div>
+
+        <div id="typewriter-wrapper">
+            <span id="typewriter"></span><span id="cursor"></span>
+        </div>
+
+        <div class="big-heart" onclick="triggerConfetti()" title="点我！">💗</div>
+    </div>
+
+    <!-- Confetti 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js">
+    </script>
+
+    <script>
+        (function() {
+            // ==================== 配置 ====================
+            // 在一起的日子：2026年1月18日
+            const startDate = new Date(2026, 0, 18);
+
+            // ==================== DOM 元素 ====================
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            const typewriterEl = document.getElementById('typewriter');
+            const cursorEl = document.getElementById('cursor');
+            const canvas = document.getElementById('starCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // ==================== Canvas 尺寸 ====================
+            let W, H;
+
+            function resizeCanvas() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+                initStars();
+            }
+
+            // ==================== 星空数据 ====================
+            const NUM_STARS = 180;
+            const NUM_FIREFLIES = 8;
+            let stars = [];
+            let fireflies = [];
+            let meteors = [];
+
+            class Star {
+                constructor() {
+                    this.reset(true);
+                }
+                reset(initRandomY) {
+                    this.x = Math.random() * W;
+                    this.y = initRandomY ? Math.random() * H : Math.random() * H;
+                    this.radius = Math.random() * 1.8 + 0.3;
+                    this.baseAlpha = Math.random() * 0.6 + 0.35;
+                    this.twinkleSpeed = Math.random() * 0.02 + 0.006;
+                    this.twinkleOffset = Math.random() * Math.PI * 2;
+                    this.hue = 30 + Math.random() * 25; // 暖金色调
+                }
+                update(frame) {
+                    this.alpha =
+                        this.baseAlpha + Math.sin(frame * this.twinkleSpeed + this.twinkleOffset) * 0.3;
+                    this.alpha = Math.max(0.08, Math.min(1, this.alpha));
+                }
+                draw(ctx) {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    // 光晕
+                    const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 3);
+                    glow.addColorStop(0, `hsla(${this.hue}, 40%, 85%, 0.9)`);
+                    glow.addColorStop(0.4, `hsla(${this.hue}, 30%, 75%, 0.4)`);
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    // 核心亮点
+                    ctx.fillStyle = `rgba(255,250,245,${this.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            class Firefly {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * W;
+                    this.y = Math.random() * H;
+                    this.targetX = this.x;
+                    this.targetY = this.y;
+                    this.radius = Math.random() * 28 + 18;
+                    this.alpha = 0;
+                    this.phase = Math.random() * Math.PI * 2;
+                    this.speed = Math.random() * 0.4 + 0.2;
+                    this.wanderTimer = Math.random() * 200;
+                    this.wanderInterval = Math.random() * 180 + 120;
+                }
+                update(frame) {
+                    this.wanderTimer++;
+                    if (this.wanderTimer > this.wanderInterval) {
+                        this.wanderTimer = 0;
+                        this.wanderInterval = Math.random() * 180 + 100;
+                        this.targetX = Math.random() * W;
+                        this.targetY = Math.random() * H;
+                    }
+                    this.x += (this.targetX - this.x) * 0.008;
+                    this.y += (this.targetY - this.y) * 0.008;
+                    this.alpha = 0.18 + Math.sin(frame * 0.015 + this.phase) * 0.12;
+                    this.alpha = Math.max(0.04, Math.min(0.35, this.alpha));
+                }
+                draw(ctx) {
+                    const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                    glow.addColorStop(0, `rgba(255,220,200,${this.alpha})`);
+                    glow.addColorStop(0.5, `rgba(240,200,180,${this.alpha * 0.5})`);
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            class Meteor {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    // 从右上区域出现
+                    this.x = W * 0.5 + Math.random() * W * 0.6;
+                    this.y = Math.random() * H * 0.35;
+                    const angle = Math.PI / 4 + Math.random() * 0.3;
+                    const speed = Math.random() * 7 + 9;
+                    this.vx = -Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.length = Math.random() * 100 + 60;
+                    this.alpha = Math.random() * 0.7 + 0.3;
+                    this.life = 1;
+                    this.decay = Math.random() * 0.015 + 0.025;
+                    this.thickness = Math.random() * 1.4 + 0.6;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.life -= this.decay;
+                    return this.life > 0 && this.x > -50 && this.y < H + 50;
+                }
+                draw(ctx) {
+                    const tailX = this.x - this.vx * this.length * 0.06;
+                    const tailY = this.y - this.vy * this.length * 0.06;
+                    const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+                    grad.addColorStop(0, `rgba(255,255,255,${this.alpha * this.life})`);
+                    grad.addColorStop(0.3, `rgba(255,240,230,${this.alpha * this.life * 0.7})`);
+                    grad.addColorStop(1, 'rgba(255,220,200,0)');
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = this.thickness;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(tailX, tailY);
+                    ctx.stroke();
+                    // 头部光点
+                    const headGlow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.thickness * 3);
+                    headGlow.addColorStop(0, `rgba(255,255,255,${this.alpha * this.life})`);
+                    headGlow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = headGlow;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.thickness * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initStars() {
+                stars = [];
+                for (let i = 0; i < NUM_STARS; i++) {
+                    stars.push(new Star());
+                }
+                fireflies = [];
+                for (let i = 0; i < NUM_FIREFLIES; i++) {
+                    fireflies.push(new Firefly());
+                }
+                meteors = [];
+            }
+
+            // ==================== 动画循环 ====================
+            let frameCount = 0;
+            let meteorCooldown = 0;
+            const METEOR_COOLDOWN_MIN = 90;
+            const METEOR_COOLDOWN_MAX = 380;
+
+            function animate() {
+                frameCount++;
+                ctx.clearRect(0, 0, W, H);
+
+                // 更新绘制星星
+                for (const star of stars) {
+                    star.update(frameCount);
+                    star.draw(ctx);
+                }
+
+                // 萤火虫
+                for (const f of fireflies) {
+                    f.update(frameCount);
+                    f.draw(ctx);
+                }
+
+                // 流星
+                meteorCooldown--;
+                if (meteorCooldown <= 0 && Math.random() < 0.025) {
+                    meteors.push(new Meteor());
+                    meteorCooldown = METEOR_COOLDOWN_MIN +
+                        Math.floor(Math.random() * (METEOR_COOLDOWN_MAX - METEOR_COOLDOWN_MIN));
+                }
+                if (meteorCooldown < -60) meteorCooldown = METEOR_COOLDOWN_MIN;
+
+                for (let i = meteors.length - 1; i >= 0; i--) {
+                    const alive = meteors[i].update();
+                    if (alive) {
+                        meteors[i].draw(ctx);
+                    } else {
+                        meteors.splice(i, 1);
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            // ==================== 计时器 ====================
+            function updateTimer() {
+                const now = new Date();
+                const diff = now - startDate;
+                if (diff < 0) {
+                    daysEl.innerText = '0';
+                    hoursEl.innerText = '00';
+                    minutesEl.innerText = '00';
+                    secondsEl.innerText = '00';
+                    return;
+                }
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / (1000 * 60)) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+
+                daysEl.innerText = d;
+                hoursEl.innerText = h < 10 ? '0' + h : h;
+                minutesEl.innerText = m < 10 ? '0' + m : m;
+                secondsEl.innerText = s < 10 ? '0' + s : s;
+            }
+
+            // ==================== 打字机 ====================
+            const loveText =
+                '从遇见你的第一天起，空气都变成了甜的。这100天里，每一刻都想好好收藏...✨';
+            let charIndex = 0;
+            let typingTimer = null;
+
+            function startTyping() {
+                if (typingTimer) clearInterval(typingTimer);
+                typewriterEl.innerHTML = '';
+                charIndex = 0;
+                cursorEl.style.display = 'inline-block';
+                typingTimer = setInterval(() => {
+                    if (charIndex < loveText.length) {
+                        typewriterEl.innerHTML += loveText.charAt(charIndex);
+                        charIndex++;
+                    } else {
+                        clearInterval(typingTimer);
+                        typingTimer = null;
+                        // 文字打完后光标继续闪烁几秒再隐藏
+                        setTimeout(() => {
+                            cursorEl.style.display = 'none';
+                        }, 4000);
+                    }
+                }, 130);
+            }
+
+            // ==================== Confetti ====================
+            function triggerConfetti() {
+                // 第一波：从中心爆发
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.55, x: 0.5 },
+                    colors: ['#f0d0d6', '#e8b4b8', '#d4a574', '#f5dede', '#fff5f0', '#ffe0e5'],
+                    startVelocity: 55,
+                    gravity: 0.8,
+                    scalar: 1.1,
+                    ticks: 200,
+                });
+                // 第二波：延迟，更大范围
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 80,
+                        spread: 110,
+                        origin: { y: 0.5, x: 0.5 },
+                        colors: ['#ffd1d9', '#f0c4cc', '#e8d5c0', '#ffffff', '#ffe8ec'],
+                        startVelocity: 40,
+                        gravity: 0.65,
+                        scalar: 0.9,
+                        ticks: 180,
+                    });
+                }, 150);
+                // 第三波：从两侧
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6, x: 0.25 },
+                        colors: ['#e8b4b8', '#f5dede', '#d4a574'],
+                        startVelocity: 35,
+                        gravity: 0.7,
+                        scalar: 0.8,
+                    });
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6, x: 0.75 },
+                        colors: ['#e8b4b8', '#f5dede', '#d4a574'],
+                        startVelocity: 35,
+                        gravity: 0.7,
+                        scalar: 0.8,
+                    });
+                }, 300);
+
+                // 爱心按钮反馈
+                const heart = document.querySelector('.big-heart');
+                heart.style.transform = 'scale(1.35)';
+                heart.style.filter = 'drop-shadow(0 0 50px rgba(255,140,160,0.9))';
+                setTimeout(() => {
+                    heart.style.transform = '';
+                    heart.style.filter = '';
+                }, 350);
+            }
+
+            // ==================== 初始化 ====================
+            function init() {
+                resizeCanvas();
+                updateTimer();
+                startTyping();
+                requestAnimationFrame(animate);
+            }
+
+            // ==================== 事件监听 ====================
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+            });
+
+            // 每隔一段时间重新打字
+            setInterval(() => {
+                startTyping();
+            }, 25000);
+
+            // 每秒更新计时器
+            setInterval(updateTimer, 1000);
+
+            // 暴露到全局
+            window.triggerConfetti = triggerConfetti;
+
+            // 启动
+            init();
+        })();
+    </script>
+</body>
+</html>

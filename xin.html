@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>❤️ 我们的恋爱宇宙 ❤️</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --rose-gold: #e8b4b8;
+            --soft-pink: #ffb3c6;
+            --deep-bg: #0a0a14;
+            --card-bg: rgba(20, 18, 35, 0.55);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.12);
+            --text-primary: #f0e6e8;
+            --text-accent: #ffc2d1;
+            --glow-color: rgba(255, 150, 170, 0.4);
+            --star-color: #c8d6e5;
+            --primary: #ff7597;
+            --secondary: #a17fe0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'PingFang SC', sans-serif;
+        }
+
+        body {
+            color: var(--text-primary);
+            text-align: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: var(--deep-bg);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            padding-bottom: 50px;
+        }
+
+        /* 星空画布 */
+        #starsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 启动画面 */
+        #startScreen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0d0d24 0%, #050510 70%, #000005 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #startScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #startScreen .title-group h1 {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            color: #ffc2d1;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 40px rgba(255, 160, 180, 0.6), 0 0 80px rgba(255, 140, 160, 0.3);
+            animation: titleShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes titleShimmer {
+            0%, 100% { text-shadow: 0 0 40px rgba(255, 160, 180, 0.6), 0 0 80px rgba(255, 140, 160, 0.3); }
+            50% { text-shadow: 0 0 60px rgba(255, 180, 200, 0.9), 0 0 120px rgba(255, 160, 180, 0.5); }
+        }
+
+        #startScreen .subtitle {
+            font-size: 0.95rem;
+            color: rgba(220, 200, 210, 0.7);
+            letter-spacing: 0.12em;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        .startBtn {
+            padding: 16px 44px;
+            font-size: 1.1rem;
+            letter-spacing: 0.06em;
+            border: 1.5px solid rgba(255, 180, 190, 0.5);
+            border-radius: 50px;
+            background: rgba(255, 140, 160, 0.08);
+            color: #ffc2d1;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(6px);
+        }
+
+        .startBtn:hover {
+            background: rgba(255, 140, 160, 0.18);
+            border-color: rgba(255, 180, 200, 0.8);
+            box-shadow: 0 0 40px rgba(255, 150, 170, 0.35);
+            transform: translateY(-3px);
+        }
+
+        /* 启动页浮动粒子 */
+        .start-particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            animation: floatUp 5s ease-in forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            100% { transform: translateY(-60vh) scale(0.2); opacity: 0; }
+        }
+
+        /* 主页面 */
+        #main {
+            display: none;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 40px 20px 60px;
+            animation: fadeInUp 0.9s ease forwards;
+        }
+
+        #main.visible {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #main .page-title {
+            font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #ffc9d5;
+            margin-bottom: 2.5rem;
+            text-shadow: 0 0 30px rgba(255, 160, 180, 0.5);
+        }
+
+        /* 3D Glassmorphism 卡片 */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            margin: 25px auto;
+            padding: 30px 24px;
+            border-radius: 24px;
+            max-width: 520px;
+            border: var(--border-glass);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.4);
+            /* 3D 偏转 */
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease-out, box-shadow 0.3s;
+        }
+
+        /* 鼠标追踪流光描边 */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            padding: 1.5px;
+            background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 117, 151, 0.45) 0%, rgba(161, 127, 224, 0.25) 50%, transparent 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 50px rgba(255, 117, 151, 0.12), 0 15px 45px rgba(0,0,0,0.5);
+        }
+
+        /* 高光反射 */
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            mix-blend-mode: overlay;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .card-glare {
+            opacity: 1;
+        }
+
+        .card h2 {
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: 1px;
+            color: #ffd0da;
+            margin-bottom: 0.8rem;
+        }
+
+        .card #time {
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #ffe0e6;
+            margin: 0.6rem 0;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 15px rgba(255, 117, 151, 0.25);
+        }
+
+        .card .time-label {
+            font-size: 0.85rem;
+            color: rgba(220, 200, 210, 0.6);
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        /* 按钮 */
+        .btn {
+            display: inline-block;
+            border: 1.5px solid rgba(255, 170, 185, 0.5);
+            padding: 13px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            background: rgba(255, 140, 160, 0.08);
+            color: #ffc9d5;
+            font-weight: 600;
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            backdrop-filter: blur(6px);
+            position: relative;
+        }
+
+        .btn:hover {
+            background: rgba(255, 140, 160, 0.18);
+            border-color: rgba(255, 180, 200, 0.8);
+            box-shadow: 0 0 30px rgba(255, 150, 170, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 爱心飘落 */
+        .floating-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3;
+            font-size: 18px;
+            animation: heartFall linear forwards;
+            opacity: 0.9;
+        }
+
+        @keyframes heartFall {
+            0% { transform: translateY(-8vh) rotate(0deg) scale(0.6); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(108vh) rotate(360deg) scale(0.35); opacity: 0; }
+        }
+
+        /* 情书弹窗 */
+        #loveModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        #loveModal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #loveModal .modal-inner {
+            background: linear-gradient(160deg, #16152a 0%, #0f0e1e 100%);
+            color: #ffd0da;
+            padding: 35px 30px;
+            border-radius: 24px;
+            max-width: 460px;
+            width: 90%;
+            border: 1px solid rgba(255, 200, 210, 0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(255, 140, 170, 0.1);
+            transform: translateY(20px) scale(0.92);
+            transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            text-align: left;
+        }
+
+        #loveModal.show .modal-inner {
+            transform: translateY(0) scale(1);
+        }
+
+        #loveModal .modal-inner h2 {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            color: #ffd5de;
+        }
+
+        #loveModal .modal-inner #typeText {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: #e8d5db;
+            min-height: 160px;
+            white-space: pre-line;
+            font-family: '楷体', serif;
+        }
+
+        #loveModal .modal-inner #typeText .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: #ffb3c6;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: cursorBlink 0.7s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .btn-close {
+            display: block;
+            margin: 1.5rem auto 0;
+            border: 1.5px solid rgba(255, 170, 185, 0.45);
+            padding: 11px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            background: rgba(255, 140, 160, 0.08);
+            color: #ffc9d5;
+            font-weight: 600;
+            transition: all 0.35s ease;
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 140, 160, 0.16);
+            border-color: rgba(255, 180, 200, 0.7);
+            box-shadow: 0 0 30px rgba(255, 150, 170, 0.3);
+        }
+
+        /* 鼠标拖尾 */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+            animation: trailPop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes trailPop {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(0.2); opacity: 0; }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px 18px;
+                border-radius: 20px;
+                margin: 16px auto;
+            }
+            .card #time { font-size: 1.6rem; }
+            #loveModal .modal-inner { padding: 25px 20px; }
+            #loveModal .modal-inner #typeText { font-size: 0.95rem; line-height: 1.7; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starsCanvas"></canvas>
+
+    <!-- 启动画面 -->
+    <div id="startScreen">
+        <div class="title-group">
+            <h1>❤️ 欢迎来到我们的世界 ❤️</h1>
+            <p class="subtitle">—— 属于我们的恋爱宇宙 ——</p>
+        </div>
+        <button class="startBtn" id="startBtn">✨ 进入我们的世界</button>
+    </div>
+
+    <!-- 主页面 -->
+    <div id="main">
+        <h1 class="page-title">🌌 我们的恋爱宇宙 🌌</h1>
+
+        <!-- 计时卡片 -->
+        <div class="card" id="timeCard">
+            <h2>💞 我们已经相爱</h2>
+            <p class="time-label">自从 2026年1月18日 起</p>
+            <p id="time">计算中...</p>
+            <p class="time-label" style="margin-top:0.3rem;">每一秒，都值得铭记</p>
+        </div>
+
+        <!-- 情书按钮卡片 -->
+        <div class="card">
+            <h2>💌 有一封信，写给你</h2>
+            <p style="color:rgba(220,200,210,0.6);font-size:0.9rem;margin:0.4rem 0 1rem;font-weight:300;">点击下方按钮，打开我的心意</p>
+            <button class="btn" id="openLetter">
+                <span class="icon">💌</span> 打开情书
+            </button>
+        </div>
+
+        <!-- 返回时光小屋 -->
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="btn" style="border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);"><i class="fas fa-home"></i> 返回时光小屋</a>
+        </div>
+
+        <p style="color:rgba(200,190,200,0.4);font-size:0.8rem;margin-top:2rem;font-weight:300;letter-spacing:0.04em;">
+            滑行或点击屏幕任意位置，洒落爱心与星光 ✨
+        </p>
+    </div>
+
+    <!-- 情书弹窗 -->
+    <div id="loveModal">
+        <div class="modal-inner">
+            <h2>💌 给你的一封情书</h2>
+            <p id="typeText"></p>
+            <button class="btn-close" id="closeLetter">❤️ 收好了</button>
+        </div>
+    </div>
+
+    <audio id="bgm" loop preload="none">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        (function() {
+            const startScreen = document.getElementById("startScreen");
+            const main = document.getElementById("main");
+            const startBtn = document.getElementById("startBtn");
+            const bgm = document.getElementById("bgm");
+            const loveModal = document.getElementById("loveModal");
+            const openLetterBtn = document.getElementById("openLetter");
+            const closeLetterBtn = document.getElementById("closeLetter");
+            const typeTextEl = document.getElementById("typeText");
+            const timeEl = document.getElementById("time");
+            const starsCanvas = document.getElementById("starsCanvas");
+            const ctx = starsCanvas.getContext("2d");
+
+            let typewriterTimer = null;
+            let musicLoaded = false;
+            let musicFadeInterval = null;
+            const startDate = new Date("2026/01/18 00:00:00");
+
+            /* ================================================================
+             *  星空绘制与流星
+             * ================================================================ */
+            let stars = [];
+            let meteors = [];
+            const STAR_COUNT = 100;
+
+            function initStars() {
+                starsCanvas.width = window.innerWidth;
+                starsCanvas.height = window.innerHeight;
+                stars = [];
+                meteors = [];
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    stars.push({
+                        x: Math.random() * starsCanvas.width,
+                        y: Math.random() * starsCanvas.height,
+                        r: Math.random() * 2 + 0.4,
+                        speed: Math.random() * 0.2 + 0.05,
+                        twinkle: Math.random() * Math.PI * 2,
+                        twinkleSpeed: Math.random() * 0.02 + 0.008,
+                        opacity: Math.random() * 0.6 + 0.3,
+                    });
+                }
+            }
+
+            function spawnMeteor() {
+                if (Math.random() < 0.012 && meteors.length < 2) {
+                    meteors.push({
+                        x: Math.random() * starsCanvas.width * 0.85,
+                        y: Math.random() * starsCanvas.height * 0.3,
+                        len: Math.random() * 70 + 40,
+                        speed: Math.random() * 6 + 5,
+                        angle: Math.random() * 0.4 + 0.35,
+                        life: 1,
+                        decay: Math.random() * 0.025 + 0.018,
+                    });
+                }
+            }
+
+            function drawStars() {
+                ctx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+
+                stars.forEach(s => {
+                    s.twinkle += s.twinkleSpeed;
+                    const flicker = 0.5 + 0.5 * Math.sin(s.twinkle);
+                    const alpha = s.opacity * flicker;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(240,210,230,${alpha})`;
+                    ctx.fill();
+
+                    s.y += s.speed;
+                    if (s.y > starsCanvas.height + 5) {
+                        s.y = -5;
+                        s.x = Math.random() * starsCanvas.width;
+                    }
+                });
+
+                meteors = meteors.filter(m => {
+                    const tailX = m.x - Math.cos(m.angle) * m.len * m.life;
+                    const tailY = m.y - Math.sin(m.angle) * m.len * m.life;
+                    const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+                    grad.addColorStop(0, `rgba(255,240,250,${m.life})`);
+                    grad.addColorStop(1, `rgba(255,180,200,0)`);
+                    ctx.beginPath();
+                    ctx.moveTo(m.x, m.y);
+                    ctx.lineTo(tailX, tailY);
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    m.x += Math.cos(m.angle) * m.speed;
+                    m.y += Math.sin(m.angle) * m.speed;
+                    m.life -= m.decay;
+                    if (m.life <= 0 || m.y > starsCanvas.height + 20) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                spawnMeteor();
+                requestAnimationFrame(drawStars);
+            }
+
+            initStars();
+            drawStars();
+            window.addEventListener("resize", () => {
+                starsCanvas.width = window.innerWidth;
+                starsCanvas.height = window.innerHeight;
+                initStars();
+            });
+
+            /* ================================================================
+             *  3D 卡片倾斜与手机陀螺仪适配
+             * ================================================================ */
+            function initTiltEffect() {
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    const glare = document.createElement('div');
+                    glare.className = 'card-glare';
+                    card.appendChild(glare);
+
+                    card.addEventListener('mousemove', function(e) {
+                        if (window.matchMedia("(max-width: 768px)").matches) return;
+                        const rect = this.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width/2;
+                        const y = e.clientY - rect.top - rect.height/2;
+
+                        const tiltX = (y / (rect.height/2)) * -6;
+                        const tiltY = (x / (rect.width/2)) * 6;
+
+                        this.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-3px)`;
+                        this.style.transition = 'transform 0.05s ease-out';
+
+                        const px = e.clientX - rect.left;
+                        const py = e.clientY - rect.top;
+                        this.style.setProperty('--mouse-x', `${px}px`);
+                        this.style.setProperty('--mouse-y', `${py}px`);
+
+                        const gx = (px / rect.width) * 100;
+                        const gy = (py / rect.height) * 100;
+                        glare.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.16) 0%, transparent 60%)`;
+                    });
+
+                    card.addEventListener('mouseleave', function() {
+                        if (window.matchMedia("(max-width: 768px)").matches) return;
+                        this.style.transform = 'rotateX(0) rotateY(0) translateY(0)';
+                        this.style.transition = 'transform 0.5s ease';
+                    });
+                });
+
+                if (window.DeviceOrientationEvent) {
+                    window.addEventListener('deviceorientation', e => {
+                        if (!window.matchMedia("(max-width: 768px)").matches) return;
+                        if (!e.beta || !e.gamma) return;
+                        const beta = Math.max(Math.min(e.beta, 70), 20) - 45;
+                        const gamma = Math.max(Math.min(e.gamma, 25), -25);
+                        const tx = (beta / 25) * 6;
+                        const ty = (gamma / 25) * -6;
+
+                        cards.forEach(card => {
+                            card.style.transform = `rotateX(${tx}deg) rotateY(${ty}deg) translateY(-2px)`;
+                            card.style.transition = 'transform 0.1s ease';
+                            
+                            const px = 50 + (gamma / 25) * 50;
+                            const py = 50 + (beta / 25) * 50;
+                            card.style.setProperty('--mouse-x', `${px}%`);
+                            card.style.setProperty('--mouse-y', `${py}%`);
+
+                            const glare = card.querySelector('.card-glare');
+                            if (glare) {
+                                glare.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.12) 0%, transparent 60%)`;
+                            }
+                        });
+                    });
+                }
+            }
+            initTiltEffect();
+
+            /* ================================================================
+             *  启动按钮与数据初始化
+             * ================================================================ */
+            startBtn.addEventListener("click", function() {
+                startScreen.classList.add('hidden');
+                main.classList.add('visible');
+                main.style.display = 'block';
+                heartExplosion();
+                startTimer();
+                if (confirm('是否要播放浪漫背景音乐？🎵')) {
+                    attemptMusicPlay();
+                }
+                requestAnimationFrame(() => { main.style.opacity = '1'; });
+            });
+
+            function startTimer() {
+                function update() {
+                    const now = new Date();
+                    const diff = now - startDate;
+                    if (diff < 0) return;
+                    const d = Math.floor(diff / 86400000);
+                    const h = Math.floor((diff % 86400000) / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    timeEl.innerHTML = `${d} <span style="font-size:0.7em;opacity:0.7;">天</span> ${h} <span style="font-size:0.7em;opacity:0.7;">时</span> ${m} <span style="font-size:0.7em;opacity:0.7;">分</span> ${s} <span style="font-size:0.7em;opacity:0.7;">秒</span>`;
+                }
+                update();
+                setInterval(update, 1000);
+            }
+
+            function attemptMusicPlay() {
+                if (musicLoaded) return;
+                bgm.volume = 0;
+                bgm.play().then(() => {
+                    musicLoaded = true;
+                    let v = 0;
+                    musicFadeInterval = setInterval(() => {
+                        if (v < 0.5) { v += 0.02; bgm.volume = v; }
+                        else { clearInterval(musicFadeInterval); }
+                    }, 150);
+                }).catch(() => {});
+            }
+
+            /* ================================================================
+             *  屏幕交互及飘散爱心
+             * ================================================================ */
+            let lastTX = 0, lastTY = 0;
+            document.addEventListener("mousemove", function(e) {
+                const d = Math.hypot(e.clientX - lastTX, e.clientY - lastTY);
+                if (d < 30) return;
+                lastTX = e.clientX; lastTY = e.clientY;
+                spawnTrail(e.clientX, e.clientY);
+            });
+
+            document.addEventListener("touchmove", function(e) {
+                if (e.touches.length === 1) {
+                    const tx = e.touches[0].clientX;
+                    const ty = e.touches[0].clientY;
+                    const d = Math.hypot(tx - lastTX, ty - lastTY);
+                    if (d < 35) return;
+                    lastTX = tx; lastTY = ty;
+                    spawnTrail(tx, ty);
+                }
+            }, { passive: true });
+
+            document.addEventListener("click", function(e) {
+                if (e.target.closest('button') || e.target.closest('a') || e.target.closest('#loveModal')) return;
+                const h = document.createElement('div');
+                h.className = 'click-heart';
+                h.innerHTML = ['❤️', '💕', '💖', '💗', '✨'][Math.floor(Math.random() * 5)];
+                h.style.left = e.clientX - 10 + 'px';
+                h.style.top = e.clientY - 10 + 'px';
+                h.style.fontSize = Math.random() * 8 + 14 + 'px';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 750);
+            });
+
+            function spawnTrail(x, y) {
+                const p = document.createElement('div');
+                p.className = 'cursor-trail';
+                p.innerHTML = ['✨', '💖', '❤️'][Math.floor(Math.random() * 3)];
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.fontSize = Math.random() * 6 + 10 + 'px';
+                p.style.color = '#ff7b9d';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 550);
+            }
+
+            function heartExplosion() {
+                const count = window.innerWidth < 480 ? 25 : 45;
+                for (let i = 0; i < count; i++) {
+                    const h = document.createElement('div');
+                    h.className = 'floating-heart';
+                    h.innerHTML = ['❤️', '💕', '💖', '✨'][Math.floor(Math.random() * 4)];
+                    h.style.left = Math.random() * 95 + '%';
+                    h.style.top = -(Math.random() * 30 + 5) + 'px';
+                    h.style.fontSize = (Math.random() * 14 + 12) + 'px';
+                    h.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                    h.style.animationDelay = Math.random() * 1.5 + 's';
+                    document.body.appendChild(h);
+                    setTimeout(() => h.remove(), 7000);
+                }
+            }
+
+            /* ================================================================
+             *  情书弹窗打字机
+             * ================================================================ */
+            let loveLetterText = `从遇见你的那一天起，\n我的世界便开始发光。\n\n想陪你看遍所有日落，\n想牵着你的手走完一生。\n\n未来很长很长，\n但我只想和你一起。\n\n你是我宇宙中最亮的星。❤️`;
+
+            function openLove() {
+                if (typewriterTimer) clearInterval(typewriterTimer);
+                loveModal.classList.add('show');
+                if (musicLoaded && bgm.duration > 35 && isFinite(bgm.duration)) {
+                    try { bgm.currentTime = 35; } catch (e) {}
+                }
+                startTypewriter();
+            }
+
+            function closeLove() {
+                loveModal.classList.remove('show');
+                if (typewriterTimer) clearInterval(typewriterTimer);
+            }
+
+            function startTypewriter() {
+                typeTextEl.innerHTML = '<span class="cursor"></span>';
+                let i = 0;
+                const chars = [...loveLetterText];
+                typewriterTimer = setInterval(() => {
+                    if (i < chars.length) {
+                        const cursorSpan = typeTextEl.querySelector('.cursor');
+                        const textNode = document.createTextNode(chars[i]);
+                        if (cursorSpan) typeTextEl.insertBefore(textNode, cursorSpan);
+                        else typeTextEl.appendChild(textNode);
+                        i++;
+                    } else {
+                        clearInterval(typewriterTimer);
+                        const cursorSpan = typeTextEl.querySelector('.cursor');
+                        if (cursorSpan) cursorSpan.remove();
+                    }
+                }, 55);
+            }
+
+            openLetterBtn.addEventListener("click", openLove);
+            closeLetterBtn.addEventListener("click", closeLove);
+            loveModal.addEventListener("click", e => { if (e.target === loveModal) closeLove(); });
+
+            // 异步向云端同步状态和素材配置
+            fetch('/api/config')
+                .then(res => res.json())
+                .then(cfg => {
+                    if (cfg.config_love_letter) {
+                        loveLetterText = cfg.config_love_letter;
+                    }
+                    if (cfg.config_bg_music_url) {
+                        const bgm = document.getElementById('bgm');
+                        if (bgm) {
+                            bgm.innerHTML = `<source src="${cfg.config_bg_music_url.trim()}" type="audio/mpeg">`;
+                            bgm.load();
+                        }
+                    }
+                })
+                .catch(e => console.warn("Sync configuration in letters failed:", e));
+        })();
+    </script>
+</body>
+</html>

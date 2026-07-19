@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>我们！</title>
+<style>
+/* 结合后的爱心背景 */
+.combined-heart-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* 确保背景在最底层 */
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffe6f2 0%, #ffccdd 100%);
+}
+
+/* 第一个方案的渐变背景 */
+.combined-heart-background::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 105, 180, 0.25) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(255, 105, 180, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 40% 80%, rgba(255, 182, 193, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 60% 20%, rgba(255, 182, 193, 0.25) 0%, transparent 25%);
+    background-repeat: no-repeat;
+    animation: floatBackground 25s ease-in-out infinite;
+}
+
+/* 第二个方案的动态爱心 */
+.heart-float {
+    position: absolute;
+    font-size: 24px;
+    animation: floatUp 15s linear infinite;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* 背景浮动动画 */
+@keyframes floatBackground {
+    0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    25% { 
+        transform: translate(-10px, 10px) scale(1.05);
+        opacity: 0.9;
+    }
+    50% { 
+        transform: translate(10px, -10px) scale(0.95);
+        opacity: 0.7;
+    }
+    75% { 
+        transform: translate(-10px, -10px) scale(1.02);
+        opacity: 0.85;
+    }
+}
+
+/* 爱心漂浮动画 */
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) rotate(0deg) scale(0.5);
+        opacity: 0;
+    }
+    5% {
+        opacity: 0.7;
+    }
+    70% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* 原有内容的样式增强 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: transparent; /* 使body背景透明以显示爱心背景 */
+}
+
+h2 {
+    color: #e75480;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    display: inline-block;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 20px;
+    margin-top: 20px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+td {
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+td:hover {
+    transform: scale(1.05);
+}
+
+img {
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 3px solid #ffc2d6;
+    transition: all 0.3s ease;
+}
+
+img:hover {
+    transform: scale(1.08) rotate(1deg);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    border-color: #ff6b9d;
+}
+
+hr {
+    margin: 30px auto;
+    width: 80%;
+    border: none;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #ff6b9d, transparent);
+}
+
+p {
+    color: #e75480;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+</style>
+</head>
+
+<body>
+    <!-- 爱心背景容器 -->
+    <div class="combined-heart-background" id="heartBackground">
+        <!-- 爱心将由JS动态创建在这里 -->
+    </div>
+    
+    <center><h2 align="center">老子有八张照片&nbsp;&nbsp;&nbsp;&nbsp;她只有一张&nbsp;&nbsp;&nbsp;&nbsp;这就是家庭地位</h2></center>
+    
+    <table width="900" border="0" cellspacing="0" cellpadding="0" height="899" align="center">
+        <tbody>
+            <tr>
+                <td><img src="../images/share_70744c146028d09ab501c55e916ff075.png" height="300" width="300"></td>
+                <td><img src="../images/share_51f7e90fee19b3927a52bd2139bf7af9.png" height="300" width="300"></td>
+                <td><img src="../images/share_1e8cab0837d39f3a941faaf817426279.png" height="300" width="300"></td>
+            </tr>
+            <tr>
+                <td><img src="../images/IMG_20260206_124546.png" width="300" height="300" alt=""/></td>
+                <td><img src="../images/mmexport1770353248593.jpg" width="300" height="300" alt=""/></td>
+                <td><img src="../images/IMG_20260206_124528.png" width="300" height="300" alt=""/></td>
+            </tr>
+            <tr>
+                <td><img src="../images/IMG_20260206_124425.png" width="300" height="300" alt=""/></td>
+                <td><img src="../images/IMG_20260206_124443.png" width="300" height="300" alt=""/></td>
+                <td><img src="../images/IMG_20260206_124500.png" width="300" height="300" alt=""/></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <hr size="3" color="#000000">
+   <center><p align="center">版权所有&copy;珊珊宝贝 未经允许，禁止使用！</p></center> 
+
+<script>
+// 创建动态爱心
+function createHearts() {
+    const container = document.getElementById('heartBackground');
+    if (!container) return;
+    
+    // 清空现有爱心（避免重复创建）
+    const existingHearts = container.querySelectorAll('.heart-float');
+    existingHearts.forEach(heart => heart.remove());
+    
+    const heartCount = 50; // 爱心数量
+    
+    for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-float';
+        heart.innerHTML = '❤';
+        
+        // 随机位置
+        const left = Math.random() * 100;
+        heart.style.left = left + 'vw';
+        
+        // 随机大小 (10px - 40px)
+        const size = Math.random() * 30 + 10;
+        heart.style.fontSize = size + 'px';
+        
+        // 随机颜色（粉色系）
+        const opacity = Math.random() * 0.5 + 0.2; // 0.2-0.7的透明度
+        const hue = Math.random() * 30 + 320; // 粉色系色相(320-350)
+        heart.style.color = `hsla(${hue}, 100%, 70%, ${opacity})`;
+        
+        // 随机动画延迟和持续时间
+        const delay = Math.random() * 5;
+        const duration = Math.random() * 10 + 10; // 10-20秒
+        heart.style.animationDelay = delay + 's';
+        heart.style.animationDuration = duration + 's';
+        
+        container.appendChild(heart);
+    }
+}
+
+// 页面加载时创建爱心
+window.addEventListener('load', createHearts);
+
+// 窗口大小变化时重新创建爱心（适应响应式）
+window.addEventListener('resize', createHearts);
+</script>
+</body>
+</html>

@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔮 恋爱特权扭蛋机 - 时光小屋</title>
+    
+    <!-- 谷歌字体与图标 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-dark: #e65275;
+            --primary-light: #ffb6c1;
+            --secondary: #a17fe0;
+            --secondary-light: #c2aef2;
+            
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.4);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+            
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a17fe0;
+            --primary-dark: #885fd1;
+            --primary-light: #c2aef2;
+            --secondary: #ff7597;
+            
+            --bg-grad: linear-gradient(135deg, #1e1b29 0%, #0f0d1a 100%);
+            --card-bg: rgba(30, 24, 46, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            --text-color: #ecf0f1;
+            --text-muted: #95a5a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-grad);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background 0.8s ease;
+        }
+
+        /* 背景 Canvas 繁星效果 */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+        }
+
+        /* 顶部导航 */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+        }
+
+        /* 扭蛋机外壳 */
+        .gashapon-machine {
+            background: var(--card-bg);
+            border: var(--border-glass);
+            border-radius: 32px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 扭蛋球舱 */
+        .capsule-case {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 70%);
+            border: 4px solid rgba(255, 255, 255, 0.35);
+            box-shadow: inset 0 20px 40px rgba(255, 255, 255, 0.2), inset 0 -10px 20px rgba(0, 0, 0, 0.05), 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #physics-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 扭蛋机底座 */
+        .machine-body {
+            width: 240px;
+            height: 140px;
+            background: linear-gradient(to bottom, var(--primary-light) 0%, var(--primary) 100%);
+            border-radius: 20px 20px 40px 40px;
+            margin-top: -15px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(255, 117, 151, 0.25);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* 拧钮旋钮 */
+        .turn-knob-wrapper {
+            position: absolute;
+            top: 20px;
+            width: 70px;
+            height: 70px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .turn-knob {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .turn-knob::before {
+            content: '';
+            width: 12px;
+            height: 48px;
+            background: #757575;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .turn-knob::after {
+            content: '';
+            width: 48px;
+            height: 12px;
+            background: #757575;
+            border-radius: 6px;
+            position: absolute;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 出蛋口 */
+        .chute-exit {
+            position: absolute;
+            bottom: -5px;
+            width: 65px;
+            height: 50px;
+            background: #2c3e50;
+            border-radius: 15px 15px 5px 5px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+        }
+
+        /* 滚落出的扭蛋 */
+        .dropped-ball {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: ballDrop 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transform-origin: center;
+        }
+
+        .dropped-ball::before {
+            content: '✨';
+            font-size: 1.1rem;
+        }
+
+        @keyframes ballDrop {
+            0% { transform: translateY(-80px) scale(0.3) rotate(0deg); opacity: 0; }
+            45% { transform: translateY(18px) scale(1) rotate(180deg); }
+            65% { transform: translateY(8px) rotate(270deg); }
+            85% { transform: translateY(15px) rotate(320deg); }
+            100% { transform: translateY(12px) rotate(360deg); }
+        }
+
+        .dropped-ball.hint-pulse {
+            animation: pulseGlow 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: translateY(12px) scale(1); box-shadow: inset -4px -4px 10px rgba(0,0,0,0.2), 0 8px 15px rgba(255,117,151,0.4), 0 0 15px var(--primary); }
+            50% { transform: translateY(12px) scale(1.08); box-shadow: inset -4px -4px 10px rgba(0,0,0,0.2), 0 12px 25px rgba(255,117,151,0.6), 0 0 25px var(--primary); }
+        }
+
+        .machine-hints {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .machine-hints h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .machine-hints p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 🎒 背包钱包面板 */
+        .wallet-panel {
+            background: var(--card-bg);
+            border: var(--border-glass);
+            border-radius: 28px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 25px;
+        }
+
+        .wallet-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .wallet-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 117, 151, 0.3);
+        }
+
+        .wallet-card.empty {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .wallet-card.empty:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-badge-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .wallet-card.empty .card-badge-count {
+            background: var(--text-muted);
+        }
+
+        .card-emoji {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .card-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .card-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* 🥚 剥开扭蛋遮罩屏 */
+        .capsule-open-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 10, 18, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .open-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .egg-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .egg-half {
+            position: absolute;
+            width: 140px;
+            height: 70px;
+            border-radius: 70px 70px 0 0;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .egg-top {
+            top: 0;
+            transform-origin: bottom center;
+        }
+
+        .egg-bottom {
+            bottom: 0;
+            transform-origin: top center;
+            border-radius: 0 0 70px 70px;
+        }
+
+        .egg-wrapper.open .egg-top {
+            transform: translateY(-80px) rotate(-15deg);
+            opacity: 0;
+        }
+
+        .egg-wrapper.open .egg-bottom {
+            transform: translateY(80px) rotate(15deg);
+            opacity: 0;
+        }
+
+        /* 弹出卡片样式 */
+        .prize-card {
+            width: 290px;
+            aspect-ratio: 3/4.6;
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.4), 0 0 30px rgba(255,215,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 4px solid rgba(255,215,0,0.6);
+            opacity: 0;
+            transform: scale(0.3) rotate(-10deg);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .prize-card.show {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .card-inner-frame {
+            border: 2px dashed rgba(255,215,0,0.4);
+            border-radius: 16px;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prize-emoji {
+            font-size: 3.5rem;
+            margin-top: 10px;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+            animation: bounceEmoji 2s infinite ease-in-out;
+        }
+
+        @keyframes bounceEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .prize-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #333;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        .prize-desc {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .prize-meta {
+            font-size: 0.75rem;
+            color: #888;
+            font-weight: 700;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding-top: 10px;
+            width: 100%;
+        }
+
+        /* 兑换卡片大招 */
+        .btn-use-prize {
+            margin-top: 15px;
+            background: linear-gradient(135deg, #f9d423, #ff4e50);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,78,80,0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-use-prize:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,78,80,0.5);
+        }
+
+        .btn-close-overlay {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-close-overlay:hover {
+            background: white;
+            color: #121012;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* 移动端响应式适配 */
+        @media (max-width: 600px) {
+            .gashapon-machine {
+                padding: 20px 10px;
+            }
+            .capsule-case {
+                width: 240px;
+                height: 240px;
+            }
+            .machine-body {
+                width: 200px;
+                height: 120px;
+            }
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <!-- 头部栏 -->
+        <header>
+            <a href="../index.html" class="btn-back"><i class="fas fa-home"></i> 时光小屋</a>
+            <button id="theme-btn" class="btn-back" style="border-radius: 50%; width: 42px; height: 42px; padding: 0; justify-content: center;" title="切换主题"><i class="fas fa-moon"></i></button>
+        </header>
+
+        <!-- 🔮 扭蛋机核心面板 -->
+        <div class="gashapon-machine">
+            <!-- 扭蛋球舱 -->
+            <div class="capsule-case">
+                <canvas id="physics-canvas"></canvas>
+            </div>
+
+            <!-- 底座 -->
+            <div class="machine-body">
+                <!-- 拧纽 -->
+                <div class="turn-knob-wrapper" id="knob-btn">
+                    <div class="turn-knob" id="knob-element"></div>
+                </div>
+                <!-- 出口 -->
+                <div class="chute-exit" id="chute-exit">
+                    <!-- JS动态塞入滑出的球 -->
+                </div>
+            </div>
+
+            <!-- 文案指示 -->
+            <div class="machine-hints">
+                <h2>🔮 恋爱特权扭蛋姬</h2>
+                <div style="margin: 12px 0; font-size: 0.95rem; font-weight: 700; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <div style="background: rgba(255, 117, 151, 0.15); border: 1px solid rgba(255, 117, 151, 0.25); padding: 8px 18px; border-radius: 50px; color: var(--primary-dark); display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(255,117,151,0.05);">
+                        <span>💖 今日免费：<span id="free-spins-count">1</span> 次</span>
+                        <span style="opacity: 0.3; margin: 0 4px;">|</span>
+                        <span>💎 额外特权：<span id="extra-spins-count">0</span> 次</span>
+                    </div>
+                    <button onclick="openKeyRedeem()" style="background: transparent; border: none; color: var(--secondary); text-decoration: underline; font-weight: 700; cursor: pointer; font-size: 0.85rem; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; transition: opacity 0.2s;"><i class="fas fa-key"></i> 输入特权暗号兑换次数</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎒 特权钱包/背包面板 -->
+        <div class="wallet-panel">
+            <h3 class="wallet-title"><i class="fas fa-wallet"></i> 珊珊的专属特权钱包</h3>
+            <div class="wallet-grid" id="wallet-cards-container">
+                <!-- 8张卡片格将由JS动态填入 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 🥚 剥开扭蛋遮罩屏 -->
+    <div id="capsule-open-overlay" class="capsule-open-overlay">
+        <div class="open-container">
+            <!-- 扭蛋圆壳 -->
+            <div class="egg-wrapper" id="egg-element">
+                <div class="egg-half egg-top" id="egg-top-half"></div>
+                <div class="egg-half egg-bottom" id="egg-bottom-half"></div>
+            </div>
+
+            <!-- 展现特权卡片 -->
+            <div class="prize-card" id="prize-card-element">
+                <div class="card-inner-frame">
+                    <div class="prize-emoji" id="card-emoji-val">🥤</div>
+                    <div>
+                        <h4 class="prize-name" id="card-name-val">奶茶续命券</h4>
+                        <p class="prize-desc" id="card-desc-val">凭此券可向哲哲兑换大杯茶百道（全糖加椰果），随时随地有效！</p>
+                    </div>
+                    <div class="prize-meta">🔒 珊珊的私人恋爱特权 · 哲哲承诺兑现</div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <button class="btn-close-overlay" id="btn-close-overlay" style="display: none;">收入钱包</button>
+        </div>
+    </div>
+
+    <!-- 🔑 密匙充值悬浮弹窗 -->
+    <div id="key-redeem-overlay" class="capsule-open-overlay" style="display: none;">
+        <div class="open-container" style="max-width: 380px;">
+            <div class="prize-card show" style="background: var(--card-bg); backdrop-filter: blur(10px); border: var(--border-glass); box-shadow: var(--shadow-glass); height: auto; aspect-ratio: auto; padding: 30px 20px;">
+                <div class="card-inner-frame" style="border-color: rgba(255, 117, 151, 0.3); gap: 15px; padding: 20px 10px;">
+                    <div style="font-size: 2.2rem; color: var(--primary-dark);"><i class="fas fa-key"></i></div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-color);">特权密令充值 🔑</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; text-align: center;">输入哲哲给的特权密令，解锁一次额外扭蛋机会吧！</p>
+                    <div style="display: flex; gap: 8px; width: 100%; justify-content: center; margin-top: 5px;">
+                        <input type="text" id="key-input" placeholder="输入特权密令..." style="text-transform: uppercase; padding: 10px 15px; border-radius: 20px; border: 2px solid rgba(255, 117, 151, 0.2); outline: none; text-align: center; font-weight: 700; width: 180px; letter-spacing: 1px; font-size: 0.9rem; background: rgba(255,255,255,0.7); color: #333;">
+                        <button id="key-submit-btn" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; padding: 10px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(255,117,151,0.2);">兑换</button>
+                    </div>
+                    <div id="key-error-msg" style="color: #ff3d68; font-size: 0.80rem; font-weight: 700; opacity: 0; transition: opacity 0.3s; height: 18px; margin-top: 5px;">⚠️ 密令无效或已被使用过</div>
+                </div>
+            </div>
+            <button class="btn-close-overlay" onclick="closeKeyRedeem()" style="margin-top: 10px;">返回扭蛋机</button>
+        </div>
+    </div>
+
+    <script>
+        // 🛡️ 安全本地存储，防范本地 file:// 协议报错
+        function safeGet(key, defaultVal = '') {
+            try {
+                return localStorage.getItem(key) || defaultVal;
+            } catch (e) {
+                try {
+                    return sessionStorage.getItem(key) || defaultVal;
+                } catch (err) {
+                    return window[`__safe_storage_${key}`] || defaultVal;
+                }
+            }
+        }
+
+        function safeSet(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch (e) {
+                try {
+                    sessionStorage.setItem(key, val);
+                } catch (err) {
+                    window[`__safe_storage_${key}`] = val;
+                }
+            }
+        }
+
+        // 🔑 密令兑换点数与限次逻辑
+        const VALID_KEYS = [
+            'LOVE-100417-SHAN',
+            'KISS-999-ZUZHE',
+            'FOREVER-200-DAYS',
+            'MUA-520-BABY',
+            'MILKTEA-FOR-SHAN',
+            'HUG-HUG-888',
+            'SWEET-SHAN-1004',
+            'ALWAYS-BE-WITH-YOU',
+            'MY-QUEEN-SHAN',
+            'LUCKY-CAPSULE-777',
+            'PUZZLE-CHAMPION-999'
+        ];
+
+        // 扭蛋次数状态更新与渲染
+        function updateSpinsDisplay() {
+            const todayStr = new Date().toDateString();
+            const lastFreeDate = safeGet('gashapon_last_free_date');
+            const hasFreeSpin = lastFreeDate !== todayStr;
+            const extraSpins = parseInt(safeGet('gashapon_extra_spins', '0')) || 0;
+            const isInfinite = safeGet('gashapon_infinite_spins') === 'true';
+
+            const freeCountEl = document.getElementById('free-spins-count');
+            const extraCountEl = document.getElementById('extra-spins-count');
+
+            if (freeCountEl) freeCountEl.textContent = hasFreeSpin ? '1' : '0';
+            if (extraCountEl) {
+                extraCountEl.textContent = isInfinite ? '∞' : extraSpins;
+            }
+        }
+
+        // 检查并扣除次数
+        function checkAndSpendSpin() {
+            const isInfinite = safeGet('gashapon_infinite_spins') === 'true';
+            if (isInfinite) {
+                return true; // 开启无限次数时，直接通过且不扣减任何次数！
+            }
+
+            const todayStr = new Date().toDateString();
+            const lastFreeDate = safeGet('gashapon_last_free_date');
+            const hasFreeSpin = lastFreeDate !== todayStr;
+            let extraSpins = parseInt(safeGet('gashapon_extra_spins', '0')) || 0;
+
+            if (hasFreeSpin) {
+                // 扣除免费次数
+                safeSet('gashapon_last_free_date', todayStr);
+                updateSpinsDisplay();
+
+                // 实时向云端同步免费次数已消费状态 (记录今日日期)
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gashapon_last_free_date: todayStr })
+                }).catch(e => console.error("Cloud free spin date sync failed:", e));
+
+                return true;
+            } else if (extraSpins > 0) {
+                // 扣除额外次数
+                extraSpins--;
+                safeSet('gashapon_extra_spins', String(extraSpins));
+                updateSpinsDisplay();
+
+                // 实时向云端同步扣减后的额外次数
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gashapon_extra_spins: String(extraSpins) })
+                }).catch(e => console.error("Cloud extra spins deduction failed:", e));
+
+                return true;
+            }
+            return false;
+        }
+
+        // 密匙充值窗口管理
+        function openKeyRedeem() {
+            initAudio();
+            const overlay = document.getElementById('key-redeem-overlay');
+            const keyInput = document.getElementById('key-input');
+            const errorMsg = document.getElementById('key-error-msg');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                if (keyInput) {
+                    keyInput.value = '';
+                    keyInput.focus();
+                }
+                if (errorMsg) errorMsg.style.opacity = '0';
+            }
+        }
+
+        function closeKeyRedeem() {
+            const overlay = document.getElementById('key-redeem-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        // 绑定密令兑换事件
+        window.addEventListener('DOMContentLoaded', () => {
+            const btnSubmit = document.getElementById('key-submit-btn');
+            const keyInput = document.getElementById('key-input');
+            const errorMsg = document.getElementById('key-error-msg');
+
+            function handleRedeem() {
+                if (!keyInput) return;
+                const code = keyInput.value.trim().toUpperCase();
+                if (!code) return;
+
+                // 读取已用秘钥列表
+                let usedKeys = [];
+                try {
+                    const stored = safeGet('gashapon_used_keys');
+                    usedKeys = stored ? JSON.parse(stored) : [];
+                } catch(e) {}
+
+                // 👑 专属万能密令检测（支持无限次重复兑换，永久激活无限扭蛋模式）
+                if (code === 'ZUZHE-LOVE-SHAN-999') {
+                    safeSet('gashapon_infinite_spins', 'true');
+                    updateSpinsDisplay();
+                    
+                    // 广播同步至云端数据库
+                    fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ gashapon_infinite_spins: 'true' })
+                    }).catch(e => console.error("Cloud config sync failed:", e));
+
+                    if (errorMsg) {
+                        errorMsg.style.color = '#38ef7d';
+                        errorMsg.textContent = '🎉 开启无限特权！获得无穷大次扭蛋机会！(∞)';
+                        errorMsg.style.opacity = '1';
+                    }
+                    playChimeSound();
+                    triggerMiniHeartConfetti();
+                    
+                    setTimeout(() => {
+                        closeKeyRedeem();
+                    }, 1500);
+                    return;
+                }
+
+                if (!VALID_KEYS.includes(code)) {
+                    showKeyError('⚠️ 无效的暗号，快去问哲哲要吧！');
+                } else if (usedKeys.includes(code)) {
+                    showKeyError('⚠️ 该暗号已被珊珊兑换过啦！');
+                } else {
+                    // 成功兑换！
+                    usedKeys.push(code);
+                    safeSet('gashapon_used_keys', JSON.stringify(usedKeys));
+                    
+                    let extraSpins = parseInt(safeGet('gashapon_extra_spins', '0')) || 0;
+                    extraSpins++;
+                    safeSet('gashapon_extra_spins', String(extraSpins));
+                    updateSpinsDisplay();
+
+                    // 广播同步至云端数据库
+                    fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            gashapon_used_keys: JSON.stringify(usedKeys),
+                            gashapon_extra_spins: String(extraSpins)
+                        })
+                    }).catch(e => console.error("Cloud config keys update failed:", e));
+
+                    if (errorMsg) {
+                        errorMsg.style.color = '#38ef7d';
+                        errorMsg.textContent = '🎉 兑换成功！额外次数 +1';
+                        errorMsg.style.opacity = '1';
+                    }
+                    
+                    playChimeSound();
+                    triggerMiniHeartConfetti();
+
+                    setTimeout(() => {
+                        closeKeyRedeem();
+                    }, 1200);
+                }
+            }
+
+            function showKeyError(msg) {
+                if (errorMsg) {
+                    errorMsg.style.color = '#ff3d68';
+                    errorMsg.textContent = msg;
+                    errorMsg.style.opacity = '1';
+                }
+                // 震动输入框
+                const inputFrame = keyInput.closest('.prize-card');
+                if (inputFrame) {
+                    inputFrame.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        inputFrame.style.animation = '';
+                    }, 500);
+                }
+                playPopSound();
+            }
+
+            if (btnSubmit) {
+                btnSubmit.addEventListener('click', handleRedeem);
+            }
+            if (keyInput) {
+                keyInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') handleRedeem();
+                });
+            }
+
+            // 初始化次数面板显示
+            updateSpinsDisplay();
+
+            // 异步从云数据库拉取最新次数与特权配置
+            fetch('/api/config')
+                .then(res => {
+                    if (!res.ok) throw new Error('GET config failed');
+                    return res.json();
+                })
+                .then(cfg => {
+                    // 云端配置强制覆盖本地缓存，确保每次打开无滞后数据
+                    safeSet('gashapon_extra_spins', String(cfg.gashapon_extra_spins !== undefined ? cfg.gashapon_extra_spins : '0'));
+                    safeSet('gashapon_last_free_date', String(cfg.gashapon_last_free_date !== undefined ? cfg.gashapon_last_free_date : ''));
+                    safeSet('gashapon_infinite_spins', String(cfg.gashapon_infinite_spins !== undefined ? cfg.gashapon_infinite_spins : 'false'));
+                    safeSet('gashapon_used_keys', String(cfg.gashapon_used_keys !== undefined ? cfg.gashapon_used_keys : '[]'));
+
+                    if (cfg.gashapon_prizes !== undefined) {
+                        const val = typeof cfg.gashapon_prizes === 'object' ? JSON.stringify(cfg.gashapon_prizes) : String(cfg.gashapon_prizes);
+                        safeSet('gashapon_prizes', val);
+                        try {
+                            const parsed = JSON.parse(val);
+                            if (parsed && Array.isArray(parsed)) {
+                                const gashaponIds = ['bobo', 'milktea', 'sese', 'tinghua', 'queen', 'aixin', 'pipi', 'sajiao', 'coax', 'forgive', 'supreme'];
+                                PRIZES = parsed.filter(p => gashaponIds.includes(p.id));
+                            }
+                        } catch(e) {}
+                    } else {
+                        // 云端没有则使用默认
+                        safeSet('gashapon_prizes', JSON.stringify(PRIZES));
+                    }
+
+                    if (cfg.gashapon_inventory !== undefined) {
+                        const val = typeof cfg.gashapon_inventory === 'object' ? JSON.stringify(cfg.gashapon_inventory) : String(cfg.gashapon_inventory);
+                        safeSet('gashapon_inventory', val);
+                        try { inventory = JSON.parse(val); } catch(e) {}
+                    } else {
+                        // 云端不存在则置空，不读取本地残留
+                        safeSet('gashapon_inventory', '{}');
+                        inventory = {};
+                    }
+                    
+                    updateSpinsDisplay();
+                    renderWallet();
+                })
+                .catch(err => {
+                    console.warn("Failed to sync gashapon configuration from cloud database, using cache:", err);
+                });
+        });
+
+        // 🌗 主题自动匹配
+        const themeBtn = document.getElementById('theme-btn');
+        let currentTheme = safeGet('theme', 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            safeSet('theme', currentTheme);
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            themeBtn.innerHTML = currentTheme === 'light' 
+                ? '<i class="fas fa-moon"></i>' 
+                : '<i class="fas fa-sun"></i>';
+        }
+
+        // 提示信息飘窗
+        function showToast(msg) {
+            let toast = document.getElementById('gashapon-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'gashapon-toast';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '40px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+                toast.style.background = 'rgba(44, 62, 80, 0.95)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 24px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '0.85rem';
+                toast.style.fontWeight = '700';
+                toast.style.zIndex = '100000';
+                toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
+                toast.style.opacity = '0';
+                toast.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                document.body.appendChild(toast);
+            }
+            
+            toast.textContent = msg;
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                toast.style.opacity = '1';
+            }, 50);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        // 🔊 Web Audio API 音效合成引擎
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx && AudioContextClass) {
+                audioCtx = new AudioContextClass();
+            }
+        }
+
+        function playKnobClickSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                // 金属机械咔哒声
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.05);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } catch(e) {}
+        }
+
+        // 啵啵声效
+        function playPopSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(700, now + 0.12);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } catch(e) {}
+        }
+
+        // 华丽铃声声效
+        function playChimeSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                // 叮铃铃~
+                playTone(523.25, now, 0.15); // C5
+                playTone(659.25, now + 0.08, 0.2); // E5
+                playTone(783.99, now + 0.16, 0.3); // G5
+            } catch(e) {}
+        }
+
+        function playTone(freq, start, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.12, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+            osc.start(start);
+            osc.stop(start + duration);
+        }
+
+        // 🎫 特权卡数据库 (支持云端后台自定义扩展配置)
+        let PRIZES = [
+            { id: 'bobo', name: '啵啵卡', emoji: '💋', desc: '利用此卡可以找臭臭兑换一个亲亲！', hue: 350 },
+            { id: 'milktea', name: '奶茶卡', emoji: '🥤', desc: '可以找臭臭兑换一杯珊珊爱喝的奶茶！', hue: 35 },
+            { id: 'sese', name: '色色卡', emoji: '🔞', desc: '可以让臭臭脱光光哦！', hue: 330 },
+            { id: 'tinghua', name: '听话卡', emoji: '👂', desc: '可以让臭臭听装屁屁的合理的话五分钟！', hue: 200 },
+            { id: 'queen', name: '装屁屁女王卡', emoji: '👑', desc: '使用此卡可以变成装屁屁女王！', hue: 45 },
+            { id: 'aixin', name: '爱心卡', emoji: '❤️', desc: '利用此卡可以找臭臭兑换一次亲自做的好吃的！', hue: 0 },
+            { id: 'pipi', name: '屁屁卡', emoji: '🍑', desc: '可以扣臭臭的屁屁！', hue: 100 },
+            { id: 'sajiao', name: '撒娇卡', emoji: '🥺', desc: '可以让臭臭对珊珊撒娇一次！', hue: 280 },
+            { id: 'coax', name: '无条件哄好卡', emoji: '🧸', desc: '可以让臭臭原本不开心的心情变好哦！', hue: 340 },
+            { id: 'forgive', name: '认错免罚卡', emoji: '🙇', desc: '当做错的时候利用此卡可以免去一次惩罚！', hue: 120 },
+            { id: 'supreme', name: '至尊卡', emoji: '✨', desc: '可以兑换任何一个你想要的卡，或自己编写一张卡！', hue: 50 }
+        ];
+
+        // 优先从本地缓存加载扩展奖池
+        const cachedPrizes = safeGet('gashapon_prizes');
+        if (cachedPrizes) {
+            try { 
+                const parsed = JSON.parse(cachedPrizes);
+                if (parsed && Array.isArray(parsed)) {
+                    PRIZES = parsed;
+                }
+            } catch(e) {}
+        }
+
+        // 背包状态
+        let inventory = {};
+        try {
+            const stored = safeGet('gashapon_inventory');
+            inventory = stored ? JSON.parse(stored) : {};
+        } catch(e) {
+            inventory = {};
+        }
+
+        function saveInventory() {
+            safeSet('gashapon_inventory', JSON.stringify(inventory));
+
+            // 广播实时同步背包数据至云端
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gashapon_inventory: JSON.stringify(inventory) })
+            }).catch(e => console.error("Cloud inventory sync failed:", e));
+        }
+
+        // 渲染钱包/背包
+        function renderWallet() {
+            const container = document.getElementById('wallet-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            PRIZES.forEach(prize => {
+                const count = inventory[prize.id] || 0;
+                const card = document.createElement('div');
+                card.className = `wallet-card ${count === 0 ? 'empty' : ''}`;
+                card.style.background = count > 0 
+                    ? `linear-gradient(135deg, hsl(${prize.hue}, 90%, 94%) 0%, hsl(${prize.hue}, 80%, 86%) 100%)`
+                    : `rgba(255,255,255, 0.12)`;
+                
+                if (currentTheme === 'dark' && count > 0) {
+                    card.style.background = `linear-gradient(135deg, hsl(${prize.hue}, 50%, 25%) 0%, hsl(${prize.hue}, 40%, 15%) 100%)`;
+                }
+
+                card.innerHTML = `
+                    ${count > 0 ? `<span class="card-badge-count">x${count}</span>` : ''}
+                    <div class="card-emoji">${prize.emoji}</div>
+                    <div class="card-name">${prize.name}</div>
+                    <div class="card-status">${count > 0 ? '👉 点击出示核销' : '🔒 尚未收集到'}</div>
+                `;
+                
+                if (count > 0) {
+                    card.addEventListener('click', () => showActiveUseCard(prize));
+                }
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 弹出核销大卡片
+        function showActiveUseCard(prize) {
+            initAudio();
+            const overlay = document.getElementById('capsule-open-overlay');
+            const egg = document.getElementById('egg-element');
+            const card = document.getElementById('prize-card-element');
+            const btnClose = document.getElementById('btn-close-overlay');
+            
+            // 填充内容
+            document.getElementById('card-emoji-val').textContent = prize.emoji;
+            document.getElementById('card-name-val').textContent = prize.name;
+            document.getElementById('card-desc-val').textContent = prize.desc;
+            
+            // 设定卡片背景
+            card.style.background = `linear-gradient(135deg, hsl(${prize.hue}, 100%, 98%) 0%, hsl(${prize.hue}, 90%, 92%) 100%)`;
+            card.style.borderColor = `hsl(${prize.hue}, 80%, 65%)`;
+            
+            // 隐藏蛋，展示卡片
+            egg.style.display = 'none';
+            card.style.display = 'flex';
+            btnClose.style.display = 'block';
+            btnClose.textContent = '确定出示给哲哲兑换';
+            
+            // 绑定核销按钮事件
+            btnClose.onclick = () => {
+                if (confirm(`确定要核销一张【${prize.name}】吗？核销后将减少数量哦！`)) {
+                    if (inventory[prize.id] && inventory[prize.id] > 0) {
+                        inventory[prize.id]--;
+                        saveInventory();
+                        renderWallet();
+                        
+                        // 播放核销动效：卡片震颤收缩
+                        card.style.transform = 'scale(0.8) rotate(5deg)';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            card.classList.remove('show');
+                        }, 500);
+                        playPopSound();
+                    }
+                }
+            };
+
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                card.classList.add('show');
+            }, 50);
+        }
+
+        // 🔮 Canvas 扭蛋机物理引擎模拟
+        const canvas = document.getElementById('physics-canvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        
+        let balls = [];
+        let isSpinning = false;
+        
+        // 舱室参数
+        const cx = 140;
+        const cy = 140;
+        const radius = 130;
+        const ballRad = 16;
+        const gravity = 0.45;
+        const friction = 0.985;
+        const elasticity = 0.65; // 弹力指数
+
+        function initPhysics() {
+            canvas.width = 280 * dpr;
+            canvas.height = 280 * dpr;
+            ctx.scale(dpr, dpr);
+            
+            // 随机生成 12 个不同颜色的球
+            balls = [];
+            const colors = [
+                '#ff7597', '#ffb6c1', '#a17fe0', '#c2aef2', 
+                '#ffd700', '#ffa751', '#2193b0', '#6dd5ed',
+                '#eb3070', '#38ef7d', '#ff0844', '#f9d423'
+            ];
+            
+            for (let i = 0; i < 12; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * (radius - ballRad - 20);
+                balls.push({
+                    x: cx + Math.cos(angle) * dist,
+                    y: cy + Math.sin(angle) * dist,
+                    vx: Math.random() * 4 - 2,
+                    vy: Math.random() * 4 - 2,
+                    radius: ballRad,
+                    color: colors[i % colors.length]
+                });
+            }
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, 280, 280);
+            
+            balls.forEach((ball, index) => {
+                // 重力与摩擦力
+                if (!isSpinning) {
+                    ball.vy += gravity;
+                }
+                ball.vx *= friction;
+                ball.vy *= friction;
+                
+                // 位置累加
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+                
+                // 限制在球形边界内
+                const dx = ball.x - cx;
+                const dy = ball.y - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > radius - ball.radius) {
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+                    // 回弹位置修正
+                    ball.x = cx + nx * (radius - ball.radius);
+                    ball.y = cy + ny * (radius - ball.radius);
+                    // 向量反射
+                    const dot = ball.vx * nx + ball.vy * ny;
+                    ball.vx -= 2 * dot * nx * elasticity;
+                    ball.vy -= 2 * dot * ny * elasticity;
+                }
+                
+                // 球与球碰撞检测
+                for (let j = index + 1; j < balls.length; j++) {
+                    const other = balls[j];
+                    const bx = other.x - ball.x;
+                    const by = other.y - ball.y;
+                    const bDist = Math.sqrt(bx * bx + by * by);
+                    const minDist = ball.radius + other.radius;
+                    
+                    if (bDist < minDist) {
+                        const ox = bx / bDist;
+                        const oy = by / bDist;
+                        // 修正重叠
+                        const overlap = minDist - bDist;
+                        ball.x -= ox * overlap * 0.5;
+                        ball.y -= oy * overlap * 0.5;
+                        other.x += ox * overlap * 0.5;
+                        other.y += oy * overlap * 0.5;
+                        
+                        // 弹性动量交换
+                        const kx = ball.vx - other.vx;
+                        const ky = ball.vy - other.vy;
+                        const p = 2 * (ox * kx + oy * ky) / 2;
+                        
+                        ball.vx -= p * ox * elasticity;
+                        ball.vy -= p * oy * elasticity;
+                        other.vx += p * ox * elasticity;
+                        other.vy += p * oy * elasticity;
+                    }
+                }
+                
+                // 绘制球体
+                ctx.beginPath();
+                const grad = ctx.createRadialGradient(ball.x - 4, ball.y - 4, 1, ball.x, ball.y, ball.radius);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.3, ball.color);
+                grad.addColorStop(1, adjustColorBrightness(ball.color, -30));
+                ctx.fillStyle = grad;
+                ctx.shadowColor = 'rgba(0,0,0,0.15)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetY = 4;
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // 重置阴影
+                ctx.shadowOffsetY = 0;
+            });
+            
+            requestAnimationFrame(drawFrame);
+        }
+
+        // 颜色亮度微调函数
+        function adjustColorBrightness(hex, percent) {
+            let num = parseInt(hex.replace("#",""), 16),
+            amt = Math.round(2.55 * percent),
+            R = (num >> 16) + amt,
+            G = (num >> 8 & 0x00FF) + amt,
+            B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<0?0:R:255)*0x10000 + (G<255?G<0?0:G:255)*0x100 + (B<255?B<0?0:B:255)).toString(16).slice(1);
+        }
+
+        // 旋转拧手柄与物理冲量激活
+        const knobBtn = document.getElementById('knob-btn');
+        const knobElem = document.getElementById('knob-element');
+        const exitChute = document.getElementById('chute-exit');
+        
+        let knobRotation = 0;
+
+        knobBtn.addEventListener('click', () => {
+            initAudio();
+            if (isSpinning) return;
+            
+            // 校验次数是否足够
+            const hasSpins = checkAndSpendSpin();
+            if (!hasSpins) {
+                showToast('❌ 今日扭蛋次数不足了哦，输入暗号兑换吧！');
+                setTimeout(() => {
+                    openKeyRedeem();
+                }, 1200);
+                return;
+            }
+
+            // 清理出蛋口历史留存球
+            const oldBall = document.querySelector('.dropped-ball');
+            if (oldBall) oldBall.remove();
+            
+            isSpinning = true;
+            
+            // 旋扭拧动 360 度
+            knobRotation += 360;
+            knobElem.style.transform = `rotate(${knobRotation}deg)`;
+            
+            // 播放旋扭卡顿音效
+            for (let i = 0; i < 6; i++) {
+                setTimeout(playKnobClickSound, i * 250);
+            }
+            
+            // 给所有小球施加无规则高强度碰撞速度
+            balls.forEach(ball => {
+                ball.vx = Math.random() * 26 - 13;
+                ball.vy = -Math.random() * 20 - 10;
+            });
+            
+            // 举例激荡 1.6 秒
+            let shakers = setInterval(() => {
+                balls.forEach(ball => {
+                    if (Math.random() > 0.4) {
+                        ball.vx += Math.random() * 6 - 3;
+                        ball.vy -= Math.random() * 5 + 2;
+                    }
+                });
+            }, 100);
+            
+            // 1.8 秒后出蛋
+            setTimeout(() => {
+                clearInterval(shakers);
+                isSpinning = false;
+                spawnDroppedBall();
+            }, 1800);
+        });
+
+        // 在出蛋口生成一颗可点击剥开的扭蛋球
+        function spawnDroppedBall() {
+            const ballColors = ['#ff7597', '#a17fe0', '#ffd700', '#2193b0', '#eb3070', '#38ef7d'];
+            const chosenColor = ballColors[Math.floor(Math.random() * ballColors.length)];
+            
+            const ballDiv = document.createElement('div');
+            ballDiv.className = 'dropped-ball hint-pulse';
+            ballDiv.style.background = `radial-gradient(circle at 30% 30%, #fff 0%, ${chosenColor} 60%, ${adjustColorBrightness(chosenColor, -40)} 100%)`;
+            
+            ballDiv.addEventListener('click', () => {
+                openCapsuleEgg(chosenColor);
+                ballDiv.remove();
+            });
+            
+            exitChute.appendChild(ballDiv);
+            playPopSound();
+        }
+
+        // 🥚 扭蛋裂开动效
+        function openCapsuleEgg(ballColor) {
+            const overlay = document.getElementById('capsule-open-overlay');
+            const egg = document.getElementById('egg-element');
+            const topHalf = document.getElementById('egg-top-half');
+            const bottomHalf = document.getElementById('egg-bottom-half');
+            const card = document.getElementById('prize-card-element');
+            const btnClose = document.getElementById('btn-close-overlay');
+            
+            // 初始化遮罩层元素状态
+            egg.style.display = 'flex';
+            card.style.display = 'none';
+            btnClose.style.display = 'none';
+            
+            topHalf.style.background = `radial-gradient(circle at 30% 20%, #fff 0%, ${ballColor} 50%, ${adjustColorBrightness(ballColor, -30)} 100%)`;
+            bottomHalf.style.background = `radial-gradient(circle at 30% 80%, #fff 0%, ${ballColor} 50%, ${adjustColorBrightness(ballColor, -40)} 100%)`;
+            
+            egg.classList.remove('open');
+            card.classList.remove('show');
+            
+            overlay.style.display = 'flex';
+            
+            // 800ms 后自动裂开
+            setTimeout(() => {
+                egg.classList.add('open');
+                playPopSound();
+                
+                // 裂开 500ms 后露出抽中的特权卡片
+                setTimeout(() => {
+                    // 随机抽取一张卡片
+                    const rolledPrize = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+                    
+                    // 放入背包
+                    inventory[rolledPrize.id] = (inventory[rolledPrize.id] || 0) + 1;
+                    saveInventory();
+                    renderWallet();
+                    
+                    // 渲染卡片信息
+                    document.getElementById('card-emoji-val').textContent = rolledPrize.emoji;
+                    document.getElementById('card-name-val').textContent = rolledPrize.name;
+                    document.getElementById('card-desc-val').textContent = rolledPrize.desc;
+                    
+                    card.style.background = `linear-gradient(135deg, hsl(${rolledPrize.hue}, 100%, 98%) 0%, hsl(${rolledPrize.hue}, 90%, 92%) 100%)`;
+                    card.style.borderColor = `hsl(${rolledPrize.hue}, 80%, 65%)`;
+                    
+                    egg.style.display = 'none';
+                    card.style.display = 'flex';
+                    btnClose.style.display = 'block';
+                    btnClose.textContent = '收入钱包🎒';
+                    
+                    setTimeout(() => {
+                        card.classList.add('show');
+                        playChimeSound();
+                        triggerMiniHeartConfetti();
+                    }, 50);
+                    
+                    btnClose.onclick = () => {
+                        card.classList.remove('show');
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                        }, 400);
+                    };
+                }, 600);
+            }, 800);
+        }
+
+        // 🏆 小范围心形礼花爆破
+        function triggerMiniHeartConfetti() {
+            const emojis = ['💖', '💕', '✨', '🌸', '❤️'];
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            
+            for (let i = 0; i < 25; i++) {
+                const frag = document.createElement('div');
+                frag.className = 'balloon-fragment';
+                frag.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                frag.style.left = (screenW / 2) + 'px';
+                frag.style.top = (screenH / 2 - 100) + 'px';
+                frag.style.fontSize = Math.random() * 15 + 15 + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 150 + 60;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                
+                frag.style.setProperty('--tx', tx + 'px');
+                frag.style.setProperty('--ty', ty + 'px');
+                
+                document.body.appendChild(frag);
+                setTimeout(() => frag.remove(), 800);
+            }
+        }
+
+        // 🌌 繁星粒子背景 Canvas
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let width = bgCanvas.width = window.innerWidth;
+        let height = bgCanvas.height = window.innerHeight;
+        
+        let stars = [];
+        for (let i = 0; i < 40; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.6 + 0.2,
+                flicker: Math.random() * 0.02 + 0.005,
+                angle: Math.random() * Math.PI * 2
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            width = bgCanvas.width = window.innerWidth;
+            height = bgCanvas.height = window.innerHeight;
+        });
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.angle += star.flicker;
+                const alpha = star.opacity + Math.sin(star.angle) * 0.2;
+                bgCtx.fillStyle = currentTheme === 'light' 
+                    ? `rgba(255, 117, 151, ${alpha})`
+                    : `rgba(161, 127, 224, ${alpha})`;
+                bgCtx.beginPath();
+                bgCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                bgCtx.fill();
+                star.y += star.size * 0.06;
+                if (star.y > height) {
+                    star.y = -10;
+                    star.x = Math.random() * width;
+                }
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        // 启动物理与初始化
+        initPhysics();
+        drawFrame();
+        animateBg();
+        renderWallet();
+    </script>
+</body>
+</html>

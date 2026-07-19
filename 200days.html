@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>在一起200天纪念日 · 珊珊 & 哲哲</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-light: rgba(255, 117, 151, 0.2);
+            --primary-dark: #e65275;
+            --secondary: #a17fe0;
+            --secondary-light: rgba(161, 127, 224, 0.2);
+            --text-color: #5d4f55;
+            --text-muted: #8c7880;
+            --bg-grad: linear-gradient(135deg, #fff2f5 0%, #f6f0ff 50%, #fff0f3 100%);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.5);
+            --shadow-glass: 0 12px 40px rgba(255, 140, 160, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --primary: #a17fe0;
+            --primary-light: rgba(161, 127, 224, 0.25);
+            --primary-dark: #d5b8ff;
+            --secondary: #00cec9;
+            --secondary-light: rgba(0, 206, 201, 0.15);
+            --bg-grad: linear-gradient(135deg, #09080f 0%, #130f24 50%, #07070a 100%);
+            --card-bg: rgba(20, 18, 30, 0.65);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --text-color: #e0d0d8;
+            --text-muted: #9c8e96;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 60px;
+            transition: background 0.8s ease, color 0.8s ease;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 极美入场动画 */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-grad);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        #intro-overlay.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-num {
+            font-size: 8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(255, 117, 151, 0.2);
+            animation: bounceIn 1.5s ease;
+            position: relative;
+        }
+
+        .intro-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 20px;
+            letter-spacing: 4px;
+            color: var(--text-color);
+            opacity: 0;
+            animation: fadeIn 1s 1s forwards;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* 🔐 密码解锁遮罩样式 */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(30, 24, 46, 0.95) 0%, rgba(12, 10, 18, 0.98) 100%);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 9998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        #password-overlay.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .password-box {
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            padding: 40px 30px;
+            border-radius: 28px;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            box-shadow: var(--shadow-glass);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .lock-icon {
+            font-size: 3rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            animation: floatLock 3s infinite ease-in-out;
+        }
+
+        @keyframes floatLock {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .password-box h3 {
+            font-size: 1.45rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .lock-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .pw-input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        #pw-input {
+            flex: 1;
+            max-width: 200px;
+            padding: 12px 18px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 117, 151, 0.2);
+            outline: none;
+            font-size: 1rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        #pw-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(255, 117, 151, 0.2);
+            background: white;
+        }
+
+        #pw-submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            padding: 12px 26px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 117, 151, 0.25);
+            transition: all 0.3s;
+        }
+
+        #pw-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 117, 151, 0.35);
+        }
+
+        .pw-hint {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 117, 151, 0.2);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            text-align: left;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* 主体布局 */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 10;
+        }
+
+        /* 顶部毛玻璃大卡片 */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            border-radius: 24px;
+            padding: 35px 25px;
+            box-shadow: var(--shadow-glass);
+            position: relative;
+            overflow: hidden;
+            /* 3D 转换支持 */
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.8s, border 0.8s;
+        }
+
+        /* 鼠标追踪流光描边 */
+        .glass-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            padding: 1.5px;
+            background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 117, 151, 0.45) 0%, rgba(161, 127, 224, 0.25) 50%, transparent 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        [data-theme="dark"] .glass-panel::before {
+            background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(161, 127, 224, 0.45) 0%, rgba(0, 206, 201, 0.25) 50%, transparent 100%);
+        }
+
+        .glass-panel:hover::before {
+            opacity: 1;
+        }
+
+        .glass-panel:hover {
+            box-shadow: var(--shadow-glass), 0 20px 50px rgba(255, 117, 151, 0.18);
+        }
+
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+            mix-blend-mode: overlay;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .glass-panel:hover .card-glare {
+            opacity: 1;
+        }
+
+        /* 200天核心数字面板 */
+        .hero-panel {
+            text-align: center;
+        }
+
+        .heart-icon {
+            font-size: 3.5rem;
+            color: var(--primary-dark);
+            animation: beat 1.2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.2); }
+            50% { transform: scale(1.15); }
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 15px 0 10px;
+            background: linear-gradient(to right, var(--primary-dark), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .anniversary-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(255,117,151,0.2);
+        }
+
+        /* 倒计时与正计时 */
+        .time-box-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.3);
+            border: var(--border-glass);
+            border-radius: 16px;
+            padding: 15px;
+            min-width: 75px;
+            text-align: center;
+            transition: all 0.5s;
+        }
+
+        .time-box .num {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: block;
+        }
+
+        .time-box .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* 统计看板 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.25);
+            border: var(--border-glass);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-title {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        /* 浪漫时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 15px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary-light), var(--secondary-light));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .timeline-content h4 {
+            font-size: 1.05rem;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 专属情书 */
+        .letter-content {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-color);
+            position: relative;
+            min-height: 120px;
+        }
+
+        .letter-content p {
+            margin-bottom: 15px;
+            text-indent: 2em;
+        }
+
+        .letter-content .signature {
+            text-align: right;
+            margin-top: 30px;
+            font-weight: 700;
+        }
+
+        /* 主题切换与返回按钮 */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: var(--border-glass);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-glass);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .theme-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            padding: 0;
+            justify-content: center;
+        }
+
+        /* 音乐挂件 */
+        .music-float {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            backdrop-filter: blur(10px);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s;
+        }
+
+        .music-float.playing {
+            animation: spin 6s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 🎮 恋爱翻牌对对碰游戏样式 */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .game-card {
+            aspect-ratio: 3/4;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .game-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .game-card.matched {
+            transform: rotateY(180deg) scale(0.95);
+            pointer-events: none;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: var(--border-glass);
+            box-shadow: var(--shadow-glass);
+        }
+
+        .card-front {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            transition: background 0.3s;
+        }
+
+        .game-card:hover .card-front {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, rgba(255, 117, 151, 0.3) 0%, rgba(161, 127, 224, 0.3) 100%);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-back .emoji {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .card-back .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.4);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .game-card.matched .card-back {
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* 🔒 情书锁屏样式 */
+        .letter-lock-container {
+            position: relative;
+        }
+
+        .letter-lock {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(60px);
+            -webkit-backdrop-filter: blur(60px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
+            transition: all 0.8s ease;
+        }
+
+        .letter-lock.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .lock-box {
+            text-align: center;
+            padding: 30px;
+            max-width: 380px;
+        }
+
+        .lock-heart-icon {
+            font-size: 3rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            animation: pulseHeart 2s infinite;
+        }
+
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .lock-box h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .lock-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .lock-progress {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            background: rgba(255, 255, 255, 0.5);
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid rgba(255, 117, 151, 0.2);
+        }
+
+        /* 📸 拍立得画廊样式 */
+        .gallery-polaroid-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .polaroid-item {
+            background: white;
+            padding: 12px 12px 24px 12px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            transform: rotate(var(--rotation, 0deg));
+        }
+
+        .polaroid-item:nth-child(even) {
+            --rotation: 2deg;
+        }
+
+        .polaroid-item:nth-child(odd) {
+            --rotation: -2deg;
+        }
+
+        .polaroid-item:hover {
+            transform: scale(1.08) rotate(0deg) translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            z-index: 10;
+        }
+
+        .polaroid-media-wrapper {
+            position: relative;
+            aspect-ratio: 1/1;
+            width: 100%;
+            overflow: hidden;
+            background: #f0f0f0;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .polaroid-media-wrapper img,
+        .polaroid-media-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .polaroid-item:hover .polaroid-media-wrapper img,
+        .polaroid-item:hover .polaroid-media-wrapper video {
+            transform: scale(1.05);
+        }
+
+        .media-play-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 117, 151, 0.8);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .polaroid-item:hover .media-play-indicator {
+            background: var(--primary);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .polaroid-caption {
+            margin-top: 15px;
+            font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', serif;
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* 🖼️ 媒体灯箱 (Lightbox) */
+        .media-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 10, 18, 0.92);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 100000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .media-lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .media-lightbox-close {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .media-lightbox-close:hover {
+            background: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .media-lightbox-content {
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+        }
+
+        .media-lightbox.active .media-lightbox-content {
+            transform: scale(1);
+        }
+
+        #lightbox-media-container {
+            width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #lightbox-media-container img,
+        #lightbox-media-container video {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+        }
+
+        .media-lightbox-caption {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1rem;
+            text-align: center;
+            font-weight: 700;
+            line-height: 1.6;
+            max-width: 600px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* 🎈 气球放飞挂件样式 */
+        .balloon-spawner {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(255, 117, 151, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .balloon-spawner:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 117, 151, 0.6);
+        }
+
+        .balloon {
+            position: fixed;
+            bottom: -120px;
+            width: 75px;
+            height: 90px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 192, 203, 0.95), rgba(255, 105, 180, 0.9) 70%, rgba(219, 112, 147, 0.95));
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            z-index: 999;
+            cursor: pointer;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.1), 0 10px 20px rgba(255, 105, 180, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 800;
+            font-size: 0.9rem;
+            user-select: none;
+            animation: sway 4s ease-in-out infinite alternate;
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 8px solid rgba(255, 105, 180, 0.9);
+        }
+
+        .balloon-string {
+            position: absolute;
+            bottom: -58px;
+            left: 50%;
+            width: 2px;
+            height: 50px;
+            background: rgba(255, 105, 180, 0.4);
+            transform-origin: top center;
+        }
+
+        @keyframes sway {
+            0% { transform: translateX(0) rotate(-5deg); }
+            100% { transform: translateX(20px) rotate(5deg); }
+        }
+
+        /* 气球爆炸碎片 */
+        .balloon-fragment {
+            position: fixed;
+            pointer-events: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1000;
+            animation: fragmentExplode 0.8s ease-out forwards;
+        }
+
+        @keyframes fragmentExplode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .gallery-polaroid-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .intro-num { font-size: 5rem; }
+            .time-box { min-width: 65px; padding: 10px; }
+            .time-box .num { font-size: 1.7rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            .card-back .emoji {
+                font-size: 1.6rem;
+            }
+            .card-back .label {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+            }
+            .gallery-polaroid-grid {
+                grid-template-columns: 1fr;
+                max-width: 260px;
+                margin: 0 auto;
+                gap: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子特效 Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- 音频元素 -->
+    <audio id="local-music" loop>
+        <source src="other2/gaobaiqiqiu.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 音乐悬浮按钮 -->
+    <div class="music-float" id="music-btn" title="点击播放/暂停背景音乐">
+        <i class="fas fa-music" style="color: var(--primary-dark);"></i>
+    </div>
+
+    <!-- 入场动画 -->
+    <div id="intro-overlay">
+        <div class="intro-num">200</div>
+        <div class="intro-text">在一起的第 200 天 · 专属浪漫纪念</div>
+    </div>
+
+    <!-- 🔐 密码保护遮罩 -->
+    <div id="password-overlay" style="display: none;">
+        <div class="password-box">
+            <div class="lock-icon"><i class="fas fa-lock"></i></div>
+            <h3>专属浪漫回忆已锁定 🔐</h3>
+            <p class="lock-desc">这是属于珊珊与哲哲的 200 天纪念日回忆空间。请输入我们的专属暗号进行解锁：</p>
+            <div class="pw-input-wrapper">
+                <input type="password" id="pw-input" placeholder="输入解锁密码..." autofocus>
+                <button id="pw-submit-btn">验证解锁</button>
+            </div>
+            <div id="pw-error-msg" style="color: #ff3d68; font-size: 0.85rem; margin-top: 10px; font-weight: 700; opacity: 0; transition: opacity 0.3s;">⚠️ 密码有误，请再想想哦</div>
+            <div class="pw-hint">
+                <p><i class="fas fa-info-circle"></i> 提示：我们复合日期的月份与天数结合（或问问哲哲）</p>
+                <p style="margin-top: 8px; color: var(--primary-dark); font-weight: 700;"><i class="fas fa-gift"></i> 注：到在一起第 200 天当天，本页面将自动解密解锁！</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 头部按钮栏 -->
+        <div class="action-bar">
+            <a href="index.html" class="btn-action"><i class="fas fa-home"></i> 返回时光小屋</a>
+            <button id="theme-btn" class="btn-action theme-btn" title="切换主题"><i class="fas fa-moon"></i></button>
+        </div>
+
+        <!-- 200天里程碑中心区 -->
+        <div class="glass-panel hero-panel">
+            <div class="card-glare"></div>
+            <div class="heart-icon"><i class="fas fa-heart"></i></div>
+            <h2 class="hero-title">白珊珊 & 陈祖哲</h2>
+            <div class="anniversary-badge" id="milestone-status">200天纪念日倒计时</div>
+
+            <!-- 200天倒计时时钟 -->
+            <div class="time-box-wrapper" id="countdown-wrapper">
+                <div class="time-box"><span class="num" id="d-days">00</span><span class="label">天</span></div>
+                <div class="time-box"><span class="num" id="d-hours">00</span><span class="label">时</span></div>
+                <div class="time-box"><span class="num" id="d-minutes">00</span><span class="label">分</span></div>
+                <div class="time-box"><span class="num" id="d-seconds">00</span><span class="label">秒</span></div>
+            </div>
+            
+            <p id="countdown-subtext" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 10px;">
+                期待 2026年8月5日 属于我们的里程碑瞬间 ✨
+            </p>
+        </div>
+
+        <!-- 爱意统计数据 -->
+        <div class="glass-panel">
+            <div class="card-glare"></div>
+            <h3 style="color: var(--primary-dark); margin-bottom: 20px;"><i class="fas fa-chart-line"></i> 我们的爱意数据看板</h3>
+            
+            <!-- 实时在一起正计时时间（精确到秒） -->
+            <div style="text-align: center; margin-bottom: 25px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 16px;">
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">我们重新牵手已过去：</div>
+                <div id="live-together-counter" style="font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); word-break: break-all;">
+                    正在计算中...
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">初次相识至今</div>
+                    <div class="stat-val" id="days-since-meet">0 天</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">复合至今</div>
+                    <div class="stat-val" id="days-since-reunion">0 天</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">我们写下的回忆</div>
+                    <div class="stat-val">365+ 条</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">守护的约定</div>
+                    <div class="stat-val">100% 坚定</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时光旅程时间线 -->
+        <div class="glass-panel">
+            <div class="card-glare"></div>
+            <h3 style="color: var(--primary-dark); margin-bottom: 20px;"><i class="fas fa-route"></i> 我们的时光旅程</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024年5月3日</div>
+                    <div class="timeline-content">
+                        <h4>初次相遇</h4>
+                        <p>奇妙的缘分悄然拉开序幕，那一天的阳光下，我们开始了属于两个人的轨道。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">风雨同舟</div>
+                    <div class="timeline-content">
+                        <h4>彼此想念与拉扯</h4>
+                        <p>跨过阻碍，虽然有过泪水和误会，但两颗炽热的心从未真正远离彼此。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2026年1月18日</div>
+                    <div class="timeline-content">
+                        <h4>重新走到了一起</h4>
+                        <p>“幸好回头还是你。” 我们以更成熟的姿态，重新牵起了对方的手，坚定走下去。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2026年8月5日</div>
+                    <div class="timeline-content">
+                        <h4>在一起的 200 天</h4>
+                        <p>迎来了我们全新的里程碑！以后的每一个200天，2000天，20000天，我都要在你身边。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📸 我们的甜蜜回忆映像馆 -->
+        <div class="glass-panel">
+            <div class="card-glare"></div>
+            <h3 style="color: var(--primary-dark); margin-bottom: 10px;"><i class="fas fa-camera-retro"></i> 甜蜜回忆映像馆 📸</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;">点击卡片可全屏沉浸式观看我们的甜蜜瞬间（含视频和照片）~</p>
+            
+            <div class="gallery-polaroid-grid">
+                <!-- Card 1: 视频 1 (Poster 1.jpg) -->
+                <div class="polaroid-item" onclick="openMediaLightbox('video', 'other2/1 (1).mp4', '每一次看到你的笑脸，我的世界就充满了阳光。❤️')">
+                    <div class="polaroid-media-wrapper">
+                        <video src="other2/1 (1).mp4" muted loop playsinline></video>
+                        <div class="media-play-indicator"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="polaroid-caption">有你的欢笑瞬间 🎥</div>
+                </div>
+                
+                <!-- Card 2: 照片 2 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('image', 'other2/1 (2).jpg', '初次相见时的心动，如今依然在胸膛跳动。✨')">
+                    <div class="polaroid-media-wrapper">
+                        <img src="other2/1 (2).jpg" alt="照片">
+                    </div>
+                    <div class="polaroid-caption">心动的一瞬间 🖼️</div>
+                </div>
+
+                <!-- Card 3: 视频 2 (Poster 3.jpg) -->
+                <div class="polaroid-item" onclick="openMediaLightbox('video', 'other2/1 (2).mp4', '牵着手慢慢走，走过属于我们的每一个四季。🍂')">
+                    <div class="polaroid-media-wrapper">
+                        <video src="other2/1 (2).mp4" muted loop playsinline></video>
+                        <div class="media-play-indicator"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="polaroid-caption">属于我们的日常 🎥</div>
+                </div>
+
+                <!-- Card 4: 照片 4 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('image', 'other2/1 (4).jpg', '牵手是我们的约定，一起走向很远的以后。🐾')">
+                    <div class="polaroid-media-wrapper">
+                        <img src="other2/1 (4).jpg" alt="照片">
+                    </div>
+                    <div class="polaroid-caption">爱意的200天和装屁屁 🖼️</div>
+                </div>
+
+                <!-- Card 5: 视频 3 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('video', 'other2/1 (3).mp4', '爱意在眼神中流淌，这次换我来守护你。🔒')">
+                    <div class="polaroid-media-wrapper">
+                        <video src="other2/1 (3).mp4" muted loop playsinline></video>
+                        <div class="media-play-indicator"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="polaroid-caption">甜蜜的对视 🎥</div>
+                </div>
+
+                <!-- Card 6: 照片 3 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('image', 'other2/1 (3).jpg', '生活中的每一刻琐碎，因为有你都变得格外甜。🧁')">
+                    <div class="polaroid-media-wrapper">
+                        <img src="other2/1 (3).jpg" alt="照片">
+                    </div>
+                    <div class="polaroid-caption">甜蜜的点滴 🖼️</div>
+                </div>
+
+                <!-- Card 7: 视频 4 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('video', 'other2/1 (4).mp4', '风雨过后，最甜的依旧是你在怀里的温度。🫂')">
+                    <div class="polaroid-media-wrapper">
+                        <video src="other2/1 (4).mp4" muted loop playsinline></video>
+                        <div class="media-play-indicator"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="polaroid-caption">深情相抱 🎥</div>
+                </div>
+
+                <!-- Card 8: 照片 1 -->
+                <div class="polaroid-item" onclick="openMediaLightbox('image', 'other2/1 (1).jpg', '在一起第 200 天，这是我们的全新起点。👑')">
+                    <div class="polaroid-media-wrapper">
+                        <img src="other2/1 (1).jpg" alt="照片">
+                    </div>
+                    <div class="polaroid-caption">两百天快乐 🖼️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎮 恋爱记忆对对碰游戏 -->
+        <div class="glass-panel">
+            <div class="card-glare"></div>
+            <h3 style="color: var(--primary-dark); margin-bottom: 10px;"><i class="fas fa-gamepad"></i> 恋爱记忆对对碰 🎮</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;">翻开卡片匹配我们甜蜜的相处点滴，全部匹配成功即可解锁下方的情书哦！</p>
+            
+            <div class="game-grid" id="game-grid">
+                <!-- JS 自动注入 12 张牌 -->
+            </div>
+        </div>
+
+        <!-- 专属情书 -->
+        <div class="glass-panel letter-lock-container">
+            <div class="card-glare"></div>
+            
+            <!-- 🔒 情书锁屏遮罩 -->
+            <div id="letter-lock-overlay" class="letter-lock">
+                <div class="lock-box">
+                    <div class="lock-heart-icon"><i class="fas fa-lock"></i></div>
+                    <h4>🔒 哲哲的 200 天真心话情书</h4>
+                    <p>本信纸已被甜蜜封印。珊珊需要先完成上方的“恋爱记忆对对碰”挑战，才能自动解锁阅读哦！</p>
+                    <div class="lock-progress">通关进度：<span id="game-progress-text">0%</span></div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary-dark); margin-bottom: 20px;"><i class="fas fa-heart"></i> 哲哲的 200 天真心话</h3>
+            <div class="letter-content" id="love-letter">
+                <!-- 动态打字效果 -->
+                <p>亲爱的珊珊宝贝：</p>
+                <p>不知不觉中，从我们重新牵手的那一天算起，竟然快要到200天了。每一天和你聊天、分享生活，都是我觉得最踏实、最快乐的时候。</p>
+                <p>谢谢你的温柔，谢谢你愿意回头，也谢谢你对我的包容。我知道我有很多做的不够完美的地方，但因为是你，我想变得更好，想给你最坚实温暖的港湾。</p>
+                <p>这200天只是个起点，未来的每一个日日夜夜，我都会一直握紧你的手，一起去看海，去吃好吃的，走过每一个春夏秋冬。我爱你，装屁屁！</p>
+                <div class="signature">永远爱你的：哲哲 ❤️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🖼️ 专属媒体灯箱 (Lightbox) -->
+    <div id="media-lightbox" class="media-lightbox" onclick="closeMediaLightbox()">
+        <span class="media-lightbox-close" onclick="event.stopPropagation(); closeMediaLightbox();"><i class="fas fa-times"></i></span>
+        <div class="media-lightbox-content" onclick="event.stopPropagation();">
+            <div id="lightbox-media-container"></div>
+            <div id="lightbox-media-caption" class="media-lightbox-caption"></div>
+        </div>
+    </div>
+
+    <!-- 🎈 气球放飞悬浮组件 -->
+    <div class="balloon-spawner" id="balloon-btn" title="放飞我们的爱意气球">
+        <i class="fas fa-heart"></i>
+    </div>
+
+    <script>
+        // 🛡️ 安全读取和存入 LocalStorage, 防止在本地 file:// 协议或某些隐私模式下抛出安全异常导致整个页面 JS 崩溃卡死
+        function safeGet(key, defaultVal = '') {
+            try {
+                return localStorage.getItem(key) || defaultVal;
+            } catch (e) {
+                try {
+                    return sessionStorage.getItem(key) || defaultVal;
+                } catch (err) {
+                    return window[`__safe_storage_${key}`] || defaultVal;
+                }
+            }
+        }
+
+        function safeSet(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch (e) {
+                try {
+                    sessionStorage.setItem(key, val);
+                } catch (err) {
+                    window[`__safe_storage_${key}`] = val;
+                }
+            }
+        }
+
+        // 自动管理主题
+        const themeBtn = document.getElementById('theme-btn');
+        let currentTheme = safeGet('theme', 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            safeSet('theme', currentTheme);
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            themeBtn.innerHTML = currentTheme === 'light' 
+                ? '<i class="fas fa-moon"></i>' 
+                : '<i class="fas fa-sun"></i>';
+        }
+
+        // 兼容 iOS/Safari 的安全日期转换方法，避免 Invalid Date 或 NaN 报错
+        function parseSafeDate(str) {
+            if (!str) return new Date();
+            if (str instanceof Date) return str;
+            if (typeof str !== 'string') return new Date(str);
+            const cleaned = str.trim().replace(/-/g, '/').replace('T', ' ');
+            return new Date(cleaned);
+        }
+
+        // 🔐 密码解锁校验逻辑与当天自动解锁
+        const now = new Date();
+        let milestoneDate = parseSafeDate(safeGet('config_countdown_target', '2026-08-05') + 'T00:00:00');
+        const is200DaysReached = now >= milestoneDate;
+
+        const pwOverlay = document.getElementById('password-overlay');
+        const pwInput = document.getElementById('pw-input');
+        const pwSubmit = document.getElementById('pw-submit-btn');
+        const pwError = document.getElementById('pw-error-msg');
+        const pwBox = pwOverlay ? pwOverlay.querySelector('.password-box') : null;
+
+        // 如果还没到 200 天，则启用密码保护并强制渲染
+        if (!is200DaysReached) {
+            if (pwOverlay) {
+                pwOverlay.style.display = 'flex';
+            }
+        } else {
+            if (pwOverlay) {
+                pwOverlay.style.display = 'none';
+            }
+        }
+
+        // 解锁动作
+        function attemptUnlock() {
+            if (!pwInput || !pwOverlay) return;
+            const inputVal = pwInput.value.trim();
+            if (inputVal === '100417') {
+                // 密码正确！
+                pwOverlay.classList.add('unlocked');
+                showToast('🔑 专属浪漫空间已开启！');
+                setTimeout(() => {
+                    pwOverlay.style.display = 'none';
+                }, 800);
+                
+                // 尝试开启音乐自动播放
+                const bgMusic = document.getElementById('local-music');
+                if (bgMusic) {
+                    bgMusic.play().then(() => {
+                        const musicBtn = document.getElementById('music-btn');
+                        if (musicBtn) musicBtn.classList.add('playing');
+                    }).catch(e => console.log("音频播放阻挡:", e));
+                }
+            } else {
+                // 密码错误！
+                if (pwError) {
+                    pwError.style.opacity = '1';
+                }
+                if (pwBox) {
+                    pwBox.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        pwBox.style.animation = '';
+                    }, 500);
+                }
+                pwInput.value = '';
+                pwInput.focus();
+            }
+        }
+
+        if (pwSubmit) {
+            pwSubmit.addEventListener('click', attemptUnlock);
+        }
+        if (pwInput) {
+            pwInput.focus();
+            pwInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    attemptUnlock();
+                }
+            });
+        }
+
+        // 自定义精美 Toast 提示
+        function showToast(text) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                color: white;
+                padding: 12px 24px;
+                border-radius: 50px;
+                box-shadow: 0 10px 25px rgba(255, 117, 151, 0.35);
+                z-index: 100000;
+                font-weight: 700;
+                font-size: 0.9rem;
+                opacity: 0;
+                transition: opacity 0.3s, transform 0.3s;
+            `;
+            toast.textContent = text;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 50);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(0px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 入场屏淡出
+        setTimeout(() => {
+            document.getElementById('intro-overlay').classList.add('fade-out');
+        }, 2200);
+
+        // 3D 倾斜与流光追踪交互逻辑
+        function init3DTiltEffect() {
+            const panels = document.querySelectorAll('.glass-panel');
+            panels.forEach(panel => {
+                panel.addEventListener('mousemove', function(e) {
+                    if (window.matchMedia("(max-width: 768px)").matches) return;
+
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+
+                    const tiltX = (y / (rect.height / 2)) * -6;
+                    const tiltY = (x / (rect.width / 2)) * 6;
+
+                    this.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-5px)`;
+                    this.style.transition = 'transform 0.05s ease-out';
+
+                    const px = e.clientX - rect.left;
+                    const py = e.clientY - rect.top;
+                    this.style.setProperty('--mouse-x', `${px}px`);
+                    this.style.setProperty('--mouse-y', `${py}px`);
+
+                    const glare = this.querySelector('.card-glare');
+                    if (glare) {
+                        const glareX = (px / rect.width) * 100;
+                        const glareY = (py / rect.height) * 100;
+                        glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, ${currentTheme === 'light' ? '0.22' : '0.12'}) 0%, transparent 60%)`;
+                    }
+                });
+
+                panel.addEventListener('mouseleave', function() {
+                    if (window.matchMedia("(max-width: 768px)").matches) return;
+                    this.style.transform = 'rotateX(0) rotateY(0) translateY(0)';
+                    this.style.transition = 'transform 0.5s ease';
+                });
+            });
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', e => {
+                    if (!window.matchMedia("(max-width: 768px)").matches) return;
+                    if (!e.beta || !e.gamma) return;
+                    const beta = Math.max(Math.min(e.beta, 70), 20) - 45;
+                    const gamma = Math.max(Math.min(e.gamma, 25), -25);
+                    const tiltX = (beta / 25) * 6;
+                    const tiltY = (gamma / 25) * -6;
+
+                    panels.forEach(p => {
+                        p.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-3px)`;
+                        p.style.transition = 'transform 0.1s ease';
+                        const px = 50 + (gamma / 25) * 50;
+                        const py = 50 + (beta / 25) * 50;
+                        p.style.setProperty('--mouse-x', `${px}%`);
+                        p.style.setProperty('--mouse-y', `${py}%`);
+                    });
+                });
+            }
+        }
+        init3DTiltEffect();
+
+        // 粒子背景 Canvas
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let stars = [];
+        const maxStars = 40;
+
+        for (let i = 0; i < maxStars; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.6 + 0.2,
+                flicker: Math.random() * 0.02 + 0.005,
+                angle: Math.random() * Math.PI * 2
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.angle += star.flicker;
+                const alpha = star.opacity + Math.sin(star.angle) * 0.2;
+                ctx.fillStyle = currentTheme === 'light' 
+                    ? `rgba(255, 117, 151, ${alpha})`
+                    : `rgba(161, 127, 224, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.y += star.size * 0.08;
+                if (star.y > height) {
+                    star.y = -10;
+                    star.x = Math.random() * width;
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 倒计时逻辑
+        let reunionDate = parseSafeDate(safeGet('config_reunion_date', '2026-01-18') + 'T00:00:00');
+        let meetDate = parseSafeDate(safeGet('config_meet_date', '2024-05-03') + 'T00:00:00');
+
+        function updateAllTimers() {
+            const now = new Date();
+
+            // 1. 初次相识至今
+            const diffMeet = now - meetDate;
+            document.getElementById('days-since-meet').textContent = Math.floor(diffMeet / (1000 * 60 * 60 * 24)) + ' 天';
+
+            // 2. 复合至今
+            const diffReunion = now - reunionDate;
+            document.getElementById('days-since-reunion').textContent = Math.floor(diffReunion / (1000 * 60 * 60 * 24)) + ' 天';
+
+            // 3. 精确在一起的实时计时
+            const liveDays = Math.floor(diffReunion / (1000 * 60 * 60 * 24));
+            const liveHours = Math.floor((diffReunion % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const liveMins = Math.floor((diffReunion % (1000 * 60 * 60)) / (1000 * 60));
+            const liveSecs = Math.floor((diffReunion % (1000 * 60)) / 1000);
+            document.getElementById('live-together-counter').textContent = 
+                `${liveDays}天 ${liveHours}小时 ${liveMins}分 ${liveSecs}秒`;
+
+            // 4. 200天纪念日倒计时
+            const diffMilestone = milestoneDate - now;
+            const statusBadge = document.getElementById('milestone-status');
+            const subtext = document.getElementById('countdown-subtext');
+
+            if (diffMilestone <= 0) {
+                statusBadge.textContent = '🎉 我们已在一起200天啦！';
+                statusBadge.style.background = 'linear-gradient(135deg, #00cec9, #a17fe0)';
+                document.getElementById('countdown-wrapper').innerHTML = 
+                    '<div style="font-size: 2.2rem; font-weight: 800; color: #ff7597; padding: 10px;">✨ 甜蜜里程碑解锁 ✨</div>';
+                subtext.innerHTML = '在这个特别的日子，愿我们的明天更加灿烂幸福 ❤️';
+            } else {
+                statusBadge.textContent = '💖 200天倒数日';
+                const d = Math.floor(diffMilestone / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diffMilestone % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diffMilestone % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diffMilestone % (1000 * 60)) / 1000);
+
+                document.getElementById('d-days').textContent = d.toString().padStart(2, '0');
+                document.getElementById('d-hours').textContent = h.toString().padStart(2, '0');
+                document.getElementById('d-minutes').textContent = m.toString().padStart(2, '0');
+                document.getElementById('d-seconds').textContent = s.toString().padStart(2, '0');
+            }
+        }
+
+        updateAllTimers();
+        setInterval(updateAllTimers, 1000);
+
+        // 专属情书高级打字机动效 (滚动视口触发)
+        function initTypewriter() {
+            const letterEl = document.getElementById('love-letter');
+            if (!letterEl) return;
+
+            const paragraphsText = [
+                { tag: 'p', text: '亲爱的珊珊宝贝：' },
+                { tag: 'p', text: '不知不觉中，从我们重新牵手的那一天算起，竟然快要到200天了。每一天和你聊天、分享生活，都是我觉得最踏实、最快乐的时候。' },
+                { tag: 'p', text: '谢谢你的温柔，谢谢你愿意回头，也谢谢你对我的包容。我知道我有很多做的不够完美的地方，但因为是你，我想变得更好，想给你最坚实温暖的港湾。' },
+                { tag: 'p', text: '这200天只是个起点，未来的每一个日日夜夜，我都会一直握紧你的手，一起去看海，去吃好吃的，走过每一个春夏秋冬。我爱你，珊珊！' },
+                { tag: 'div', text: '永远爱你的：哲哲 ❤️', class: 'signature' }
+            ];
+
+            letterEl.innerHTML = ''; // 清空
+
+            let pIndex = 0;
+            let charIndex = 0;
+            let currentEl = null;
+
+            function typeNextChar() {
+                if (pIndex >= paragraphsText.length) return;
+
+                const item = paragraphsText[pIndex];
+
+                if (charIndex === 0) {
+                    currentEl = document.createElement(item.tag);
+                    if (item.class) currentEl.className = item.class;
+                    letterEl.appendChild(currentEl);
+                }
+
+                if (charIndex < item.text.length) {
+                    currentEl.textContent += item.text.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeNextChar, Math.random() * 40 + 25);
+                } else {
+                    pIndex++;
+                    charIndex = 0;
+                    setTimeout(typeNextChar, 600);
+                }
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(typeNextChar, 500);
+                        observer.unobserve(letterEl);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            observer.observe(letterEl);
+        }
+
+        // 🔊 Web Audio API 声音合成引擎
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudioContext() {
+            if (!audioCtx && AudioContextClass) {
+                audioCtx = new AudioContextClass();
+            }
+        }
+
+        function playPopSound() {
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch(e) {}
+        }
+        
+        function playMatchSound() {
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                playTone(523.25, now, 0.15); // C5
+                playTone(659.25, now + 0.1, 0.25); // E5
+            } catch(e) {}
+        }
+
+        function playTone(freq, start, duration) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.12, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+            osc.start(start);
+            osc.stop(start + duration);
+        }
+
+        // 🎮 恋爱翻牌对对碰游戏逻辑
+        const GAME_DATA = [
+            { emoji: '☕', label: '喝奶茶', quote: '每次你嘴馋想喝茶百道，我都想陪你一起喝，甜度必须是全糖加椰果~' },
+            { emoji: '🎬', label: '看电影', quote: '爆米花的甜味，都不及在黑暗中你靠在我肩膀时的温柔。' },
+            { emoji: '🫂', label: '抱抱你', quote: '把你紧紧抱进怀里的那一刻，我感觉自己拥有了全世界。' },
+            { emoji: '🍔', label: '吃大餐', quote: '把你养得胖胖的，是我最幸福的成就感！' },
+            { emoji: '🗺️', label: '去旅行', quote: '世界很大，但最美的风景就是你在我身边的侧脸。' },
+            { emoji: '💖', label: '在一起', quote: '兜兜转转，幸好依旧是你。200天快乐，我的宝贝！' }
+        ];
+
+        let shuffledCards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let isBoardLocked = false;
+        let matchedPairs = 0;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('game-grid');
+            if (!grid) return;
+            
+            // 复制数据，做成 12 张卡片
+            const cardsPool = [...GAME_DATA, ...GAME_DATA];
+            
+            // 随机洗牌 (Fisher-Yates Shuffle)
+            for (let i = cardsPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardsPool[i], cardsPool[j]] = [cardsPool[j], cardsPool[i]];
+            }
+            
+            shuffledCards = cardsPool;
+            grid.innerHTML = '';
+            
+            shuffledCards.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.setAttribute('data-index', index);
+                card.setAttribute('data-emoji', item.emoji);
+                
+                card.innerHTML = `
+                    <div class="card-face card-front"><i class="fas fa-heart"></i></div>
+                    <div class="card-face card-back">
+                        <span class="emoji">${item.emoji}</span>
+                        <span class="label">${item.label}</span>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => handleCardClick(card));
+                grid.appendChild(card);
+            });
+            
+            // 重置状态
+            firstCard = null;
+            secondCard = null;
+            isBoardLocked = false;
+            matchedPairs = 0;
+            updateLockProgress();
+        }
+
+        function handleCardClick(card) {
+            initAudioContext();
+            if (isBoardLocked) return;
+            if (card === firstCard) return;
+            if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            
+            playPopSound();
+            card.classList.add('flipped');
+            
+            if (!firstCard) {
+                firstCard = card;
+                return;
+            }
+            
+            secondCard = card;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            isBoardLocked = true;
+            const index1 = parseInt(firstCard.getAttribute('data-index'));
+            const index2 = parseInt(secondCard.getAttribute('data-index'));
+            const item1 = shuffledCards[index1];
+            const item2 = shuffledCards[index2];
+            
+            if (item1.emoji === item2.emoji) {
+                // 配对成功！
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                
+                matchedPairs++;
+                updateLockProgress();
+                playMatchSound();
+                
+                // 弹窗展示对应的回忆情话
+                setTimeout(() => {
+                    showToast(`静悄悄的情话...\n💕 【${item1.label}】\n${item1.quote}`, 4500);
+                }, 400);
+
+                resetTurn();
+                
+                // 检查是否通关
+                if (matchedPairs === GAME_DATA.length) {
+                    setTimeout(handleGameWin, 1500);
+                }
+            } else {
+                // 配对失败，翻回去
+                setTimeout(() => {
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    resetTurn();
+                }, 1000);
+            }
+        }
+
+        function resetTurn() {
+            firstCard = null;
+            secondCard = null;
+            isBoardLocked = false;
+        }
+
+        function updateLockProgress() {
+            const progressEl = document.getElementById('game-progress-text');
+            if (progressEl) {
+                const percent = Math.round((matchedPairs / GAME_DATA.length) * 100);
+                progressEl.textContent = `${percent}%`;
+            }
+        }
+
+        function handleGameWin() {
+            // 解锁情书
+            const lockOverlay = document.getElementById('letter-lock-overlay');
+            if (lockOverlay) {
+                lockOverlay.classList.add('unlocked');
+                setTimeout(() => {
+                    lockOverlay.style.display = 'none';
+                }, 800);
+            }
+            
+            // 触发漫天爱心礼花
+            triggerHeartConfetti();
+            
+            // 启动情书打字机动效
+            initTypewriter();
+            
+            showToast('👑 恭喜你，通关对对碰游戏！200天专属真心话已解锁！❤️');
+        }
+
+        // 🎈 气球放飞挂件逻辑
+        const BALLOON_WORDS = ['珊珊宝贝', '哲哲', '相守', '爱你', '第200天', '朝朝暮暮', '甜蜜蜜', 'Mua~', '心心相印'];
+        const balloonBtn = document.getElementById('balloon-btn');
+        if (balloonBtn) {
+            balloonBtn.addEventListener('click', () => {
+                initAudioContext();
+                const word = BALLOON_WORDS[Math.floor(Math.random() * BALLOON_WORDS.length)];
+                createBalloon(word);
+            });
+        }
+
+        function createBalloon(text) {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            balloon.textContent = text;
+            
+            // 随机水平位置
+            balloon.style.left = (Math.random() * (window.innerWidth - 100) + 20) + 'px';
+            
+            // 随机色相 (粉红-紫红区间)
+            const hue = Math.floor(Math.random() * 30) + 335;
+            balloon.style.background = `radial-gradient(circle at 30% 30%, hsl(${hue}, 100%, 85%), hsl(${hue}, 90%, 65%) 70%, hsl(${hue}, 80%, 55%))`;
+            
+            const string = document.createElement('div');
+            string.className = 'balloon-string';
+            balloon.appendChild(string);
+            
+            document.body.appendChild(balloon);
+            
+            let currentY = -120;
+            const speed = Math.random() * 2 + 2.5;
+            
+            const floatInterval = setInterval(() => {
+                currentY += speed;
+                balloon.style.bottom = currentY + 'px';
+                // 飘出屏幕自动销毁
+                if (currentY > window.innerHeight + 120) {
+                    clearInterval(floatInterval);
+                    balloon.remove();
+                }
+            }, 16);
+            
+            // 戳破气球
+            const popAction = (e) => {
+                e.stopPropagation();
+                clearInterval(floatInterval);
+                playPopSound();
+                explodeBalloon(balloon);
+                balloon.remove();
+            };
+            balloon.addEventListener('mousedown', popAction);
+            balloon.addEventListener('touchstart', popAction);
+        }
+
+        function explodeBalloon(balloon) {
+            const rect = balloon.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            
+            const colors = ['#ff7597', '#ffb6c1', '#a17fe0', '#ff3d68', '#fff'];
+            
+            for (let i = 0; i < 18; i++) {
+                const frag = document.createElement('div');
+                frag.className = 'balloon-fragment';
+                frag.style.left = cx + 'px';
+                frag.style.top = cy + 'px';
+                frag.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 100 + 50;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                
+                frag.style.setProperty('--tx', tx + 'px');
+                frag.style.setProperty('--ty', ty + 'px');
+                
+                document.body.appendChild(frag);
+                setTimeout(() => frag.remove(), 800);
+            }
+        }
+
+        // 🏆 满屏爱心飘落（通关大奖特效）
+        function triggerHeartConfetti() {
+            const emojis = ['💖', '💕', '✨', '🌸', '❤️', '💝'];
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const frag = document.createElement('div');
+                    frag.className = 'balloon-fragment';
+                    frag.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    frag.style.left = Math.random() * window.innerWidth + 'px';
+                    frag.style.top = Math.random() * window.innerHeight + 'px';
+                    frag.style.fontSize = Math.random() * 20 + 15 + 'px';
+                    frag.style.setProperty('--tx', (Math.random() * 300 - 150) + 'px');
+                    frag.style.setProperty('--ty', (Math.random() * -300 - 100) + 'px');
+                    document.body.appendChild(frag);
+                    setTimeout(() => frag.remove(), 800);
+                }, Math.random() * 800);
+            }
+        }
+
+        // 📸 Polaroid 媒体灯箱 (Lightbox) 交互
+        function openMediaLightbox(type, src, caption) {
+            initAudioContext();
+            const lightbox = document.getElementById('media-lightbox');
+            const container = document.getElementById('lightbox-media-container');
+            const captionEl = document.getElementById('lightbox-media-caption');
+            
+            if (!lightbox || !container || !captionEl) return;
+            
+            container.innerHTML = '';
+            
+            if (type === 'video') {
+                const video = document.createElement('video');
+                video.src = src;
+                video.controls = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.style.maxWidth = '100%';
+                video.style.maxHeight = '70vh';
+                container.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = src;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '70vh';
+                container.appendChild(img);
+            }
+            
+            captionEl.textContent = caption;
+            lightbox.style.display = 'flex';
+            setTimeout(() => {
+                lightbox.classList.add('active');
+            }, 10);
+        }
+        
+        function closeMediaLightbox() {
+            const lightbox = document.getElementById('media-lightbox');
+            if (!lightbox) return;
+            
+            lightbox.classList.remove('active');
+            setTimeout(() => {
+                lightbox.style.display = 'none';
+                document.getElementById('lightbox-media-container').innerHTML = '';
+            }, 400);
+        }
+
+        // 视频悬浮自动静音播放
+        function initVideoHoverPlay() {
+            const polaroids = document.querySelectorAll('.polaroid-item');
+            polaroids.forEach(item => {
+                const video = item.querySelector('video');
+                if (video) {
+                    item.addEventListener('mouseenter', () => {
+                        video.play().catch(() => {});
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        video.pause();
+                        video.currentTime = 0;
+                    });
+                }
+            });
+        }
+
+        // 修改 Toast 以便能支持换行和自定义持续时间
+        function showToast(text, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(30, 24, 46, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 117, 151, 0.3);
+                color: white;
+                padding: 14px 28px;
+                border-radius: 24px;
+                box-shadow: 0 12px 30px rgba(255, 117, 151, 0.3);
+                z-index: 100000;
+                font-weight: 700;
+                font-size: 0.95rem;
+                opacity: 0;
+                line-height: 1.6;
+                white-space: pre-wrap;
+                text-align: center;
+                max-width: 90%;
+                width: 400px;
+                transition: opacity 0.3s, transform 0.3s;
+            `;
+            toast.textContent = text;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 50);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(0px)';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // 统一初始化动作
+        if (is200DaysReached) {
+            // 如果到了 200 天，则自动解锁真心话信纸，并播放打字效果
+            const lockOverlay = document.getElementById('letter-lock-overlay');
+            if (lockOverlay) lockOverlay.style.display = 'none';
+            initTypewriter();
+        } else {
+            // 否则初始化游戏矩阵
+            initMemoryGame();
+        }
+        initVideoHoverPlay();
+
+        // 背景音乐交互
+        const musicBtn = document.getElementById('music-btn');
+        const audio = document.getElementById('local-music');
+
+        musicBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    musicBtn.classList.add('playing');
+                }).catch(e => console.log("播放被拦截:", e));
+            } else {
+                audio.pause();
+                musicBtn.classList.remove('playing');
+            }
+        });
+
+        // 🔄 异步从云数据库同步纪念日相关配置，若有更新则动态刷新视图
+        fetch('/api/config')
+            .then(res => {
+                if (!res.ok) throw new Error('GET config failed');
+                return res.json();
+            })
+            .then(cfg => {
+                Object.keys(cfg).forEach(key => {
+                    if (key !== 'id' && key !== '_id') {
+                        const val = typeof cfg[key] === 'object' ? JSON.stringify(cfg[key]) : String(cfg[key]);
+                        safeSet(key, val);
+                    }
+                });
+                // 刷新计算内存变量值
+                milestoneDate = parseSafeDate(safeGet('config_countdown_target', '2026-08-05') + 'T00:00:00');
+                reunionDate = parseSafeDate(safeGet('config_reunion_date', '2026-01-18') + 'T00:00:00');
+                meetDate = parseSafeDate(safeGet('config_meet_date', '2024-05-03') + 'T00:00:00');
+
+                // 重新刷新密码保护锁的状态
+                const is200DaysReached = new Date() >= milestoneDate;
+                const pwOverlay = document.getElementById('password-overlay');
+                if (pwOverlay) {
+                    if (!is200DaysReached) {
+                        // 如果解锁标记已经被密码解锁成功通过了，则不重新显示锁，否则如果已经到了解锁日期直接隐藏
+                        if (!pwOverlay.classList.contains('unlocked')) {
+                            pwOverlay.style.display = 'flex';
+                        }
+                    } else {
+                        pwOverlay.style.display = 'none';
+                    }
+                }
+                // 重新刷新计时器
+                updateAllTimers();
+            })
+            .catch(e => {
+                console.warn("Failed to sync config from cloud database inside 200days:", e);
+            });
+    </script>
+</body>
+</html>

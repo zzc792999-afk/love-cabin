@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📝 恋爱默契大考验 - 时光小屋</title>
+    
+    <!-- 谷歌字体与图标 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-dark: #e65275;
+            --primary-light: #ffb6c1;
+            --secondary: #a17fe0;
+            --secondary-light: #c2aef2;
+            
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.4);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+            
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a17fe0;
+            --primary-dark: #885fd1;
+            --primary-light: #c2aef2;
+            --secondary: #ff7597;
+            
+            --bg-grad: linear-gradient(135deg, #1e1b29 0%, #0f0d1a 100%);
+            --card-bg: rgba(30, 24, 46, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            --text-color: #ecf0f1;
+            --text-muted: #95a5a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-grad);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background 0.8s ease;
+        }
+
+        /* 背景 Canvas 繁星效果 */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+        }
+
+        /* 顶部导航 */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+        }
+
+        /* 进度条 */
+        .progress-container {
+            background: var(--card-bg);
+            border: var(--border-glass);
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* 答题舞台 */
+        .quiz-stage {
+            position: relative;
+            min-height: 420px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* 卡片容器 */
+        .quiz-card {
+            width: 100%;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            border-radius: 28px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: absolute;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-style: preserve-3d;
+        }
+
+        /* 答题卡片进出动画状态 */
+        .quiz-card.slide-in {
+            transform: translateX(120%) rotateY(15deg) scale(0.9);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .quiz-card.active {
+            transform: translateX(0) rotateY(0deg) scale(1);
+            opacity: 1;
+            z-index: 5;
+        }
+
+        .quiz-card.slide-out {
+            transform: translateX(-120%) rotateY(-15deg) scale(0.9);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* 卡片摇晃动效 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .quiz-card.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            padding: 16px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        /* 选中状态 */
+        .option-item.correct {
+            background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%) !important;
+            border-color: #55efc4 !important;
+            color: #0f342e !important;
+            box-shadow: 0 4px 15px rgba(85,239,196,0.3);
+        }
+
+        .option-item.wrong {
+            background: linear-gradient(135deg, #ff9999 0%, #ff5e62 100%) !important;
+            border-color: #ff3f42 !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(255,94,98,0.3);
+        }
+
+        .option-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            transition: all 0.3s;
+        }
+
+        .option-item:hover .option-marker {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .option-item.correct .option-marker {
+            border-color: transparent !important;
+            background: #fff;
+            color: #2ecc71;
+        }
+
+        .option-item.wrong .option-marker {
+            border-color: transparent !important;
+            background: #fff;
+            color: #e74c3c;
+        }
+
+        /* 通关大礼券卡 */
+        .reward-box {
+            background: var(--card-bg);
+            border: var(--border-glass);
+            border-radius: 32px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 35px 25px;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            animation: rewardFadeUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes rewardFadeUp {
+            0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .reward-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #f9d423, #ff4e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .reward-coupon {
+            width: 100%;
+            max-width: 320px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            border: 4px solid #ffd700;
+            box-shadow: 0 15px 35px rgba(255,215,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .reward-coupon::before, .reward-coupon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--bg-grad);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .reward-coupon::before { left: -12px; transform: translateY(-50%); box-shadow: inset -4px 0 6px rgba(0,0,0,0.05); }
+        .reward-coupon::after { right: -12px; transform: translateY(-50%); box-shadow: inset 4px 0 6px rgba(0,0,0,0.05); }
+
+        .key-code-box {
+            font-family: 'Outfit', monospace;
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: #f8f9fa;
+            border: 2px dashed rgba(255,215,0,0.6);
+            color: #d4af37;
+            padding: 10px 25px;
+            border-radius: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-code-box:hover {
+            background: #fffdf3;
+            transform: scale(1.05);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 117, 151, 0.35);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 117, 151, 0.5);
+        }
+
+        /* 消息小吐司 */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            z-index: 10000;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <!-- 头部栏 -->
+        <header>
+            <a href="../index.html" class="btn-back"><i class="fas fa-home"></i> 时光小屋</a>
+            <button id="theme-btn" class="btn-back" style="border-radius: 50%; width: 42px; height: 42px; padding: 0; justify-content: center;" title="切换主题"><i class="fas fa-moon"></i></button>
+        </header>
+
+        <!-- 进度条面板 -->
+        <div class="progress-container" id="progress-panel">
+            <div class="progress-header">
+                <span style="color: var(--primary-dark);"><i class="fas fa-heart"></i> 默契大挑战</span>
+                <span id="progress-text-val">答题进度：1 / 5</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill-val"></div>
+            </div>
+        </div>
+
+        <!-- 答题舞台 -->
+        <div class="quiz-stage" id="quiz-stage-panel">
+            <!-- 卡片由JS动态载入并添加进出动效 -->
+        </div>
+
+        <!-- 通关奖品 -->
+        <div class="reward-box" id="reward-panel">
+            <div style="font-size: 3.5rem;">🏆</div>
+            <h2 class="reward-title">默契通关大吉！</h2>
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">珊珊对我们的纪念日了若指掌呢，哲哲太感动啦！这是赏给珊珊的女王特权充值密令，快去复制充值吧：</p>
+            
+            <div class="reward-coupon">
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">🎁 恋爱特权扭蛋券 🎁</div>
+                <div class="key-code-box" id="btn-copy-code" title="点击一键复制">
+                    <span id="coupon-code-val">LUCKY-CAPSULE-777</span>
+                    <i class="far fa-copy"></i>
+                </div>
+                <div style="font-size: 0.7rem; color: var(--primary-dark); font-weight: 800;">🔒 限兑一次 · 自动获取扭蛋次数 +1</div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 15px;">
+                <a href="gashapon.html" class="btn-action"><i class="fas fa-gamepad"></i> 去扭蛋机兑换</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast-el">已成功复制特权暗号！</div>
+
+    <script>
+        // 🛡️ 安全本地存储
+        function safeGet(key, defaultVal = '') {
+            try {
+                return localStorage.getItem(key) || defaultVal;
+            } catch (e) {
+                try {
+                    return sessionStorage.getItem(key) || defaultVal;
+                } catch (err) {
+                    return window[`__safe_storage_${key}`] || defaultVal;
+                }
+            }
+        }
+
+        function safeSet(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch (e) {
+                try {
+                    sessionStorage.setItem(key, val);
+                } catch (err) {
+                    window[`__safe_storage_${key}`] = val;
+                }
+            }
+        }
+
+        // 🌗 主题自动匹配
+        const themeBtn = document.getElementById('theme-btn');
+        let currentTheme = safeGet('theme', 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            safeSet('theme', currentTheme);
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            themeBtn.innerHTML = currentTheme === 'light' 
+                ? '<i class="fas fa-moon"></i>' 
+                : '<i class="fas fa-sun"></i>';
+        }
+
+        // 🔊 Web Audio API 音效合成器
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx && AudioContextClass) {
+                audioCtx = new AudioContextClass();
+            }
+        }
+
+        function playCorrectSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                // 叮咚~ C5-E5
+                playTone(523.25, now, 0.12);
+                playTone(659.25, now + 0.08, 0.2);
+            } catch(e) {}
+        }
+
+        function playWrongSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                // 咚（低沉短促）
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } catch(e) {}
+        }
+
+        function playTone(freq, start, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.1, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+            osc.start(start);
+            osc.stop(start + duration);
+        }
+
+        // 📝 5道题目题库
+        const QUESTIONS = [
+            {
+                q: "我们第一次相见，确定恋爱故事开端的日期是哪天？",
+                options: ["2024年5月3日", "2024年5月20日", "2024年6月1日"],
+                correctIndex: 0
+            },
+            {
+                q: "哲哲和珊珊经历风雨，重新执手走到一起（复合）的日期是？",
+                options: ["2026年1月1日", "2026年1月18日", "2026年2月14日"],
+                correctIndex: 1
+            },
+            {
+                q: "我们在一起的第 200 天纪念日里程碑是在哪一天？",
+                options: ["2026年8月5日", "2026年8月15日", "2026年8月20日"],
+                correctIndex: 0
+            },
+            {
+                q: "日常聊天和相处中，哲哲最心动珊珊对他的哪种亲密称呼？",
+                options: ["呆子", "哲哲", "大猪蹄子"],
+                correctIndex: 1
+            },
+            {
+                q: "哲哲写在真心话情书里的承诺，未来我们要一起去看的风景是？",
+                options: ["漫天的繁星", "下雪的冬夜", "蓝色的海"],
+                correctIndex: 2
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        const stagePanel = document.getElementById('quiz-stage-panel');
+        const progressFill = document.getElementById('progress-fill-val');
+        const progressText = document.getElementById('progress-text-val');
+
+        // 初始化渲染题目卡片
+        function renderQuestion(index) {
+            if (index >= QUESTIONS.length) {
+                showFinalReward();
+                return;
+            }
+            
+            // 更新进度条
+            const progressPercent = (index / QUESTIONS.length) * 100;
+            progressFill.style.width = progressPercent + '%';
+            progressText.textContent = `答题进度：${index + 1} / ${QUESTIONS.length}`;
+
+            const qData = QUESTIONS[index];
+            const card = document.createElement('div');
+            card.className = 'quiz-card slide-in';
+            card.innerHTML = `
+                <div class="question-number"><i class="fas fa-heart"></i> Question ${index + 1}</div>
+                <div class="question-text">${qData.q}</div>
+                <div class="options-list">
+                    ${qData.options.map((opt, oIdx) => `
+                        <div class="option-item" data-index="${oIdx}">
+                            <div class="option-marker">${String.fromCharCode(65 + oIdx)}</div>
+                            <span>${opt}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            stagePanel.appendChild(card);
+            
+            // 卡片滑入
+            setTimeout(() => {
+                card.classList.remove('slide-in');
+                card.classList.add('active');
+            }, 50);
+
+            // 选项绑定点击事件
+            const options = card.querySelectorAll('.option-item');
+            options.forEach(item => {
+                item.addEventListener('click', () => {
+                    const selectedIdx = parseInt(item.getAttribute('data-index'));
+                    if (selectedIdx === qData.correctIndex) {
+                        // 回答正确！
+                        playCorrectSound();
+                        item.classList.add('correct');
+                        
+                        // 禁用所有选项防止重复点击
+                        options.forEach(opt => opt.style.pointerEvents = 'none');
+                        
+                        // 800ms后滑出卡片并进入下一题
+                        setTimeout(() => {
+                            card.classList.remove('active');
+                            card.classList.add('slide-out');
+                            
+                            currentQuestionIndex++;
+                            
+                            setTimeout(() => {
+                                card.remove();
+                                renderQuestion(currentQuestionIndex);
+                            }, 600);
+                        }, 800);
+                    } else {
+                        // 回答错误！
+                        playWrongSound();
+                        item.classList.add('wrong');
+                        card.classList.add('shake');
+                        
+                        // 移除错误标记与抖动
+                        setTimeout(() => {
+                            item.classList.remove('wrong');
+                            card.classList.remove('shake');
+                        }, 500);
+                    }
+                });
+            });
+        }
+
+        // 显示终极奖品
+        function showFinalReward() {
+            progressFill.style.width = '100%';
+            progressText.textContent = `答题进度：已通关！`;
+
+            document.getElementById('progress-panel').style.display = 'none';
+            stagePanel.style.display = 'none';
+            
+            const rewardPanel = document.getElementById('reward-panel');
+            rewardPanel.style.display = 'flex';
+
+            playTone(523.25, audioCtx.currentTime, 0.15); // C5
+            playTone(659.25, audioCtx.currentTime + 0.1, 0.15); // E5
+            playTone(783.99, audioCtx.currentTime + 0.2, 0.3); // G5
+            playTone(1046.50, audioCtx.currentTime + 0.35, 0.5); // C6
+            
+            triggerConfetti();
+
+            // 👑 标记通关并上传同步至云端数据库
+            if (safeGet('quiz_completed') !== 'true') {
+                safeSet('quiz_completed', 'true');
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quiz_completed: 'true' })
+                }).catch(e => console.error("Cloud quiz sync failed:", e));
+            }
+        }
+
+        // 复制暗号按钮
+        const btnCopy = document.getElementById('btn-copy-code');
+        const toastEl = document.getElementById('toast-el');
+
+        btnCopy.addEventListener('click', () => {
+            initAudio();
+            const codeText = document.getElementById('coupon-code-val').textContent;
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                toastEl.classList.add('show');
+                playTone(880, audioCtx.currentTime, 0.2);
+                
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 2000);
+            }).catch(() => {
+                alert('您的设备不支持自动复制，请手动选中复制：' + codeText);
+            });
+        });
+
+        // 🏆 漫天爱心礼花
+        function triggerConfetti() {
+            const emojis = ['💖', '💕', '✨', '🌸', '❤️'];
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const frag = document.createElement('div');
+                    frag.className = 'balloon-fragment';
+                    frag.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    frag.style.left = (screenW / 2) + 'px';
+                    frag.style.top = (screenH / 2) + 'px';
+                    frag.style.fontSize = Math.random() * 20 + 20 + 'px';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 250 + 80;
+                    const tx = Math.cos(angle) * dist;
+                    const ty = Math.sin(angle) * dist - 80;
+                    
+                    frag.style.setProperty('--tx', tx + 'px');
+                    frag.style.setProperty('--ty', ty + 'px');
+                    
+                    document.body.appendChild(frag);
+                    setTimeout(() => frag.remove(), 1000);
+                }, i * 30);
+            }
+        }
+
+        // 🌌 繁星粒子背景 Canvas
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let width = bgCanvas.width = window.innerWidth;
+        let height = bgCanvas.height = window.innerHeight;
+        
+        let stars = [];
+        for (let i = 0; i < 40; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.6 + 0.2,
+                flicker: Math.random() * 0.02 + 0.005,
+                angle: Math.random() * Math.PI * 2
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            width = bgCanvas.width = window.innerWidth;
+            height = bgCanvas.height = window.innerHeight;
+        });
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.angle += star.flicker;
+                const alpha = star.opacity + Math.sin(star.angle) * 0.2;
+                bgCtx.fillStyle = currentTheme === 'light' 
+                    ? `rgba(255, 117, 151, ${alpha})`
+                    : `rgba(161, 127, 224, ${alpha})`;
+                bgCtx.beginPath();
+                bgCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                bgCtx.fill();
+                star.y += star.size * 0.06;
+                if (star.y > height) {
+                    star.y = -10;
+                    star.x = Math.random() * width;
+                }
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        // 启动答题与背景 (优先读取本地缓存，随后拉取云端状态校验)
+        const cachedCompleted = safeGet('quiz_completed') === 'true';
+        if (cachedCompleted) {
+            showFinalReward();
+        } else {
+            renderQuestion(currentQuestionIndex);
+        }
+        animateBg();
+
+        // 异步向云端同步状态
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(cfg => {
+                if (cfg.quiz_completed !== undefined) {
+                    safeSet('quiz_completed', String(cfg.quiz_completed));
+                    const isNowCompleted = cfg.quiz_completed === 'true';
+                    const rewardPanel = document.getElementById('reward-panel');
+                    if (isNowCompleted) {
+                        showFinalReward();
+                    } else if (rewardPanel && rewardPanel.style.display === 'flex') {
+                        // 如果管理员在后台重置了，则立刻刷新隐藏奖励页面并开启答题
+                        rewardPanel.style.display = 'none';
+                        document.getElementById('progress-panel').style.display = 'block';
+                        stagePanel.style.display = 'block';
+                        currentQuestionIndex = 0;
+                        renderQuestion(0);
+                    }
+                }
+            })
+            .catch(e => console.warn("Sync quiz configuration failed:", e));
+    </script>
+</body>
+</html>

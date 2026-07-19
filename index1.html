@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>他在干嘛 · 悄悄关注</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-light: #ffdce5;
+            --primary-dark: #e65275;
+            --secondary: #a17fe0;
+            --bg-grad: linear-gradient(135deg, #fff2f5 0%, #f6f0ff 50%, #fff0f3 100%);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.4);
+            --shadow-glass: 0 12px 40px rgba(255, 140, 160, 0.12);
+            --text-color: #5d4f55;
+            --font-family: 'Outfit', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 洒落心装饰 */
+        .decor-heart {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            border-radius: 30px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow-glass);
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+            border-radius: 3px 3px 0 0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-weight: 800;
+            text-shadow: 2px 2px 8px rgba(255, 117, 151, 0.15);
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--secondary);
+            margin-bottom: 35px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .status-box {
+            background: rgba(255, 255, 255, 0.75);
+            border: 2px dashed var(--primary);
+            border-radius: 20px;
+            padding: 40px 20px;
+            margin: 25px 0;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 10px rgba(255, 117, 151, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .status-text {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            font-weight: 800;
+            line-height: 1.4;
+            font-family: '楷体', 'Segoe UI', sans-serif;
+            word-break: break-all;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 117, 151, 0.3);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(255, 117, 151, 0.45);
+        }
+
+        .check-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .marquee-container {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border-left: 4px solid var(--primary);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        footer {
+            margin-top: 35px;
+            color: var(--text-color);
+            opacity: 0.6;
+            font-size: 0.8rem;
+            border-top: 1px dashed rgba(255, 117, 151, 0.2);
+            padding-top: 15px;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="decor-heart" style="top: 15%; left: 10%; transform: rotate(-20deg);">💭</div>
+    <div class="decor-heart" style="bottom: 20%; right: 12%; transform: rotate(15deg);">💕</div>
+
+    <div class="container">
+        <h1>他在干嘛</h1>
+        <p class="subtitle">点击下方按钮，悄悄看看陈祖哲现在在干嘛</p>
+
+        <div class="status-box" id="status-box">
+            <div class="status-text" id="status-text">点击下方按钮查看</div>
+        </div>
+
+        <button class="check-btn" id="check-btn">
+            <i class="fas fa-search-heart"></i> 点这查看他在干嘛
+        </button>
+
+        <div style="margin-top: 10px;">
+            <a href="index.html" class="back-link"><i class="fas fa-home"></i> 返回时光小屋</a>
+        </div>
+
+        <div class="marquee-container">
+            <div class="marquee-content">他现在十分想你，非常想你！超级想你！超级无敌想你！❤️</div>
+        </div>
+
+        <footer>
+            <p>时光小屋趣味状态生成插件 | 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // 本地缺省状态词库池
+            let statusList = [
+                "他正在极度想你！心率加速中 💓",
+                "他正在听着你们都喜欢的歌 🎵",
+                "他正抱着手机傻笑，看你们以前的聊天记录 📱",
+                "他正在闭着眼脑补下次见面给你大大的拥抱 🫂",
+                "他正在偷偷刷新你的动态，期待你的最新消息 ✨",
+                "他正在想：白珊珊宝贝怎么这么可爱诱人呢？🥰",
+                "他正在认真地为你们以后的旅行做攻略 🗺️",
+                "他刚刚脑海中闪过你傻傻呆呆戴眼镜的清纯模样 👓",
+                "他在想：宝贝的嘴巴一定特别特别好亲吧 💋",
+                "他正在回忆你们正式复合的那一瞬间的感动 💖",
+                "他在上厕所，并且正在想你 🚽",
+                "他在心里默念了 100 遍“我超级喜欢白珊珊” 👑",
+                "他正在计划着下次要带你去吃什么惊艳的超级大餐 🍕",
+                "他正在想：珊珊今天肯定也在超级想他对不对？🐾"
+            ];
+
+            const textEl = document.getElementById('status-text');
+            const btn = document.getElementById('check-btn');
+            const box = document.getElementById('status-box');
+
+            let lastIdx = -1;
+            let typewriterTimer = null;
+
+            function showRandomStatus() {
+                // 触发抖动
+                box.style.animation = 'none';
+                void box.offsetWidth;
+                box.style.animation = 'heartbeat 0.4s ease-out';
+
+                let nextIdx;
+                do {
+                    nextIdx = Math.floor(Math.random() * statusList.length);
+                } while (nextIdx === lastIdx && statusList.length > 1);
+
+                lastIdx = nextIdx;
+                typeText(textEl, statusList[nextIdx]);
+                btn.innerHTML = '<i class="fas fa-redo"></i> 再点一次看看他在干嘛';
+            }
+
+            function typeText(element, text) {
+                if (typewriterTimer) clearInterval(typewriterTimer);
+                element.textContent = '';
+                let i = 0;
+                const chars = [...text];
+                typewriterTimer = setInterval(() => {
+                    if (i < chars.length) {
+                        element.textContent += chars[i];
+                        i++;
+                    } else {
+                        clearInterval(typewriterTimer);
+                        typewriterTimer = null;
+                    }
+                }, 30);
+            }
+
+            // 初始化显示
+            showRandomStatus();
+            btn.addEventListener('click', showRandomStatus);
+
+            // 异步从云数据库拉取最新状态文案池并加载
+            fetch('/api/config')
+                .then(res => res.json())
+                .then(cfg => {
+                    if (cfg.config_he_doing_list) {
+                        try {
+                            const parsed = JSON.parse(cfg.config_he_doing_list);
+                            if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+                                statusList = parsed;
+                                // 刷新展示最新的随机状态
+                                showRandomStatus();
+                            }
+                        } catch(e) {
+                            console.warn("Parse config_he_doing_list failed:", e);
+                        }
+                    }
+                })
+                .catch(err => console.warn("Load config in he_doing failed:", err));
+
+            // 点击洒落爱心
+            document.addEventListener('click', function(e) {
+                if (e.target === btn || e.target.closest('button') || e.target.closest('a')) return;
+                const h = document.createElement('div');
+                h.textContent = ['❤️', '💕', '💖', '💗', '✨'][Math.floor(Math.random() * 5)];
+                h.style.position = 'fixed';
+                h.style.left = e.clientX - 10 + 'px';
+                h.style.top = e.clientY - 10 + 'px';
+                h.style.fontSize = Math.random() * 10 + 16 + 'px';
+                h.style.pointerEvents = 'none';
+                h.style.zIndex = '9999';
+
+                h.animate([
+                    { transform: 'scale(0.3)', opacity: 1 },
+                    { transform: 'scale(1.2) translateY(-40px)', opacity: 0.8 },
+                    { transform: 'scale(0.5) translateY(-80px)', opacity: 0 }
+                ], { duration: 800, fill: 'forwards' });
+
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 800);
+            });
+        })();
+    </script>
+</body>
+</html>

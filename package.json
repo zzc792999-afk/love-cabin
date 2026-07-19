@@ -1,0 +1,13 @@
+{
+  "name": "zuzhe-shanshan-cabin",
+  "version": "1.0.0",
+  "description": "Love Cabin for Zuzhe and Shanshan",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0"
+  }
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>致愿意回头的你 · 祖哲的心里话</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入拆信专属样式 -->
+    <link rel="stylesheet" href="style_letter.css">
+</head>
+<body>
+
+    <!-- 飘落玫瑰花瓣 Canvas -->
+    <canvas id="rose-canvas"></canvas>
+
+    <div class="letter-page-title">💌 祖哲给你写的一封心里话</div>
+
+    <!-- 信封与信纸主容器 -->
+    <div class="envelope-wrapper" id="envelope-wrapper">
+        <!-- 信封封口盖 -->
+        <div class="envelope-flap"></div>
+        
+        <!-- 火漆印章 -->
+        <div class="wax-seal">
+            <i class="fas fa-heart"></i>
+        </div>
+        
+        <!-- 信封斜底口袋 -->
+        <div class="envelope-pocket"></div>
+
+        <!-- 内部信纸 -->
+        <div class="letter-paper" id="letter-paper">
+            <div class="letter-content">
+                <h2>致愿意回头的你</h2>
+                <p>兜兜转转，还是你。</p>
+                <p>分开的那段时间，好像什么都没少，又好像什么都少了。那些没说出口的想念、没解开的误会，都在重逢的这一刻有了最好的答案。</p>
+                <p>其实你把我删除的那天，我本以为我们再也没有机会了，心瞬间沉到了谷底，没想到你又突然找我和好……真的，特别开心！</p>
+                <p>对了！其实每次回家的路上，我都会刻意经过你家门口，只希望能看一眼或者偶遇你哈哈哈！结果这么多次里，就成功遇到了你一次——你傻乎乎地戴着眼镜走在路上，还是像以前那样清纯，可爱得让我不知所措。</p>
+                <p>这一次，让我们带着更成熟的自己，重新相爱吧。要从新鲜感走到归属感，从心动走到心安。</p>
+                <p>以后的路，换我们一起慢慢走，抓紧了，再也不要松手了好嘛？</p>
+                <div class="letter-footer">
+                    —— 永远最爱你的祖哲 💌<br>
+                    <span style="font-size: 0.85rem; font-weight: normal; color: #8c7880;">二零二六年 · 重逢纪念</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="open-tips" id="open-tips">👉 点击心型火漆印，拆开这封信 👈</div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <div class="back-btn-container" id="back-btn-container">
+        <a href="../index.html" class="btn-letter-back"><i class="fas fa-home"></i> 返回我们的时光小屋</a>
+    </div>
+
+    <!-- 脚本逻辑 -->
+    <script src="letter.js"></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不分手约定 · 见证我们的守护</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-light: #ffdce5;
+            --primary-dark: #e65275;
+            --secondary: #a17fe0;
+            --bg-grad: linear-gradient(135deg, #fff2f5 0%, #f6f0ff 50%, #fff0f3 100%);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.4);
+            --shadow-glass: 0 12px 40px rgba(255, 140, 160, 0.12);
+            --text-color: #5d4f55;
+            --font-family: 'Outfit', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 飘落心点缀 */
+        .decor-heart {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: var(--shadow-glass);
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+            border-radius: 3px 3px 0 0;
+        }
+
+        header {
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 8px rgba(255, 117, 151, 0.15);
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--secondary);
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* 签名卡片网格 */
+        .signatures-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
+        .sig-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            flex: 1;
+            min-width: 250px;
+            max-width: 340px;
+            transition: transform 0.3s;
+        }
+
+        .sig-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sig-img-box {
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fffbfe;
+            border: 1px solid rgba(255, 117, 151, 0.1);
+            position: relative;
+        }
+
+        .sig-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+
+        .sig-card:hover .sig-img-box img {
+            transform: scale(1.04);
+        }
+
+        .sig-label {
+            margin-top: 15px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.05rem;
+        }
+
+        /* 音频组件 */
+        .audio-container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 30px;
+            border: var(--border-glass);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(255, 117, 151, 0.05);
+        }
+
+        .audio-desc {
+            font-size: 1rem;
+            color: var(--text-color);
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 550px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            outline: none;
+        }
+
+        /* 返回首页按钮 */
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(255, 117, 151, 0.3);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 117, 151, 0.45);
+        }
+
+        .heart-pulse {
+            color: var(--primary);
+            animation: heartbeat 1.6s infinite;
+            display: inline-block;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1.1); }
+            45% { transform: scale(1.25); }
+        }
+
+        footer {
+            margin-top: 35px;
+            color: var(--text-color);
+            opacity: 0.6;
+            font-size: 0.85rem;
+            border-top: 1px dashed rgba(255,117,151,0.2);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+            }
+            h1 {
+                font-size: 2.1rem;
+            }
+            .sig-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 散落底纹心 -->
+    <div class="decor-heart" style="top: 10%; left: 8%; transform: rotate(-15deg);">❤️</div>
+    <div class="decor-heart" style="bottom: 15%; right: 8%; transform: rotate(20deg);">💕</div>
+
+    <div class="container">
+        <header>
+            <h1>不分手约定</h1>
+            <p class="subtitle">珍贵的签名见证与永恒誓言，记录美好的承诺与守护</p>
+        </header>
+
+        <!-- 签名版块 -->
+        <h2 class="section-title"><i class="fas fa-signature"></i> 誓言手印签名</h2>
+        <div class="signatures-grid">
+            <div class="sig-card">
+                <div class="sig-img-box">
+                    <img src="images/1.jpg" alt="白珊珊签名手印" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'250\\' height=\\'220\\'><rect width=\\'250\\' height=\\'220\\' fill=\\'%23fcf8fc\\'/><text x=\\'125\\' y=\\'110\\' text-anchor=\\'middle\\' fill=\\'%23d1a1b1\\'>签名加载中</text></svg>'">
+                </div>
+                <div class="sig-label">白珊珊专属手印 🐾</div>
+            </div>
+            <div class="sig-card">
+                <div class="sig-img-box">
+                    <img src="images/2.jpg" alt="陈祖哲签名手印" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'250\\' height=\\'220\\'><rect width=\\'250\\' height=\\'220\\' fill=\\'%23fcf8fc\\'/><text x=\\'125\\' y=\\'110\\' text-anchor=\\'middle\\' fill=\\'%23d1a1b1\\'>签名加载中</text></svg>'">
+                </div>
+                <div class="sig-label">陈祖哲专属手印 🐾</div>
+            </div>
+        </div>
+
+        <!-- 音频誓言 -->
+        <h2 class="section-title"><i class="fas fa-music"></i> 我们的声音诺言</h2>
+        <div class="audio-container">
+            <p class="audio-desc">
+                这段珍贵的录音承载着永恒的承诺与真挚的情感。点击播放按钮，聆听这份坚定的不分手誓言，感受其中蕴含的决意与心意。
+            </p>
+            <audio controls>
+                <source src="other/yd.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放功能，请使用现代浏览器。
+            </audio>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> 返回我们的时光小屋</a>
+        </div>
+
+        <footer>
+            <p>© 2026 不分手约定 | 用心定格我们每一次的心跳 <span class="heart-pulse">❤️</span></p>
+            <p>本页面展示的签名手印与音频均为个人珍藏记录，保留所有权利。</p>
+        </footer>
+    </div>
+
+    <script>
+        // 添加全局点击洒落爱心小互动
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('a') || e.target.closest('audio')) return;
+
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '✨'];
+            const h = document.createElement('div');
+            h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            h.style.position = 'fixed';
+            h.style.left = e.clientX - 10 + 'px';
+            h.style.top = e.clientY - 10 + 'px';
+            h.style.fontSize = Math.random() * 10 + 16 + 'px';
+            h.style.pointerEvents = 'none';
+            h.style.zIndex = '9999';
+
+            h.animate([
+                { transform: 'scale(0.3)', opacity: 1 },
+                { transform: 'scale(1.2) translateY(-40px)', opacity: 0.8 },
+                { transform: 'scale(0.5) translateY(-80px)', opacity: 0 }
+            ], { duration: 800, fill: 'forwards' });
+
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 800);
+        });
+    </script>
+</body>
+</html>

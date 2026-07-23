@@ -618,6 +618,8 @@
         let scratchPercent = 0;
         let inventory = {};
         let isCardUnlocked = false;
+        let pendingPrizeId = "";
+        let pendingDeck = "";
 
         // 🔊 Web Audio API 音效合成引擎
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -794,10 +796,19 @@
             }
         }
 
-        // 选择随机卡片
+        // 选择随机卡片 (如果存在进行中的 pendingPrizeId，则直接锁定加载它)
         function selectRandomPrize() {
-            const filtered = ALL_PRIZES.filter(p => p.type === currentDeck);
-            currentPrize = filtered[Math.floor(Math.random() * filtered.length)];
+            if (pendingPrizeId) {
+                const found = ALL_PRIZES.find(p => p.id === pendingPrizeId);
+                if (found) {
+                    currentPrize = found;
+                }
+            }
+            
+            if (!currentPrize) {
+                const filtered = ALL_PRIZES.filter(p => p.type === currentDeck);
+                currentPrize = filtered[Math.floor(Math.random() * filtered.length)];
+            }
             
             // 渲染底层内容
             document.getElementById('prize-emoji').textContent = currentPrize.emoji;
@@ -815,6 +826,10 @@
         // 切换卡包
         function switchDeck(deckName, btn) {
             if (isDrawing) return;
+            if (isCardUnlocked) {
+                alert('⚠️ 当前卡片已解锁，请先刮开它再切换卡包哦！');
+                return;
+            }
             currentDeck = deckName;
             
             // 按钮高亮切换
@@ -873,10 +888,25 @@
             canvas.style.pointerEvents = 'none';
             playChimeSound();
             
+            pendingPrizeId = "";
+            pendingDeck = "";
+
             // 添加至钱包
             if (currentPrize) {
                 inventory[currentPrize.id] = (inventory[currentPrize.id] || 0) + 1;
-                saveInventory();
+                
+                safeSet('gashapon_inventory', JSON.stringify(inventory));
+                // 一并保存背包并清理进行中刮卡
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        gashapon_inventory: JSON.stringify(inventory),
+                        scratch_pending_prize_id: "",
+                        scratch_pending_deck: ""
+                    })
+                }).catch(e => console.error("Cloud inventory and pending clean sync failed:", e));
+
                 renderWallet();
                 
                 // 3D 庆祝翻转
@@ -886,6 +916,9 @@
                     box.style.transform = 'none';
                 }, 800);
             }
+            
+            currentPrize = null;
+            initScratchCard(false); // 重画为锁定界面
             updateCountsDisplay();
         }
 
@@ -900,30 +933,63 @@
             const extraSpins = parseInt(safeGet('scratch_extra_spins', '0')) || 0;
 
             if (hasFreeScratch) {
+                // 预先选定卡券并保存至云 pending，防止刷新重来
+                const filtered = ALL_PRIZES.filter(p => p.type === currentDeck);
+                const selected = filtered[Math.floor(Math.random() * filtered.length)];
+                pendingPrizeId = selected.id;
+                pendingDeck = currentDeck;
+
                 safeSet('scratch_last_free_date', todayStr);
                 
-                // 向云端同步免费扣除状态
+                // 向云端同步免费扣除状态与 pending 进行中的刮刮乐
                 fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scratch_last_free_date: todayStr })
-                }).catch(e => console.error("Scratch date sync failed:", e));
+                    body: JSON.stringify({ 
+                        scratch_last_free_date: todayStr,
+                        scratch_pending_prize_id: pendingPrizeId,
+                        scratch_pending_deck: pendingDeck
+                    })
+                }).catch(e => console.error("Scratch date and pending sync failed:", e));
 
                 initScratchCard(true); // 传入 true 以解锁
                 updateCountsDisplay();
             } else if (isInfinite) {
-                // 无限模式，不扣任何次数直接解锁
+                // 无限模式，预先选定卡券并保存至云 pending
+                const filtered = ALL_PRIZES.filter(p => p.type === currentDeck);
+                const selected = filtered[Math.floor(Math.random() * filtered.length)];
+                pendingPrizeId = selected.id;
+                pendingDeck = currentDeck;
+
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        scratch_pending_prize_id: pendingPrizeId,
+                        scratch_pending_deck: pendingDeck
+                    })
+                }).catch(e => console.error("Scratch pending sync failed:", e));
+
                 initScratchCard(true);
                 updateCountsDisplay();
             } else if (extraSpins > 0) {
-                // 扣除一次额外机会
+                // 消耗一次额外机会，预先选定卡券并保存至云 pending
+                const filtered = ALL_PRIZES.filter(p => p.type === currentDeck);
+                const selected = filtered[Math.floor(Math.random() * filtered.length)];
+                pendingPrizeId = selected.id;
+                pendingDeck = currentDeck;
+
                 const newExtra = extraSpins - 1;
                 safeSet('scratch_extra_spins', String(newExtra));
 
                 fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scratch_extra_spins: String(newExtra) })
+                    body: JSON.stringify({ 
+                        scratch_extra_spins: String(newExtra),
+                        scratch_pending_prize_id: pendingPrizeId,
+                        scratch_pending_deck: pendingDeck
+                    })
                 }).catch(e => console.error("Scratch extra spins sync failed:", e));
 
                 initScratchCard(true);
@@ -1239,6 +1305,10 @@
                     safeSet('scratch_infinite_spins', cfg.scratch_infinite_spins !== undefined ? cfg.scratch_infinite_spins : 'false');
                     safeSet('scratch_used_keys', cfg.scratch_used_keys !== undefined ? cfg.scratch_used_keys : '[]');
                     
+                    // 获取云端锁定的未刮完卡片
+                    pendingPrizeId = cfg.scratch_pending_prize_id || "";
+                    pendingDeck = cfg.scratch_pending_deck || "";
+                    
                     // 同步刮刮乐专属奖励池
                     if (cfg.scratch_prizes !== undefined) {
                         const prizesVal = typeof cfg.scratch_prizes === 'object' ? JSON.stringify(cfg.scratch_prizes) : String(cfg.scratch_prizes);
@@ -1281,7 +1351,24 @@
                     }
                     
                     updateCountsDisplay();
-                    initScratchCard(false); // 同步后重绘卡面显示状态
+                    
+                    if (pendingPrizeId) {
+                        // 恢复原有的卡包高亮
+                        currentDeck = pendingDeck;
+                        const btns = document.querySelectorAll('.deck-btn');
+                        btns.forEach(b => {
+                            const clickAttr = b.getAttribute('onclick') || '';
+                            if (clickAttr.includes(currentDeck)) {
+                                b.classList.add('active');
+                            } else {
+                                b.classList.remove('active');
+                            }
+                        });
+                        initScratchCard(true); // 恢复未刮完的解锁状态现场
+                    } else {
+                        initScratchCard(false); // 默认初始锁定
+                    }
+                    
                     renderWallet();
                 })
                 .catch(err => {

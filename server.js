@@ -95,7 +95,9 @@ function ensureConfigFile() {
                 { id: 'blackmail', name: '表情包销毁券', emoji: '📸', desc: '无条件销毁一张哲哲手机里珊珊的搞怪照片或表情包！', hue: 270 },
                 { id: 'hug_tick', name: '深情熊抱券', emoji: '🤗', desc: '兑换一次长达60秒以上的超深熊抱，随时为珊珊补充能量！', hue: 350 },
                 { id: 'nickname', name: '肉麻爱称券', emoji: '🏷️', desc: '哲哲今天必须用珊珊指定的超肉麻爱称称呼她，叫错一次罚写情书！', hue: 290 }
-            ])
+            ]),
+            scratch_pending_prize_id: "",
+            scratch_pending_deck: ""
         };
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfigs, null, 4), 'utf8');
     }
@@ -536,7 +538,9 @@ const server = http.createServer((req, res) => {
                                         { id: 'blackmail', name: '表情包销毁券', emoji: '📸', desc: '无条件销毁一张哲哲手机里珊珊的搞怪照片或表情包！', hue: 270 },
                                         { id: 'hug_tick', name: '深情熊抱券', emoji: '🤗', desc: '兑换一次长达60秒以上的超深熊抱，随时为珊珊补充能量！', hue: 350 },
                                         { id: 'nickname', name: '肉麻爱称券', emoji: '🏷️', desc: '哲哲今天必须用珊珊指定的超肉麻爱称称呼她，叫错一次罚写情书！', hue: 290 }
-                                    ])
+                                    ]),
+                                    scratch_pending_prize_id: "",
+                                    scratch_pending_deck: ""
                                 };
                                 return col.insertOne(defaultConfigs).then(() => defaultConfigs);
                             }

@@ -870,9 +870,14 @@
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
                     重置后，珊珊今天可以再次解锁一张新卡刮奖（跳过一天只能解锁一次的逻辑限制）。
                 </p>
-                <button class="btn-reset-keys" id="btn-reset-scratch-date" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin: 0;">
-                    <i class="fas fa-rotate-left"></i> 重置今日已解锁状态 (允许今天重新解锁刮卡)
-                </button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-reset-keys" id="btn-reset-scratch-date" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin: 0; flex: 1; min-width: 250px;">
+                        <i class="fas fa-rotate-left"></i> 重置今日已解锁状态 (允许今天重新解锁刮卡)
+                    </button>
+                    <button class="btn-reset-keys" id="btn-reset-scratch-pending" style="background: linear-gradient(135deg, #eccc68, #ff7f50); margin: 0; flex: 1; min-width: 250px;">
+                        <i class="fas fa-trash-can"></i> 作废当前正在进行的刮卡 (允许其重新选择卡包解锁)
+                    </button>
+                </div>
             </div>
 
             <!-- 秘钥清单 -->
@@ -1425,7 +1430,8 @@
                         'chat_reply_miss', 'chat_reply_hug', 'chat_reply_coax', 'config_bg_music_url',
                         'config_love_letter', 'config_photo_list', 'config_he_doing_list',
                         'quarrel_mode', 'quarrel_text', 'scratch_last_free_date',
-                        'scratch_extra_spins', 'scratch_infinite_spins', 'scratch_used_keys', 'scratch_prizes'
+                        'scratch_extra_spins', 'scratch_infinite_spins', 'scratch_used_keys', 'scratch_prizes',
+                        'scratch_pending_prize_id', 'scratch_pending_deck'
                     ];
 
                     CONFIG_KEYS.forEach(key => {
@@ -1657,6 +1663,15 @@
         document.getElementById('btn-reset-scratch-date').addEventListener('click', () => {
             if (!confirm('确定要重置今日刮刮乐使用状态吗？重置后珊珊今天可以再次解锁一张新卡刮奖。')) return;
             saveConfigToServer({ scratch_last_free_date: '' }, '🔄 今日刮刮乐状态已重置！珊珊可以重新解锁刮奖了！');
+            setTimeout(initAdminData, 600); // 延迟重载刷新状态
+        });
+
+        document.getElementById('btn-reset-scratch-pending').addEventListener('click', () => {
+            if (!confirm('确定要强制废除当前进行中的刮卡吗？废除后卡面会重置，且珊珊可以重新解锁抽取。')) return;
+            saveConfigToServer({ 
+                scratch_pending_prize_id: '', 
+                scratch_pending_deck: '' 
+            }, '🔄 进行中的刮卡已被强制废除重置！');
             setTimeout(initAdminData, 600); // 延迟重载刷新状态
         });
 

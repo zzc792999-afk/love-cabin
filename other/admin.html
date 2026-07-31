@@ -1132,6 +1132,33 @@
                         答案：<span class="qa-a">C. 蓝色的海</span>
                     </div>
                 </div>
+                <!-- 🤝 SweetPact 心动契约云管理 -->
+                <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px; margin-top: 20px;">
+                    <h3 style="font-size: 1.05rem; color: var(--primary); margin-bottom: 12px;">
+                        <i class="fas fa-handshake"></i> SweetPact 心动契约云数据控制
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">当前爱意储蓄金币数:</label>
+                            <input type="number" id="input-sweetpact-coins" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 4px;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">和平开黑局数:</label>
+                            <input type="number" id="input-sweetpact-peace-count" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 4px;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">不分手契约签署状态:</label>
+                            <select id="select-sweetpact-contract" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 4px; height: 38px;">
+                                <option value="false">未签署</option>
+                                <option value="true">已生效 💖</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-helper" id="btn-save-sweetpact" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); margin: 0; color: white; border: none; flex: 1;"><i class="fas fa-check-circle"></i> 确认保存契约云数据</button>
+                        <button class="btn-helper" id="btn-reset-sweetpact-logs" style="margin: 0; flex: 1;"><i class="fas fa-history"></i> 重置并清空爱意金币流水记录</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1431,7 +1458,9 @@
                         'config_love_letter', 'config_photo_list', 'config_he_doing_list',
                         'quarrel_mode', 'quarrel_text', 'scratch_last_free_date',
                         'scratch_extra_spins', 'scratch_infinite_spins', 'scratch_used_keys', 'scratch_prizes',
-                        'scratch_pending_prize_id', 'scratch_pending_deck'
+                        'scratch_pending_prize_id', 'scratch_pending_deck',
+                        'sweetpact_peace_count', 'sweetpact_love_coins', 'sweetpact_contract_signed',
+                        'sweetpact_partner_a', 'sweetpact_partner_b', 'sweetpact_history_logs'
                     ];
 
                     CONFIG_KEYS.forEach(key => {
@@ -1538,9 +1567,20 @@
                 quarrelTextEl.value = safeGet('quarrel_text', '');
             }
 
-            // --- 5.12 动态网站素材配置载入 ---
-            document.getElementById('input-bg-music-url').value = safeGet('config_bg_music_url', '');
             document.getElementById('input-love-letter').value = safeGet('config_love_letter', `从遇见你的那一天起，\n我的世界便开始发光。\n\n想陪你看遍所有日落，\n想牵着你的手走完一生。\n\n未来很长很长，\n但我只想和你一起。\n\n你是我宇宙中最亮的星。❤️`);
+
+            // --- 5.13 SweetPact 契约数据载入 ---
+            const sweetCoins = safeGet('sweetpact_love_coins', '100');
+            const sweetPeace = safeGet('sweetpact_peace_count', '0');
+            const sweetContract = safeGet('sweetpact_contract_signed', 'false');
+
+            const inputCoins = document.getElementById('input-sweetpact-coins');
+            const inputPeace = document.getElementById('input-sweetpact-peace-count');
+            const selectContract = document.getElementById('select-sweetpact-contract');
+
+            if (inputCoins) inputCoins.value = sweetCoins;
+            if (inputPeace) inputPeace.value = sweetPeace;
+            if (selectContract) selectContract.value = sweetContract;
 
             // 载入并渲染相册
             const cachedPhotos = safeGet('config_photo_list');
@@ -1839,6 +1879,52 @@
             window['__safe_session_storage_小屋开幕已播放'] = 'false';
             showToast('📩 信封开幕状态已重置！刷新主页即可重新看到信封拆信效果。');
         });
+
+        // ==========================================
+        // 🤝 SweetPact 心动契约云数据管理
+        // ==========================================
+        const btnSaveSweet = document.getElementById('btn-save-sweetpact');
+        if (btnSaveSweet) {
+            btnSaveSweet.addEventListener('click', () => {
+                const coinsVal = document.getElementById('input-sweetpact-coins').value;
+                const peaceVal = document.getElementById('input-sweetpact-peace-count').value;
+                const contractVal = document.getElementById('select-sweetpact-contract').value;
+
+                const payload = {
+                    sweetpact_love_coins: String(parseInt(coinsVal) || 0),
+                    sweetpact_peace_count: String(parseInt(peaceVal) || 0),
+                    sweetpact_contract_signed: contractVal
+                };
+
+                // 如果将契约重置为未签署，也将签名清空
+                if (contractVal === 'false') {
+                    payload.sweetpact_partner_a = '';
+                    payload.sweetpact_partner_b = '';
+                } else {
+                    // 如果设为已签署但没有名字，则给个默认值
+                    if (!safeGet('sweetpact_partner_a')) {
+                        payload.sweetpact_partner_a = '哲哲';
+                    }
+                    if (!safeGet('sweetpact_partner_b')) {
+                        payload.sweetpact_partner_b = '珊珊';
+                    }
+                }
+
+                saveConfigToServer(payload, '✅ 心动契约云数据修改已成功同步！');
+                setTimeout(initAdminData, 600);
+            });
+        }
+
+        const btnResetLogs = document.getElementById('btn-reset-sweetpact-logs');
+        if (btnResetLogs) {
+            btnResetLogs.addEventListener('click', () => {
+                if (!confirm('确定要清空所有爱意金币流水的历史记录吗？')) return;
+                saveConfigToServer({
+                    sweetpact_history_logs: '[]'
+                }, '🔄 爱意金币流水记录已重置清空！');
+                setTimeout(initAdminData, 600);
+            });
+        }
 
         // ==========================================
         // 💬 留言管理逻辑 (API联动与降级)

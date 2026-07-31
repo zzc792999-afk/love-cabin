@@ -97,7 +97,13 @@ function ensureConfigFile() {
                 { id: 'nickname', name: '肉麻爱称券', emoji: '🏷️', desc: '哲哲今天必须用珊珊指定的超肉麻爱称称呼她，叫错一次罚写情书！', hue: 290 }
             ]),
             scratch_pending_prize_id: "",
-            scratch_pending_deck: ""
+            scratch_pending_deck: "",
+            sweetpact_peace_count: "0",
+            sweetpact_love_coins: "100",
+            sweetpact_contract_signed: "false",
+            sweetpact_partner_a: "",
+            sweetpact_partner_b: "",
+            sweetpact_history_logs: "[]"
         };
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfigs, null, 4), 'utf8');
     }
@@ -540,7 +546,13 @@ const server = http.createServer((req, res) => {
                                         { id: 'nickname', name: '肉麻爱称券', emoji: '🏷️', desc: '哲哲今天必须用珊珊指定的超肉麻爱称称呼她，叫错一次罚写情书！', hue: 290 }
                                     ]),
                                     scratch_pending_prize_id: "",
-                                    scratch_pending_deck: ""
+                                    scratch_pending_deck: "",
+                                    sweetpact_peace_count: "0",
+                                    sweetpact_love_coins: "100",
+                                    sweetpact_contract_signed: "false",
+                                    sweetpact_partner_a: "",
+                                    sweetpact_partner_b: "",
+                                    sweetpact_history_logs: "[]"
                                 };
                                 return col.insertOne(defaultConfigs).then(() => defaultConfigs);
                             }

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 情侣心动大冒险飞行棋</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ----------------------------------------------------
+           CoupleBoardGame (情侣心动冒险飞行棋) - Style Guide
+           Modern Dark Glassmorphism & Neon Fantasy Vibe
+        ---------------------------------------------------- */
+        :root {
+            --bg-primary: #080314;
+            --bg-gradient: linear-gradient(135deg, #080314 0%, #16072b 50%, #0d041a 100%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.08);
+            
+            --primary: #ff477e;
+            --primary-glow: rgba(255, 71, 126, 0.4);
+            --secondary: #00f5d4;
+            --secondary-glow: rgba(0, 245, 212, 0.4);
+            --accent-purple: #9b5de5;
+            
+            --text-main: #f8f9fa;
+            --text-muted: #a0a5c0;
+            
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            
+            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景微光 */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.22;
+            animation: floatGlow 18s infinite alternate ease-in-out;
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 80%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .circle-2 {
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 80%);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes floatGlow {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(80px, 40px) scale(1.15); }
+        }
+
+        /* 界面容器 */
+        .app-container {
+            width: 100%;
+            max-width: 950px;
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 24px;
+            z-index: 2;
+            position: relative;
+        }
+
+        @media (max-width: 868px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                padding-top: 40px;
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* 返回首页 */
+        .btn-back-home {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .btn-back-home:hover {
+            color: white;
+            background: var(--glass-hover);
+        }
+
+        /* 棋盘地图 */
+        .board-map {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 8px;
+            width: 100%;
+            aspect-ratio: 1.4;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 10px;
+        }
+
+        @media (max-width: 500px) {
+            .board-map {
+                gap: 4px;
+                padding: 6px;
+            }
+        }
+
+        /* 棋盘网格单元 */
+        .grid-tile {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .grid-tile:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .grid-num {
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+        }
+
+        .grid-emoji {
+            font-size: 1.3rem;
+        }
+
+        .grid-text {
+            color: var(--text-main);
+            font-size: 0.65rem;
+            font-weight: 500;
+            max-width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 玩家棋子标记 */
+        .token-holder {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            display: flex;
+            gap: 3px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .player-token {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            color: #fff;
+            animation: bounce 0.6s infinite alternate ease-in-out;
+        }
+
+        .token-a {
+            background: #ff477e; /* 哲哲 */
+        }
+
+        .token-b {
+            background: #00bbf9; /* 珊珊 */
+            animation-delay: -0.3s;
+        }
+
+        /* 格子类型配色 */
+        .tile-start { border: 1.5px solid var(--secondary); background: rgba(0, 245, 212, 0.07) !important; }
+        .tile-end { border: 1.5px solid var(--primary); background: rgba(255, 71, 126, 0.07) !important; }
+        .tile-coin { border-color: #ffb703; background: rgba(255, 183, 3, 0.05); }
+        .tile-adventure { border-color: var(--accent-purple); }
+
+        /* 右侧控制台 */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .panel-header {
+            text-align: center;
+            width: 100%;
+        }
+
+        .panel-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        /* 当前玩家回合 */
+        .turn-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .turn-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .active-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .avatar-a { background: #ff477e; }
+        .avatar-b { background: #00bbf9; }
+
+        .active-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* 3D 骰子区域 */
+        .dice-wrapper {
+            perspective: 600px;
+            width: 120px;
+            height: 120px;
+            margin: 20px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(-20deg);
+            transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dot-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 80px;
+            height: 80px;
+        }
+
+        .dice-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #2b2d42;
+            align-self: center;
+            justify-self: center;
+        }
+
+        .dice-dot.red {
+            background: #d90429;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Face orientation */
+        .face-1 { transform: rotateY(0deg) translateZ(60px); }
+        .face-2 { transform: rotateY(90deg) translateZ(60px); }
+        .face-3 { transform: rotateX(90deg) translateZ(60px); }
+        .face-4 { transform: rotateX(-90deg) translateZ(60px); }
+        .face-5 { transform: rotateY(-90deg) translateZ(60px); }
+        .face-6 { transform: rotateY(180deg) translateZ(60px); }
+
+        /* Roll animations trigger class */
+        .rolling {
+            animation: diceSpinning 1.2s infinite linear;
+        }
+
+        @keyframes diceSpinning {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* 状态与金币显示 */
+        .points-box {
+            background: rgba(255, 183, 3, 0.1);
+            border: 1px solid #ffb703;
+            border-radius: 12px;
+            padding: 10px 15px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        /* 冒险对话弹框 */
+        .adventure-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .adventure-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .adventure-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .adventure-overlay.active .adventure-card {
+            transform: scale(1);
+        }
+
+        .adv-tag {
+            font-size: 0.75rem;
+            background: rgba(255, 71, 126, 0.15);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            display: inline-block;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .adv-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+        }
+
+        .adv-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .adv-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent-purple) 100%);
+            color: #080314;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 700;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--secondary-glow);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-circle circle-1"></div>
+        <div class="glow-circle circle-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- 返回主页 -->
+        <a href="../index.html" class="btn-back-home">↩ 返回主页</a>
+
+        <!-- 左侧：棋盘 -->
+        <div class="glass-card">
+            <div class="board-map" id="boardMap">
+                <!-- Grid Tiles (1 to 24) Generated by JS -->
+            </div>
+        </div>
+
+        <!-- 右侧：玩家状态与骰子控制 -->
+        <div class="glass-card control-panel">
+            <div class="panel-header">
+                <h2>🎲 心动大冒险飞行棋</h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">点击骰子开始摇号移动，解锁甜蜜任务！</p>
+            </div>
+
+            <!-- 当前回合玩家 -->
+            <div class="turn-card">
+                <span style="font-size:0.85rem; color:var(--text-muted);">当前回合</span>
+                <div class="turn-info">
+                    <div class="active-avatar avatar-a" id="activeAvatar">哲</div>
+                    <span class="active-name" id="activeName">哲哲</span>
+                </div>
+            </div>
+
+            <!-- 3D 骰子 -->
+            <div class="dice-wrapper" id="diceBtn">
+                <div class="cube" id="diceCube">
+                    <!-- Face 1 -->
+                    <div class="cube-face face-1">
+                        <div class="dot-container">
+                            <div></div><div></div><div></div>
+                            <div></div><div class="dice-dot red"></div><div></div>
+                            <div></div><div></div><div></div>
+                        </div>
+                    </div>
+                    <!-- Face 2 -->
+                    <div class="cube-face face-2">
+                        <div class="dot-container">
+                            <div class="dice-dot"></div><div></div><div></div>
+                            <div></div><div></div><div></div>
+                            <div></div><div></div><div class="dice-dot"></div>
+                        </div>
+                    </div>
+                    <!-- Face 3 -->
+                    <div class="cube-face face-3">
+                        <div class="dot-container">
+                            <div class="dice-dot"></div><div></div><div></div>
+                            <div></div><div class="dice-dot"></div><div></div>
+                            <div></div><div></div><div class="dice-dot"></div>
+                        </div>
+                    </div>
+                    <!-- Face 4 -->
+                    <div class="cube-face face-4">
+                        <div class="dot-container">
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                            <div></div><div></div><div></div>
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                        </div>
+                    </div>
+                    <!-- Face 5 -->
+                    <div class="cube-face face-5">
+                        <div class="dot-container">
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                            <div></div><div class="dice-dot"></div><div></div>
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                        </div>
+                    </div>
+                    <!-- Face 6 -->
+                    <div class="cube-face face-6">
+                        <div class="dot-container">
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                            <div class="dice-dot"></div><div></div><div class="dice-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 累计状态 -->
+            <div class="points-box">
+                <span>💰 我们的爱意储蓄金币</span>
+                <span style="font-weight:bold; color:#ffb703;" id="cloudCoinsDisplay">... 🪙</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 冒险惩罚卡牌弹窗 -->
+    <div class="adventure-overlay" id="adventureOverlay">
+        <div class="adventure-card">
+            <div class="adv-tag" id="advTag">真心话</div>
+            <div class="adv-emoji" id="advEmoji">❓</div>
+            <div class="adv-title" id="advTitle">真心话挑战</div>
+            <div class="adv-desc" id="advDesc">请诚实地告诉对方：我们上一次吵架是因为什么？</div>
+            <button class="btn-confirm" id="btnConfirmAction">我已完成执行！</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // --- 棋盘格路径定位配置 (7x5 贪吃蛇回路布阵) ---
+        // 起点在(4,0) [即 bottom-left / grid 坐标]，一路往右往上往左
+        // 这样可以绘制成一个环形跑道
+        const GRID_COORDS = [
+            { r: 5, c: 1 }, { r: 5, c: 2 }, { r: 5, c: 3 }, { r: 5, c: 4 }, { r: 5, c: 5 }, { r: 5, c: 6 }, { r: 5, c: 7 }, // bottom row (1-7)
+            { r: 4, c: 7 }, { r: 3, c: 7 }, { r: 2, c: 7 }, { r: 1, c: 7 }, // right col (8-11)
+            { r: 1, c: 6 }, { r: 1, c: 5 }, { r: 1, c: 4 }, { r: 1, c: 3 }, { r: 1, c: 2 }, { r: 1, c: 1 }, // top row (12-17)
+            { r: 2, c: 1 }, { r: 3, c: 1 }, { r: 4, c: 1 }, // left col (18-20)
+            { r: 3, c: 2 }, { r: 3, c: 3 }, { r: 3, c: 4 }, { r: 3, c: 5 }  // inner finish (21-24)
+        ];
+
+        const BOARD_DATA = [
+            { type: "start", name: "起点", emoji: "🏁", text: "心动大冒险飞行棋起点，预祝你们玩得开心！" },
+            { type: "adventure", name: "照片分享", emoji: "📸", text: "分享一张手机里对方的可爱照或搞怪照！" },
+            { type: "adventure", name: "深情对视", emoji: "🍬", text: "深情对视 10 秒，先笑的一方必须承认今天自己最粘人！" },
+            { type: "coin", name: "金币罐", emoji: "🪙", text: "踩中好运金币罐！爱意金币 +5 🪙！", coinEffect: 5 },
+            { type: "adventure", name: "按摩服务", emoji: "💆", text: "被动特权！对方必须为您揉揉肩膀或揉手 30 秒。" },
+            { type: "adventure", name: "真心话", emoji: "❓", text: "真心话：说出对方身上最吸引你的 3 个优点。" },
+            { type: "adventure", name: "大冒险", emoji: "🚨", text: "大冒险：用最软萌、最可爱的声音对对方说一句“我最喜欢你啦”。" },
+            { type: "trap", name: "倒车倒车", emoji: "💔", text: "哎呀走神了！不小心往后倒退 2 格。", moveEffect: -2 },
+            { type: "adventure", name: "盖章索吻", emoji: "💋", text: "索吻特权！向对方索要一个甜甜的吻（亲额头或亲脸颊）。" },
+            { type: "adventure", name: "奶茶预订", emoji: "🥤", text: "下次约会时，由对方承包请客买你最爱喝的奶茶！" },
+            { type: "adventure", name: "模仿对方", emoji: "🎭", text: "模仿对方吃醋或者撒娇时的表情和动作，由对方打分。" },
+            { type: "safe", name: "休息避风港", emoji: "🛡️", text: "安全区！什么也没发生，闭目养神休息一个回合吧。" },
+            { type: "coin", name: "金币爆仓", emoji: "🪙", text: "财神降临！爱意金币 +10 🪙！", coinEffect: 10 },
+            { type: "adventure", name: "模仿动物", emoji: "🐾", text: "大冒险：模仿一只可爱的小猫，喵喵叫 3 声并做抓挠动作。" },
+            { type: "adventure", name: "真心话", emoji: "❓", text: "真心话：如果你拥有一次超能力，你最想为对方做的一件事是什么？" },
+            { type: "adventure", name: "美味投喂", emoji: "🍰", text: "甜蜜互动：对方必须用嘴喂你吃一块小零食或喝一口水。" },
+            { type: "rocket", name: "心动加速", emoji: "🚀", text: "踩中推进器！心动速度拉满，前进 3 格！", moveEffect: 3 },
+            { type: "adventure", name: "禁言诅咒", emoji: "🚫", text: "两分钟内不准说话，若期间说话了，下次见面前写一篇 100 字检讨！" },
+            { type: "adventure", name: "十指相扣", emoji: "🤝", text: "甜蜜约定：双方十指相扣维持整整 1 分钟，松开算输。" },
+            { type: "adventure", name: "真心话", emoji: "❓", text: "真心话：诚实说出，你心目中我们最浪漫的约会是哪一次？" },
+            { type: "adventure", name: "大唱情歌", emoji: "🎵", text: "大冒险：看着对方的眼睛，清唱一首情歌的副歌部分给对方听。" },
+            { type: "trap", name: "金币小偷", emoji: "🪙", text: "糟糕，踩到金币裂缝！扣除 10 金币 🪙，不够则罚做鬼脸 10 秒！", coinEffect: -10 },
+            { type: "adventure", name: "包揽家务", emoji: "🧹", text: "家务大PK：说出一件你愿意为对方分担的家务，下次就由你来洗碗！" },
+            { type: "end", name: "终点", emoji: "🎉", text: "恭喜抵达心动终点！获得【无条件满足一个愿望】黄金特权券一张！" }
+        ];
+
+        // 玩家数据
+        let players = {
+            a: { name: "哲哲", pos: 0, char: "哲", color: "#ff477e" },
+            b: { name: "珊珊", pos: 0, char: "珊", color: "#00bbf9" }
+        };
+        let activePlayerKey = 'a'; // 哲哲先手
+        let cloudCoins = 100;
+        let isDiceRolling = false;
+        let audioCtx = null;
+
+        // --- DOM Elements ---
+        const boardMap = document.getElementById('boardMap');
+        const activeAvatar = document.getElementById('activeAvatar');
+        const activeName = document.getElementById('activeName');
+        const diceBtn = document.getElementById('diceBtn');
+        const diceCube = document.getElementById('diceCube');
+        const cloudCoinsDisplay = document.getElementById('cloudCoinsDisplay');
+
+        // 音效控制
+        function playTone(freq, type, duration) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = type || 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // --- 绘制地图 ---
+        function initBoard() {
+            boardMap.innerHTML = "";
+            for (let i = 0; i < BOARD_DATA.length; i++) {
+                const data = BOARD_DATA[i];
+                const coord = GRID_COORDS[i];
+                
+                const tile = document.createElement('div');
+                tile.className = `grid-tile tile-${data.type}`;
+                tile.style.gridRow = coord.r;
+                tile.style.gridColumn = coord.c;
+                tile.id = `tile-${i}`;
+                
+                tile.innerHTML = `
+                    <span class="grid-num">${i === 0 ? "Start" : i === 23 ? "End" : i}</span>
+                    <span class="grid-emoji">${data.emoji}</span>
+                    <span class="grid-text">${data.name}</span>
+                    <div class="token-holder" id="token-holder-${i}"></div>
+                `;
+                
+                boardMap.appendChild(tile);
+            }
+            renderPlayerTokens();
+            fetchCloudCoins();
+        }
+
+        // --- 绘制玩家棋子 ---
+        function renderPlayerTokens() {
+            // 清空所有棋盘格上的棋子
+            for (let i = 0; i < BOARD_DATA.length; i++) {
+                const holder = document.getElementById(`token-holder-${i}`);
+                if (holder) holder.innerHTML = "";
+            }
+
+            // 绘制当前棋子
+            ['a', 'b'].forEach(key => {
+                const p = players[key];
+                const holder = document.getElementById(`token-holder-${p.pos}`);
+                if (holder) {
+                    const token = document.createElement('div');
+                    token.className = `player-token token-${key}`;
+                    token.textContent = p.char;
+                    holder.appendChild(token);
+                }
+            });
+        }
+
+        // --- 骰子面翻转变换角度 ---
+        const DICE_ROTATIONS = {
+            1: { x: 0, y: 0 },
+            2: { x: 0, y: -90 },
+            3: { x: -90, y: 0 },
+            4: { x: 90, y: 0 },
+            5: { x: 0, y: 90 },
+            6: { x: 180, y: 0 }
+        };
+
+        // --- 掷骰子动作 ---
+        diceBtn.addEventListener('click', rollDice);
+
+        function rollDice() {
+            if (isDiceRolling) return;
+            isDiceRolling = true;
+            
+            playTone(200, 'sawtooth', 0.8);
+            diceCube.classList.add('rolling');
+
+            const rollResult = 1 + Math.floor(Math.random() * 6);
+
+            // 摇骰子 1.2 秒后结算位置
+            setTimeout(() => {
+                diceCube.classList.remove('rolling');
+                const rot = DICE_ROTATIONS[rollResult];
+                // 加点小偏斜更有3D感
+                diceCube.style.transform = `rotateX(${rot.x + 360}deg) rotateY(${rot.y + 360}deg)`;
+                
+                playTone(600, 'sine', 0.15);
+                setTimeout(() => playTone(800, 'sine', 0.2), 80);
+
+                setTimeout(() => {
+                    movePlayer(activePlayerKey, rollResult);
+                }, 400);
+            }, 1200);
+        }
+
+        // --- 棋子移动 ---
+        function movePlayer(key, steps) {
+            const p = players[key];
+            let targetPos = p.pos + steps;
+            
+            // 终点边界控制
+            if (targetPos >= BOARD_DATA.length - 1) {
+                targetPos = BOARD_DATA.length - 1;
+            }
+
+            // 逐步跳跃动画效果
+            let currentStep = p.pos;
+            const stepTimer = setInterval(() => {
+                currentStep++;
+                p.pos = currentStep;
+                renderPlayerTokens();
+                playTone(300 + currentStep * 15, 'triangle', 0.08);
+
+                if (currentStep >= targetPos) {
+                    clearInterval(stepTimer);
+                    setTimeout(() => {
+                        handleTileAction(key, targetPos);
+                    }, 400);
+                }
+            }, 180);
+        }
+
+        // --- 格子事件结算 ---
+        function handleTileAction(playerKey, pos) {
+            const data = BOARD_DATA[pos];
+            const p = players[playerKey];
+
+            // 组装弹窗内容
+            const overlay = document.getElementById('adventureOverlay');
+            const tag = document.getElementById('advTag');
+            const emoji = document.getElementById('advEmoji');
+            const title = document.getElementById('advTitle');
+            const desc = document.getElementById('advDesc');
+
+            tag.textContent = data.type === 'coin' ? '💰 储蓄金币' : data.type === 'trap' ? '🚨 惩罚格子' : '💖 甜蜜互动';
+            tag.style.background = data.type === 'coin' ? 'rgba(255, 183, 3, 0.15)' : 'rgba(255, 71, 126, 0.15)';
+            tag.style.color = data.type === 'coin' ? '#ffb703' : 'var(--primary)';
+            
+            emoji.textContent = data.emoji;
+            title.textContent = `${p.name} 踩中【${data.name}】`;
+            desc.textContent = data.text;
+
+            overlay.classList.add('active');
+            playTone(523.25, 'sine', 0.25); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.25), 100); // E5
+
+            // 处理特殊金币增加/扣除逻辑
+            if (data.coinEffect) {
+                updateCloudCoins(data.coinEffect);
+            }
+
+            // 解除弹框后继续处理是否位移
+            document.getElementById('btnConfirmAction').onclick = () => {
+                overlay.classList.remove('active');
+                playTone(600, 'sine', 0.08);
+
+                // 如果有特殊前进/后退属性
+                if (data.moveEffect) {
+                    setTimeout(() => {
+                        movePlayerDirectly(playerKey, data.moveEffect);
+                    }, 500);
+                } else if (pos === BOARD_DATA.length - 1) {
+                    // 到达终点，大放烟花
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                    alert(`🎉 恭喜 ${p.name} 胜利通关！`);
+                    isDiceRolling = false;
+                } else {
+                    // 下一个玩家的回合
+                    activePlayerKey = activePlayerKey === 'a' ? 'b' : 'a';
+                    updateTurnUI();
+                    isDiceRolling = false;
+                }
+            };
+        }
+
+        // --- 直接移动（后退或加速前进） ---
+        function movePlayerDirectly(key, steps) {
+            const p = players[key];
+            let targetPos = p.pos + steps;
+            if (targetPos < 0) targetPos = 0;
+            if (targetPos >= BOARD_DATA.length - 1) targetPos = BOARD_DATA.length - 1;
+
+            p.pos = targetPos;
+            renderPlayerTokens();
+            playTone(400, 'sawtooth', 0.2);
+
+            setTimeout(() => {
+                // 直接移动后不再重复触发新格子的文字弹窗，只切换回合
+                activePlayerKey = activePlayerKey === 'a' ? 'b' : 'a';
+                updateTurnUI();
+                isDiceRolling = false;
+            }, 600);
+        }
+
+        // --- 更新回合 UI ---
+        function updateTurnUI() {
+            const activePlayer = players[activePlayerKey];
+            activeAvatar.textContent = activePlayer.char;
+            activeAvatar.className = `active-avatar avatar-${activePlayerKey}`;
+            activeName.textContent = `${activePlayer.name}的回合`;
+        }
+
+        // --- 联动拉取云数据金币 ---
+        function fetchCloudCoins() {
+            fetch('/api/config')
+                .then(res => res.json())
+                .then(cfg => {
+                    if (cfg.sweetpact_love_coins !== undefined) {
+                        cloudCoins = parseInt(cfg.sweetpact_love_coins);
+                        cloudCoinsDisplay.textContent = `${cloudCoins} 🪙`;
+                    }
+                })
+                .catch(e => {
+                    cloudCoinsDisplay.textContent = `100 🪙`;
+                });
+        }
+
+        // --- 联动修改云数据金币 ---
+        function updateCloudCoins(offset) {
+            cloudCoins += offset;
+            if (cloudCoins < 0) cloudCoins = 0;
+            cloudCoinsDisplay.textContent = `${cloudCoins} 🪙`;
+
+            // 保存云端
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sweetpact_love_coins: String(cloudCoins) })
+            }).catch(e => console.error("Board game coin sync failed:", e));
+        }
+
+        // 启动
+        initBoard();
+        updateTurnUI();
+    </script>
+</body>
+</html>

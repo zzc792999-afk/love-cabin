@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍔 恋爱决策大转盘</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ----------------------------------------------------
+           SweetWheel (恋爱决策大转盘) - Design System
+           Modern Dark Glassmorphism & Neon Glow Aesthetic
+        ---------------------------------------------------- */
+        :root {
+            --bg-primary: #0a0410;
+            --bg-gradient: linear-gradient(135deg, #0a0410 0%, #150924 50%, #0e0517 100%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.08);
+            
+            --primary: #ff477e;
+            --primary-glow: rgba(255, 71, 126, 0.4);
+            --secondary: #00f5d4;
+            --secondary-glow: rgba(0, 245, 212, 0.4);
+            --accent-purple: #9b5de5;
+            
+            --text-main: #f8f9fa;
+            --text-muted: #a0a5c0;
+            
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
+            
+            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景发光 */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .glow-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            animation: floatGlow 20s infinite alternate ease-in-out;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 80%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .circle-2 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 80%);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -6s;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, 40px) scale(1.1); }
+        }
+
+        /* 界面容器 */
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            z-index: 2;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 返回首页按钮 */
+        .btn-back-home {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .btn-back-home:hover {
+            color: white;
+            background: var(--glass-hover);
+        }
+
+        /* 顶部导航与分类 */
+        .wheel-nav {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            padding: 5px;
+            border-radius: var(--radius-pill);
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* 转盘主展示区 */
+        .wheel-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 20px 0;
+        }
+
+        .wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 71, 126, 0.15);
+            transition: transform cubic-bezier(0.1, 0.8, 0.1, 1);
+            transform: rotate(0deg);
+        }
+
+        /* 指针 */
+        .wheel-pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 5;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            user-select: none;
+        }
+
+        .wheel-pointer::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 28px solid #fff;
+            z-index: -1;
+        }
+
+        .wheel-pointer:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .wheel-pointer:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        /* 控制与选项编辑面板 */
+        .options-panel {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary);
+            border-bottom: 1px dashed var(--glass-border);
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .options-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .options-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .option-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .btn-delete-opt {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .btn-delete-opt:hover {
+            color: var(--primary);
+        }
+
+        /* 添加选项表单 */
+        .add-option-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .form-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary-glow);
+        }
+
+        .btn-add {
+            background: var(--secondary);
+            color: #0a0410;
+            border: none;
+            padding: 10px 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 12px var(--secondary-glow);
+        }
+
+        /* 决定弹窗 */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .result-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .result-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-overlay.active .result-card {
+            transform: scale(1);
+        }
+
+        .result-emoji {
+            font-size: 4rem;
+            margin-bottom: 12px;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 24px;
+            text-shadow: 0 0 15px rgba(255, 71, 126, 0.35);
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 700;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            width: 100%;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        .btn-confirm:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-circle circle-1"></div>
+        <div class="glow-circle circle-2"></div>
+    </div>
+
+    <div class="app-container" style="position: relative;">
+        <!-- 返回首页 -->
+        <a href="../index.html" class="btn-back-home">↩ 返回主页</a>
+
+        <!-- 左侧：转盘面板 -->
+        <div class="glass-card">
+            <!-- 导航 Tabs -->
+            <div class="wheel-nav">
+                <button class="nav-btn active" data-type="eat">🍔 今天吃什么</button>
+                <button class="nav-btn" data-type="do">🎭 今天做什么</button>
+                <button class="nav-btn" data-type="custom">✏️ 自定义转盘</button>
+            </div>
+
+            <!-- 转盘本体 -->
+            <div class="wheel-wrapper">
+                <canvas id="wheelCanvas" class="wheel-canvas" width="640" height="640"></canvas>
+                <div class="wheel-pointer" id="pointer">🎯</div>
+            </div>
+        </div>
+
+        <!-- 右侧：选项编辑面板 -->
+        <div class="glass-card options-panel">
+            <h3 class="panel-title"><i class="fas fa-list-ul"></i> 转盘选项配置</h3>
+            <div class="options-list" id="optsList">
+                <!-- 由 JS 填充 -->
+            </div>
+            
+            <div class="add-option-form">
+                <input type="text" class="form-input" id="newOptInput" placeholder="输入新的选择..." maxlength="15">
+                <button class="btn-add" id="btnAddOpt">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果飘窗弹框 -->
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-card">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">大转盘的结果决定是：</div>
+            <div class="result-value" id="resultVal">火锅</div>
+            <button class="btn-confirm" onclick="closeResult()">遵命，就它了！</button>
+        </div>
+    </div>
+
+    <!-- Canvas Confetti 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // --- 预置配置选项 ---
+        const PRESETS = {
+            eat: ["火锅 🍲", "烤肉 🍖", "寿司日料 🍣", "螺蛳粉 🍜", "炸鸡汉堡 🍔", "川菜炒菜 🥘", "大餐由对方下厨 🍳", "清淡粥面 🥣"],
+            do: ["看场甜甜的电影 🎬", "手拉手逛公园 ⛲", "一起宅着打游戏 🎮", "出门抓娃娃 🧸", "给对方揉揉肩肩 💆", "一起睡个大懒觉 💤", "悄悄准备一份惊喜 🎁", "去商场逛街夹抓 🛍️"],
+            custom: ["大冒险一次", "做饭给对方吃", "免洗碗一天", "真心话大冒险", "清空对方购物车", "唱一首歌"]
+        };
+
+        // 配色系统
+        const COLORS = ["#ff477e", "#9b5de5", "#00f5d4", "#ffb703", "#00bbf9", "#f15bb5", "#fee440", "#3a86c8"];
+
+        // 应用状态
+        let currentType = 'eat';
+        let options = [...PRESETS.eat];
+        let isSpinning = false;
+        let startAngle = 0;
+        let audioCtx = null;
+
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const pointer = document.getElementById('pointer');
+        const optsList = document.getElementById('optsList');
+        const newOptInput = document.getElementById('newOptInput');
+        const btnAddOpt = document.getElementById('btnAddOpt');
+
+        // 音效控制
+        function playTone(freq, duration) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // --- 绘制转盘 ---
+        function drawWheel() {
+            const numSegments = options.length;
+            const arc = Math.PI * 2 / numSegments;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制底图外圈阴影
+            ctx.save();
+            ctx.translate(320, 320);
+            
+            // 逐段画扇区
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * arc;
+                ctx.fillStyle = COLORS[i % COLORS.length];
+                
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, 300, angle, angle + arc);
+                ctx.closePath();
+                ctx.fill();
+                
+                // 绘制白线分割线
+                ctx.strokeStyle = "rgba(255,255,255,0.15)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 绘制文本
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 20px Noto Sans SC";
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 5;
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.rotate(angle + arc / 2);
+                ctx.fillText(options[i], 270, 0);
+                ctx.restore();
+            }
+
+            // 外围金边装饰圈
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.arc(0, 0, 305, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // --- 渲染选项列表 ---
+        function renderOptionsList() {
+            optsList.innerHTML = "";
+            options.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = "option-item";
+                div.innerHTML = `
+                    <div class="option-color-dot" style="background-color: ${COLORS[idx % COLORS.length]}"></div>
+                    <span class="option-text">${opt}</span>
+                    <button class="btn-delete-opt" onclick="deleteOption(${idx})"><i class="fas fa-trash-alt"></i></button>
+                `;
+                optsList.appendChild(div);
+            });
+            drawWheel();
+        }
+
+        // --- 添加选项 ---
+        btnAddOpt.addEventListener('click', () => {
+            const val = newOptInput.value.trim();
+            if (!val) {
+                alert("请输入选项内容哦！");
+                return;
+            }
+            if (options.length >= 16) {
+                alert("最多只能设置16个选项哦！");
+                return;
+            }
+            options.push(val);
+            newOptInput.value = "";
+            saveCustomOptions();
+            renderOptionsList();
+            playTone(800, 0.1);
+        });
+
+        window.deleteOption = function(idx) {
+            if (options.length <= 2) {
+                alert("大转盘至少需要保留 2 个选项哦！");
+                return;
+            }
+            options.splice(idx, 1);
+            saveCustomOptions();
+            renderOptionsList();
+            playTone(200, 0.1);
+        }
+
+        // --- 云端/本地存储自定义转盘数据 ---
+        function saveCustomOptions() {
+            if (currentType === 'custom') {
+                localStorage.setItem("wheel_custom_options", JSON.stringify(options));
+                // 同步至云端
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sweetpact_wheel_options: JSON.stringify(options) })
+                }).catch(e => console.error(e));
+            }
+        }
+
+        function loadCustomOptions() {
+            if (currentType === 'custom') {
+                const local = localStorage.getItem("wheel_custom_options");
+                if (local) {
+                    options = JSON.parse(local);
+                    renderOptionsList();
+                }
+                
+                fetch('/api/config')
+                    .then(res => res.json())
+                    .then(cfg => {
+                        if (cfg.sweetpact_wheel_options) {
+                            options = JSON.parse(cfg.sweetpact_wheel_options);
+                            localStorage.setItem("wheel_custom_options", cfg.sweetpact_wheel_options);
+                            renderOptionsList();
+                        }
+                    }).catch(e => {});
+            }
+        }
+
+        // --- 切换 Tabs ---
+        const tabBtns = document.querySelectorAll('.nav-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isSpinning) return;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentType = btn.getAttribute('data-type');
+                if (currentType === 'custom') {
+                    const local = localStorage.getItem("wheel_custom_options");
+                    options = local ? JSON.parse(local) : [...PRESETS.custom];
+                    loadCustomOptions();
+                } else {
+                    options = [...PRESETS[currentType]];
+                }
+                renderOptionsList();
+                playTone(600, 0.15);
+            });
+        });
+
+        // --- 旋转动作 ---
+        let currentRotation = 0;
+        pointer.addEventListener('click', spinWheel);
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            // 产生一个 4~8 圈的旋转角度 + 随机偏移角
+            const spinRounds = 5 + Math.floor(Math.random() * 4);
+            const extraDegrees = Math.random() * 360;
+            const targetRotation = currentRotation + spinRounds * 360 + extraDegrees;
+
+            // 动效时间
+            const duration = 5000; // 5s
+            const start = performance.now();
+            const startRot = currentRotation;
+
+            // 定时播放旋转点击声音 (逐渐减慢)
+            let lastTickAngle = 0;
+            const numSegments = options.length;
+            const segmentArc = 360 / numSegments;
+
+            function animate(timestamp) {
+                const elapsed = timestamp - start;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 缓动曲线 (Ease-out cubic)
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                currentRotation = startRot + (targetRotation - startRot) * easeOut;
+                
+                canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+                // 计算是否转过了一个扇区，如果是则播放点击声
+                const currentAngleNormalized = (currentRotation) % 360;
+                if (Math.abs(currentAngleNormalized - lastTickAngle) > segmentArc * 0.8) {
+                    playTone(400 + Math.sin(progress * Math.PI) * 150, 0.05);
+                    lastTickAngle = currentAngleNormalized;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    currentRotation = currentRotation % 360;
+                    handleSpinFinished();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- 旋转结算 ---
+        function handleSpinFinished() {
+            // 转盘是以 3 点钟方向为 0 弧度，顺时针增长。
+            // 指针在正上方（12 点钟方向，即 -90 度 或 270 度位置）。
+            // 倒推选中位置：
+            const numSegments = options.length;
+            const arc = 360 / numSegments;
+            
+            // 270 度是指针所对的位置。因为转盘旋转了 currentRotation 度，
+            // 相当于原图逆时针移了 currentRotation 度，所以计算公式为：
+            const winningIndex = Math.floor((270 - currentRotation + 360 * 10) % 360 / arc);
+            const resultText = options[winningIndex];
+
+            // 弹出结果
+            document.getElementById('resultVal').textContent = resultText;
+            
+            setTimeout(() => {
+                document.getElementById('resultOverlay').classList.add('active');
+                playTone(880, 0.45);
+                setTimeout(() => playTone(1046.5, 0.6), 150);
+
+                // 飘礼花
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }, 300);
+        }
+
+        window.closeResult = function() {
+            document.getElementById('resultOverlay').classList.remove('active');
+            playTone(600, 0.1);
+        }
+
+        // 初始载入
+        renderOptionsList();
+    </script>
+</body>
+</html>

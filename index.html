@@ -46,10 +46,14 @@
     <div class="container">
         <!-- 头部标题 (带主题切换按钮) -->
         <header>
+            <!-- 👩‍❤️‍👨 角色视角切换按钮 -->
+            <button id="role-toggle" class="role-toggle-btn" title="切换当前玩家视角 (祖哲 / 珊珊)" style="position: absolute; top: 20px; left: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); border: var(--border-glass); box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: all 0.3s; z-index: 100;">
+                <span id="role-indicator-icon">👩</span>
+            </button>
             <button id="theme-toggle" class="theme-toggle-btn" title="一键切换 梦幻樱粉 / 极光暗夜">
                 <i class="fas fa-moon"></i>
             </button>
-            <h1 class="header-title"><i class="fas fa-heart"></i> 致珊珊宝贝 <i class="fas fa-heart"></i></h1>
+            <h1 class="header-title"><i class="fas fa-heart"></i> 致<span id="header-girlfriend-name">珊珊</span>宝贝 <i class="fas fa-heart"></i></h1>
             <p class="subtitle">记录我们的相遇、重逢与未来的每一天</p>
         </header>
 
@@ -126,6 +130,50 @@
                 </div>
             </div>
 
+            <!-- 🏆 恋爱成就勋章墙 -->
+            <div class="glass-panel" style="margin-bottom: 25px;">
+                <div class="card-glare"></div>
+                <h3 style="color: var(--primary-dark); text-align: center; margin-bottom: 25px; font-size: 1.5rem;"><i class="fas fa-trophy"></i> 我们的心动勋章墙</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; justify-content: center;">
+                    <!-- Badge 1: 终身契约 -->
+                    <div class="medal-badge" id="badge-contract" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="签署心动契约">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🤝</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">终身契约</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">签署心动契约</p>
+                    </div>
+                    <!-- Badge 2: 安全诊断 -->
+                    <div class="medal-badge" id="badge-diagnose" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="通过安全中心诊断">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🛡️</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">安全仙女</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">完成安全中心诊断</p>
+                    </div>
+                    <!-- Badge 3: 金币达人 -->
+                    <div class="medal-badge" id="badge-coins" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="爱意金币累计达到 120">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🪙</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">金币富豪</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">金币达到 120 个</p>
+                    </div>
+                    <!-- Badge 4: 大富翁 -->
+                    <div class="medal-badge" id="badge-boardgame" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="顺利通关一次心动飞行棋">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🎲</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">大富翁</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">通关一次飞行棋</p>
+                    </div>
+                    <!-- Badge 5: 干饭之王 -->
+                    <div class="medal-badge" id="badge-wheel" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="完成大转盘美食决策且干饭记录上传云端">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🍔</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">决策干饭王</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">完成转盘美食决策</p>
+                    </div>
+                    <!-- Badge 6: 时光寄语 -->
+                    <div class="medal-badge" id="badge-diary" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="在恋爱手账里写下第一篇日记">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">✉️</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">时光手账家</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">写下第一篇日记</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- 倒计时区域 -->
             <div class="glass-panel">
                 <div class="card-glare"></div>
@@ -189,6 +237,7 @@
                     <a href="other/answer_book.html" class="btn-secondary" style="border-color: #f39c12; color: #d35400;"><i class="fas fa-book"></i> 📖 恋爱答案之书</a>
                     
                     <a href="xin.html" class="btn-secondary" style="border-color: var(--secondary); color: var(--secondary);"><i class="fas fa-globe"></i> 🌌 我们的恋爱宇宙</a>
+                    <a href="other/diary.html" class="btn-secondary" style="border-color: #9b5de5; color: #9b5de5;"><i class="fas fa-book"></i> 📔 恋爱心动手账</a>
                     <a href="other/player.html" class="btn-secondary" style="border-color: #e74c3c; color: #c0392b;"><i class="fas fa-music"></i> 📻 专属心动随身听</a>
                     <a href="other/messages.html" class="btn-secondary" style="border-color: #3498db; color: #2980b9;"><i class="fas fa-sticky-note"></i> 📜 留言历史回廊</a>
                     <a href="index1.html" class="btn-secondary" style="border-color: #ff7597; color: #e65275;"><i class="fas fa-search-heart"></i> 🔍 悄悄看他在干嘛</a>
@@ -466,6 +515,7 @@
     </footer>
 
     <!-- 引入核心逻辑 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="app.js"></script>
     <script>
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

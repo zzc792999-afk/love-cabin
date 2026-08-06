@@ -1239,6 +1239,29 @@
                     </div>
                 </div>
 
+                <!-- 🎵 云端歌单管理 -->
+                <div class="form-group" style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 20px; margin-top: 20px;">
+                    <label style="font-weight: 600;"><i class="fas fa-play-circle"></i> 云端歌单点歌台 (config_playlist)</label>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                        为珊珊点歌！在此管理的歌曲将实时载入主页底部的黑胶唱机中。请输入歌曲名字与直链 MP3 地址。
+                    </p>
+                    <!-- 歌单列表容器 -->
+                    <div id="admin-playlist-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                        <!-- 动态填充歌曲条目 -->
+                    </div>
+                    <!-- 添加歌曲表单 -->
+                    <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.1); font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px;">
+                        <span style="font-weight: 600; color: var(--secondary);">➕ 点歌 / 添加新歌曲</span>
+                        <div style="display: grid; grid-template-columns: 80px 1fr; gap: 8px; align-items: center;">
+                            <label>歌名歌手:</label>
+                            <input type="text" id="add-song-title" placeholder="如: 周杰伦 - 告白气球" style="padding: 4px 8px; font-size: 0.8rem;">
+                            <label>音乐链接:</label>
+                            <input type="text" id="add-song-url" placeholder="如: other/1.mp3 或外链 MP3 URL" style="padding: 4px 8px; font-size: 0.8rem; font-family: monospace;">
+                        </div>
+                        <button type="button" class="btn-helper" id="btn-add-song" style="align-self: flex-end; padding: 4px 12px; color: var(--secondary); border-color: rgba(161,127,224,0.3);"><i class="fas fa-plus"></i> 确认添加</button>
+                    </div>
+                </div>
+
                 <!-- 保存所有素材 -->
                 <div style="margin-top: 30px; text-align: right; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
                     <button class="btn-submit" id="btn-save-assets" style="margin: 0; font-size: 0.9rem; padding: 10px 25px;"><i class="fas fa-save"></i> 💾 保存并同步所有素材配置</button>
@@ -1356,6 +1379,7 @@
 
         let adminPhotos = [];
         let adminStatuses = [];
+        let adminPlaylist = [];
 
         const loginOverlay = document.getElementById('login-overlay');
         const loginPass = document.getElementById('admin-pass');
@@ -1460,7 +1484,10 @@
                         'scratch_extra_spins', 'scratch_infinite_spins', 'scratch_used_keys', 'scratch_prizes',
                         'scratch_pending_prize_id', 'scratch_pending_deck',
                         'sweetpact_peace_count', 'sweetpact_love_coins', 'sweetpact_contract_signed',
-                        'sweetpact_partner_a', 'sweetpact_partner_b', 'sweetpact_history_logs'
+                        'sweetpact_partner_a', 'sweetpact_partner_b', 'sweetpact_history_logs',
+                        'sweetpact_miss_trigger_zuzhe', 'sweetpact_miss_trigger_shanshan',
+                        'sweetpact_prank_diagnosed', 'sweetpact_boardgame_won',
+                        'config_playlist', 'sweetpact_wheel_options'
                     ];
 
                     CONFIG_KEYS.forEach(key => {
@@ -1609,6 +1636,20 @@
                 adminStatuses = [...DEFAULT_STATUSES];
             }
             renderStatusesListAdmin();
+
+            // 载入并渲染歌单
+            const cachedPlaylist = safeGet('config_playlist');
+            if (cachedPlaylist) {
+                try {
+                    const parsed = JSON.parse(cachedPlaylist);
+                    adminPlaylist = (parsed && Array.isArray(parsed)) ? parsed : [];
+                } catch(e) {
+                    adminPlaylist = [];
+                }
+            } else {
+                adminPlaylist = [];
+            }
+            renderPlaylistAdmin();
         }
 
         // 向后端提交保存全局配置
@@ -2644,6 +2685,51 @@
             document.getElementById('add-status-text').value = '';
         });
 
+        // 渲染与操作点歌台歌曲列表
+        function renderPlaylistAdmin() {
+            const container = document.getElementById('admin-playlist-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (adminPlaylist.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted); text-align: center; font-size: 0.8rem; padding: 10px;">暂无云端歌曲，默认播放本地默认音频</div>';
+                return;
+            }
+
+            adminPlaylist.forEach((song, idx) => {
+                const item = document.createElement('div');
+                item.style.cssText = "display:flex; justify-content:space-between; align-items:center; gap:10px; background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:4px; border:1px solid rgba(255,255,255,0.04); font-size:0.8rem;";
+                item.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                        <span style="color:#eee; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${idx + 1}. ${song.title}</span>
+                        <span style="color:var(--text-muted); font-size:0.7rem; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${song.url}</span>
+                    </div>
+                    <button type="button" class="btn-helper" style="color:#ff4757; border-color:rgba(255,71,87,0.2); padding:2px 6px; font-size:0.7rem; white-space:nowrap; margin:0;" onclick="deleteSongAdmin(${idx})">
+                        <i class="fas fa-trash-alt"></i> 删除
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        window.deleteSongAdmin = function(idx) {
+            adminPlaylist.splice(idx, 1);
+            renderPlaylistAdmin();
+        };
+
+        document.getElementById('btn-add-song').addEventListener('click', () => {
+            const title = document.getElementById('add-song-title').value.trim();
+            const url = document.getElementById('add-song-url').value.trim();
+            if (!title || !url) {
+                alert('请填写完整的歌曲名字与播放直链地址！');
+                return;
+            }
+            adminPlaylist.push({ title, url });
+            renderPlaylistAdmin();
+            document.getElementById('add-song-title').value = '';
+            document.getElementById('add-song-url').value = '';
+        });
+
         // 绑定保存所有素材动作
         document.getElementById('btn-save-assets').addEventListener('click', () => {
             const bgMusicUrl = document.getElementById('input-bg-music-url').value.trim();
@@ -2653,7 +2739,8 @@
                 config_bg_music_url: bgMusicUrl,
                 config_love_letter: loveLetter,
                 config_photo_list: JSON.stringify(adminPhotos),
-                config_he_doing_list: JSON.stringify(adminStatuses)
+                config_he_doing_list: JSON.stringify(adminStatuses),
+                config_playlist: JSON.stringify(adminPlaylist)
             }, '🎨 网站图片、音乐、情书和状态文案配置同步保存成功！');
         });
 

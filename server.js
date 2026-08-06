@@ -13,7 +13,11 @@ let dbClient = null;
 let messagesCollection = null;
 let configCollection = null;
 let wishlistCollection = null;
+let diaryCollection = null;
+let decisionsCollection = null;
 const mongoURI = process.env.MONGODB_URI || "";
+const DIARY_FILE = path.join(__dirname, 'other', 'diary.json');
+const DECISIONS_FILE = path.join(__dirname, 'other', 'decisions.json');
 
 if (mongoURI) {
     console.log("检测到 MONGODB_URI，正在建立云数据库连接...");
@@ -24,13 +28,17 @@ if (mongoURI) {
             messagesCollection = db.collection('messages');
             configCollection = db.collection('config');
             wishlistCollection = db.collection('wishlist');
-            console.log("💖 MongoDB 云数据库连接成功！留言、配置及心愿单数据已开启云端永久化。");
+            diaryCollection = db.collection('diary');
+            decisionsCollection = db.collection('decisions');
+            console.log("💖 MongoDB 云数据库连接成功！留言、配置、心愿单、日记和决策数据已开启云端永久化。");
         })
         .catch(err => {
             console.error("⚠️ MongoDB 连接失败，自动降级为本地 JSON 文件存储:", err.message);
             messagesCollection = null;
             configCollection = null;
             wishlistCollection = null;
+            diaryCollection = null;
+            decisionsCollection = null;
         });
 }
 
@@ -49,6 +57,8 @@ function getDatabaseCollection(collectionName) {
             if (collectionName === 'config') col = configCollection;
             else if (collectionName === 'messages') col = messagesCollection;
             else if (collectionName === 'wishlist') col = wishlistCollection;
+            else if (collectionName === 'diary') col = diaryCollection;
+            else if (collectionName === 'decisions') col = decisionsCollection;
 
             if (col) {
                 clearInterval(interval);
@@ -103,7 +113,13 @@ function ensureConfigFile() {
             sweetpact_contract_signed: "false",
             sweetpact_partner_a: "",
             sweetpact_partner_b: "",
-            sweetpact_history_logs: "[]"
+            sweetpact_history_logs: "[]",
+            sweetpact_miss_trigger_zuzhe: "",
+            sweetpact_miss_trigger_shanshan: "",
+            sweetpact_prank_diagnosed: "false",
+            sweetpact_boardgame_won: "false",
+            config_playlist: "[]",
+            sweetpact_wheel_options: ""
         };
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfigs, null, 4), 'utf8');
     }
@@ -117,6 +133,28 @@ function ensureWishlistFile() {
     }
     if (!fs.existsSync(WISHLIST_FILE)) {
         fs.writeFileSync(WISHLIST_FILE, JSON.stringify([], null, 4), 'utf8');
+    }
+}
+
+// 确保本地日记数据文件存在
+function ensureDiaryFile() {
+    const dir = path.dirname(DIARY_FILE);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(DIARY_FILE)) {
+        fs.writeFileSync(DIARY_FILE, JSON.stringify([], null, 4), 'utf8');
+    }
+}
+
+// 确保本地决策数据文件存在
+function ensureDecisionsFile() {
+    const dir = path.dirname(DECISIONS_FILE);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(DECISIONS_FILE)) {
+        fs.writeFileSync(DECISIONS_FILE, JSON.stringify([], null, 4), 'utf8');
     }
 }
 
@@ -487,6 +525,225 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // 3.8 获取双人日记列表
+    if (pathname === '/api/diary' && req.method === 'GET') {
+        getDatabaseCollection('diary')
+            .then(col => {
+                if (col) {
+                    return col.find({}).sort({ timestamp: -1 }).toArray()
+                        .then(docs => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(docs));
+                        });
+                } else {
+                    ensureDiaryFile();
+                    fs.readFile(DIARY_FILE, 'utf8', (err, data) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地日记失败' }));
+                            return;
+                        }
+                        try {
+                            const list = JSON.parse(data);
+                            list.sort((a, b) => b.timestamp - a.timestamp);
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(list));
+                        } catch(e) {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify([]));
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取日记失败' }));
+            });
+        return;
+    }
+
+    // 3.9 新增双人日记条目
+    if (pathname === '/api/diary' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const entry = JSON.parse(body);
+                entry.timestamp = entry.timestamp || Date.now();
+                entry.id = entry.id || Math.random().toString(36).substring(2, 9);
+                getDatabaseCollection('diary')
+                    .then(col => {
+                        if (col) {
+                            return col.insertOne(entry)
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, entry }));
+                                });
+                        } else {
+                            ensureDiaryFile();
+                            fs.readFile(DIARY_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                if (!readErr) {
+                                    try { list = JSON.parse(data); } catch(e) {}
+                                }
+                                list.push(entry);
+                                fs.writeFile(DIARY_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                    if (writeErr) {
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: '保存本地日记失败' }));
+                                        return;
+                                    }
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, entry }));
+                                });
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '保存日记失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
+    // 3.10 删除日记条目
+    if (pathname === '/api/diary' && req.method === 'DELETE') {
+        const id = url.searchParams.get('id');
+        if (!id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: '缺失 id 参数' }));
+            return;
+        }
+        getDatabaseCollection('diary')
+            .then(col => {
+                if (col) {
+                    return col.deleteOne({ id: id })
+                        .then(() => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                } else {
+                    ensureDiaryFile();
+                    fs.readFile(DIARY_FILE, 'utf8', (readErr, data) => {
+                        if (readErr) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '删除本地日记失败' }));
+                            return;
+                        }
+                        let list = [];
+                        try { list = JSON.parse(data); } catch(e) {}
+                        list = list.filter(item => item.id !== id);
+                        fs.writeFile(DIARY_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                            if (writeErr) {
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: '更新本地日记失败' }));
+                                      return;
+                            }
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '删除日记失败' }));
+            });
+        return;
+    }
+
+    // 3.11 获取决策记录列表
+    if (pathname === '/api/decisions' && req.method === 'GET') {
+        getDatabaseCollection('decisions')
+            .then(col => {
+                if (col) {
+                    return col.find({}).sort({ timestamp: -1 }).limit(20).toArray()
+                        .then(docs => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(docs));
+                        });
+                } else {
+                    ensureDecisionsFile();
+                    fs.readFile(DECISIONS_FILE, 'utf8', (err, data) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地决策记录失败' }));
+                            return;
+                        }
+                        try {
+                            const list = JSON.parse(data);
+                            list.sort((a, b) => b.timestamp - a.timestamp);
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(list.slice(0, 20)));
+                        } catch(e) {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify([]));
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取决策记录失败' }));
+            });
+        return;
+    }
+
+    // 3.12 新增决策记录条目
+    if (pathname === '/api/decisions' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const record = JSON.parse(body);
+                record.timestamp = record.timestamp || Date.now();
+                getDatabaseCollection('decisions')
+                    .then(col => {
+                        if (col) {
+                            return col.insertOne(record)
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, record }));
+                                });
+                        } else {
+                            ensureDecisionsFile();
+                            fs.readFile(DECISIONS_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                if (!readErr) {
+                                    try { list = JSON.parse(data); } catch(e) {}
+                                }
+                                list.push(record);
+                                list.sort((a, b) => b.timestamp - a.timestamp);
+                                list = list.slice(0, 50); // 只保留最近50条
+                                fs.writeFile(DECISIONS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                    if (writeErr) {
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: '保存本地决策记录失败' }));
+                                        return;
+                                    }
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, record }));
+                                });
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '保存决策记录失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
     // 4. 获取全局配置
     if (pathname === '/api/config' && req.method === 'GET') {
         let finished = false;
@@ -552,7 +809,13 @@ const server = http.createServer((req, res) => {
                                     sweetpact_contract_signed: "false",
                                     sweetpact_partner_a: "",
                                     sweetpact_partner_b: "",
-                                    sweetpact_history_logs: "[]"
+                                    sweetpact_history_logs: "[]",
+                                    sweetpact_miss_trigger_zuzhe: "",
+                                    sweetpact_miss_trigger_shanshan: "",
+                                    sweetpact_prank_diagnosed: "false",
+                                    sweetpact_boardgame_won: "false",
+                                    config_playlist: "[]",
+                                    sweetpact_wheel_options: ""
                                 };
                                 return col.insertOne(defaultConfigs).then(() => defaultConfigs);
                             }

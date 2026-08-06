@@ -218,7 +218,11 @@
         wishlist: [],
         stickyNotes: [],
         musicPlaying: false,
-        theme: 'light'
+        theme: 'light',
+        myRole: localStorage.getItem('myRole') || 'shanshan',
+        lastSeenMissTrigger: null,
+        playlist: [],
+        currentSongIndex: 0
     };
 
     // 🔄 异步从云数据库拉取最新全局配置并动态渲染
@@ -236,7 +240,12 @@
                 'gashapon_inventory', 'tree_points', 'treePoints', 'config_anniversary_password',
                 'chat_reply_miss', 'chat_reply_hug', 'chat_reply_coax', 'config_bg_music_url',
                 'config_love_letter', 'config_photo_list', 'config_he_doing_list',
-                'quarrel_mode', 'quarrel_text'
+                'quarrel_mode', 'quarrel_text',
+                'sweetpact_peace_count', 'sweetpact_love_coins', 'sweetpact_contract_signed',
+                'sweetpact_partner_a', 'sweetpact_partner_b', 'sweetpact_history_logs',
+                'sweetpact_miss_trigger_zuzhe', 'sweetpact_miss_trigger_shanshan',
+                'sweetpact_prank_diagnosed', 'sweetpact_boardgame_won',
+                'config_playlist', 'sweetpact_wheel_options'
             ];
 
             CONFIG_KEYS.forEach(key => {
@@ -328,22 +337,54 @@
                 } catch(err) {}
             }
 
-            // 实时同步背景音乐源
-            if (cfg.config_bg_music_url !== undefined) {
-                const bgMusic = document.getElementById('bg-music');
-                if (bgMusic) {
-                    const sourceEl = bgMusic.querySelector('source');
-                    const currentSrc = sourceEl ? sourceEl.getAttribute('src') : '';
-                    const targetSrc = cfg.config_bg_music_url.trim() || 'other/1.mp3';
-                    if (currentSrc !== targetSrc) {
-                        bgMusic.innerHTML = `<source src="${targetSrc}" type="audio/mpeg">`;
-                        bgMusic.load();
-                        if (state.musicPlaying) {
-                            bgMusic.play().catch(e => console.log("Music play blocked:", e));
-                        }
+            // 实时同步云端歌单
+            if (cfg.config_playlist !== undefined) {
+                try {
+                    const parsed = JSON.parse(cfg.config_playlist);
+                    if (Array.isArray(parsed)) {
+                        state.playlist = parsed;
+                    }
+                } catch(e) {}
+            }
+
+            // 实时同步背景音乐源与歌单
+            const bgMusic = document.getElementById('bg-music');
+            if (bgMusic) {
+                let targetSrc = 'other/1.mp3';
+                if (state.playlist && state.playlist.length > 0) {
+                    targetSrc = state.playlist[state.currentSongIndex]?.url || 'other/1.mp3';
+                } else if (cfg.config_bg_music_url) {
+                    targetSrc = cfg.config_bg_music_url.trim();
+                }
+
+                const sourceEl = bgMusic.querySelector('source');
+                const currentSrc = sourceEl ? sourceEl.getAttribute('src') : '';
+                if (currentSrc !== targetSrc) {
+                    bgMusic.innerHTML = `<source src="${targetSrc}" type="audio/mpeg">`;
+                    bgMusic.load();
+                    if (state.musicPlaying) {
+                        bgMusic.play().catch(e => console.log("Music play blocked:", e));
                     }
                 }
             }
+
+            // 💓 异地“想你啦”变动侦测
+            const targetTriggerKey = state.myRole === 'shanshan' ? 'sweetpact_miss_trigger_zuzhe' : 'sweetpact_miss_trigger_shanshan';
+            const targetTriggerVal = cfg[targetTriggerKey];
+            if (targetTriggerVal) {
+                const targetTimestamp = parseInt(targetTriggerVal) || 0;
+                if (state.lastSeenMissTrigger === null) {
+                    state.lastSeenMissTrigger = targetTimestamp;
+                } else if (targetTimestamp > state.lastSeenMissTrigger) {
+                    state.lastSeenMissTrigger = targetTimestamp;
+                    triggerScreenHearts();
+                    showToastMessage(`💕 ${state.myRole === 'shanshan' ? '哲哲' : '珊珊'} 刚才悄悄想你啦！`);
+                }
+            }
+
+            // 🏆 勋章成就解锁检测
+            checkLocalBadges(cfg);
+
         } catch (e) {
             console.warn("Failed to sync global config from server, using local cached values:", e);
         }
@@ -388,6 +429,7 @@
     // 确保即便云端数据库正在唤醒中（耗时30秒），用户依然可以瞬间点开信封进入小屋
     (function() {
         initThemeSystem();
+        initRoleSystem();
         initBackgroundCanvas();
         initWelcomeToast();
         initNavigation();
@@ -422,6 +464,9 @@
 
             // 异步同步云数据库全局配置并刷新界面
             await syncGlobalConfig();
+
+            // 异步加载日记与决策相关的本地/云端勋章状态
+            checkDiaryAndDecisionBadges();
 
             // 异步同步云端心愿单列表
             await loadWishlistFromServer();
@@ -1922,7 +1967,12 @@
                     player.classList.add('playing');
                     if (eq) eq.classList.add('active');
                     state.musicPlaying = true;
-                    showToastMessage('💿 转动爱意唱片盘，声波同频跳动中... 🎶');
+                    if (state.playlist && state.playlist.length > 0) {
+                        const currentSong = state.playlist[state.currentSongIndex];
+                        showToastMessage(`💿 正在播放：${currentSong.title} 🎶 (双击唱片可切歌哦)`);
+                    } else {
+                        showToastMessage('💿 转动爱意唱片盘，声波同频跳动中... 🎶');
+                    }
                 }).catch(() => {
                     showToastMessage('⚠️ 浏览器拒绝了自动播歌，再次点击下唱片即可！');
                 });
@@ -1932,6 +1982,40 @@
                 if (eq) eq.classList.remove('active');
                 state.musicPlaying = false;
                 showToastMessage('💤 留声机暂停，但想念依然不停转');
+            }
+        });
+
+        // 🎵 双击唱片进行切歌
+        player.addEventListener('dblclick', function(e) {
+            e.stopPropagation();
+            if (state.playlist && state.playlist.length > 1) {
+                state.currentSongIndex = (state.currentSongIndex + 1) % state.playlist.length;
+                const nextSong = state.playlist[state.currentSongIndex];
+                audio.innerHTML = `<source src="${nextSong.url}" type="audio/mpeg">`;
+                audio.load();
+                audio.play().then(() => {
+                    player.classList.add('playing');
+                    if (eq) eq.classList.add('active');
+                    state.musicPlaying = true;
+                    showToastMessage(`🎵 切歌成功！当前播放：${nextSong.title}`);
+                }).catch(err => console.log("切歌自动播放受阻:", err));
+            } else {
+                showToastMessage('💡 还没有配置多首云端歌曲，无法切歌哦');
+            }
+        });
+
+        // 🎵 歌曲结束自动播放下一首
+        audio.addEventListener('ended', function() {
+            if (state.playlist && state.playlist.length > 1) {
+                state.currentSongIndex = (state.currentSongIndex + 1) % state.playlist.length;
+                const nextSong = state.playlist[state.currentSongIndex];
+                audio.innerHTML = `<source src="${nextSong.url}" type="audio/mpeg">`;
+                audio.load();
+                audio.play().then(() => {
+                    showToastMessage(`🎵 自动播放下一首：${nextSong.title}`);
+                }).catch(err => console.log("自动续播受阻:", err));
+            } else {
+                audio.play().catch(err => console.log("重播受阻:", err));
             }
         });
     }
@@ -1970,15 +2054,19 @@
             safeSet('tree_points', String(state.treePoints));
             updateTreeDashboard();
 
-            // 实时上传想念次数与爱意树到云端
+            // 实时上传想念次数、想念触发时间戳与爱意树到云端
+            const postData = {
+                miss_count: String(state.missCount),
+                miss_last_date: state.missLastDate,
+                tree_points: String(state.treePoints)
+            };
+            const triggerKey = state.myRole === 'shanshan' ? 'sweetpact_miss_trigger_shanshan' : 'sweetpact_miss_trigger_zuzhe';
+            postData[triggerKey] = String(Date.now());
+
             fetch('/api/config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    miss_count: String(state.missCount),
-                    miss_last_date: state.missLastDate,
-                    tree_points: String(state.treePoints)
-                })
+                body: JSON.stringify(postData)
             }).catch(e => console.error("Cloud miss count sync failed:", e));
         });
 
@@ -2066,6 +2154,122 @@
                 toast.classList.remove('show');
             }, 3500);
         }
+    }
+
+    /* ================================================================
+     *  角色视角切换系统
+     * ================================================================ */
+    function initRoleSystem() {
+        const roleBtn = document.getElementById('role-toggle');
+        if (!roleBtn) return;
+
+        applyRole(state.myRole);
+
+        roleBtn.addEventListener('click', function() {
+            const nextRole = state.myRole === 'shanshan' ? 'zuzhe' : 'shanshan';
+            applyRole(nextRole);
+            showToastMessage(`已切换至 ${nextRole === 'shanshan' ? '珊珊' : '祖哲'} 的主页视角！`);
+        });
+    }
+
+    function applyRole(role) {
+        state.myRole = role;
+        localStorage.setItem('myRole', role);
+        
+        const roleIcon = document.getElementById('role-indicator-icon');
+        const headerGf = document.getElementById('header-girlfriend-name');
+        const pulseTitle = document.getElementById('pulse-status-title');
+        
+        if (role === 'shanshan') {
+            if (roleIcon) roleIcon.textContent = '👩';
+            if (headerGf) headerGf.textContent = '珊珊';
+            if (pulseTitle) pulseTitle.textContent = '陈祖哲 的实时爱意状态';
+        } else {
+            if (roleIcon) roleIcon.textContent = '👨';
+            if (headerGf) headerGf.textContent = '祖哲';
+            if (pulseTitle) pulseTitle.textContent = '白珊珊 的实时爱意状态';
+        }
+        
+        // 重置上一次看过的想念时间戳，防止视角切换自爆
+        state.lastSeenMissTrigger = null;
+    }
+
+    /* ================================================================
+     *  异地“想你啦”屏幕爆心特效
+     * ================================================================ */
+    function triggerScreenHearts() {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 180,
+                spread: 100,
+                scalar: 1.2,
+                colors: ['#ff477e', '#ff7597', '#ff8da9', '#a17fe0'],
+                origin: { y: 0.6 }
+            });
+        }
+    }
+
+    /* ================================================================
+     *  勋章墙解锁检测
+     * ================================================================ */
+    function checkLocalBadges(cfg) {
+        // 终身契约
+        const badgeContract = document.getElementById('badge-contract');
+        if (badgeContract) {
+            if (cfg.sweetpact_contract_signed === 'true') {
+                badgeContract.classList.add('unlocked');
+            } else {
+                badgeContract.classList.remove('unlocked');
+            }
+        }
+        // 安全诊断
+        const badgeDiagnose = document.getElementById('badge-diagnose');
+        if (badgeDiagnose) {
+            if (cfg.sweetpact_prank_diagnosed === 'true') {
+                badgeDiagnose.classList.add('unlocked');
+            } else {
+                badgeDiagnose.classList.remove('unlocked');
+            }
+        }
+        // 金币富豪
+        const badgeCoins = document.getElementById('badge-coins');
+        if (badgeCoins) {
+            if (parseInt(cfg.sweetpact_love_coins) >= 120) {
+                badgeCoins.classList.add('unlocked');
+            } else {
+                badgeCoins.classList.remove('unlocked');
+            }
+        }
+        // 飞行棋
+        const badgeBoardgame = document.getElementById('badge-boardgame');
+        if (badgeBoardgame) {
+            if (cfg.sweetpact_boardgame_won === 'true') {
+                badgeBoardgame.classList.add('unlocked');
+            } else {
+                badgeBoardgame.classList.remove('unlocked');
+            }
+        }
+    }
+
+    async function checkDiaryAndDecisionBadges() {
+        try {
+            const diaryRes = await fetch('/api/diary');
+            if (diaryRes.ok) {
+                const diaries = await diaryRes.json();
+                const badgeDiary = document.getElementById('badge-diary');
+                if (badgeDiary && diaries.length > 0) {
+                    badgeDiary.classList.add('unlocked');
+                }
+            }
+            const decisionRes = await fetch('/api/decisions');
+            if (decisionRes.ok) {
+                const decisions = await decisionRes.json();
+                const badgeWheel = document.getElementById('badge-wheel');
+                if (badgeWheel && decisions.length > 0) {
+                    badgeWheel.classList.add('unlocked');
+                }
+            }
+        } catch(e) {}
     }
 
     /* ==========================================

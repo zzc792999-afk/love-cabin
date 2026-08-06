@@ -1547,6 +1547,14 @@
                 
                 // 大放礼花
                 startHeartsExplosion();
+
+                // 同步更新勋章状态至云端配置
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sweetpact_prank_diagnosed: 'true' })
+                }).catch(e => console.log('Sync diagnosed badge failed:', e));
+
                 chestBox.onclick = null; // 防连点
             };
         }

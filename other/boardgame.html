@@ -855,6 +855,14 @@
                         origin: { y: 0.6 }
                     });
                     alert(`🎉 恭喜 ${p.name} 胜利通关！`);
+                    
+                    // 同步更新勋章状态至云端配置
+                    fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sweetpact_boardgame_won: 'true' })
+                    }).catch(e => console.log('Sync boardgame badge failed:', e));
+
                     isDiceRolling = false;
                 } else {
                     // 下一个玩家的回合

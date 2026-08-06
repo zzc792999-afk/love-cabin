@@ -1971,3 +1971,23 @@ footer .heart {
     }
 }
 
+/* 🏆 勋章墙解锁高亮与呼吸发光特效 */
+.medal-badge.unlocked {
+    filter: grayscale(0) !important;
+    opacity: 1 !important;
+    border: 1.5px solid rgba(0, 245, 212, 0.4) !important;
+    background: linear-gradient(135deg, rgba(255, 71, 126, 0.08) 0%, rgba(0, 245, 212, 0.08) 100%) !important;
+    box-shadow: 0 4px 15px rgba(255, 71, 126, 0.15), 0 0 10px rgba(0, 245, 212, 0.1);
+    animation: badgePulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes badgePulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(255, 71, 126, 0.15), 0 0 10px rgba(0, 245, 212, 0.1);
+        transform: translateY(0);
+    }
+    100% {
+        box-shadow: 0 8px 25px rgba(255, 71, 126, 0.35), 0 0 15px rgba(0, 245, 212, 0.25);
+        transform: translateY(-3px);
+    }
+}

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📔 我们的恋爱心动手账</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ----------------------------------------------------
+           SweetDiary (恋爱心动手账) - Style Guide
+           Romantic Dark Glassmorphism Vibe
+        ---------------------------------------------------- */
+        :root {
+            --bg-primary: #090312;
+            --bg-gradient: linear-gradient(135deg, #090312 0%, #170929 50%, #0c0419 100%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover: rgba(255, 255, 255, 0.12);
+            
+            --primary: #ff477e;
+            --primary-glow: rgba(255, 71, 126, 0.35);
+            --secondary: #00f5d4;
+            --secondary-glow: rgba(0, 245, 212, 0.35);
+            --accent-purple: #9b5de5;
+            
+            --text-main: #f8f9fa;
+            --text-muted: #a8aec0;
+            
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
+            
+            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 60px 15px 30px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 极美发光背景 */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.2;
+            animation: floatGlow 22s infinite alternate ease-in-out;
+        }
+
+        .circle-1 {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 85%);
+            top: -150px;
+            left: -150px;
+        }
+
+        .circle-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 85%);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -6s;
+        }
+
+        @keyframes floatGlow {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(70px, 50px) scale(1.1); }
+        }
+
+        /* 主容器 */
+        .diary-container {
+            width: 100%;
+            max-width: 720px;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* 返回首页 */
+        .btn-back-home {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back-home:hover {
+            color: white;
+            background: var(--glass-hover);
+        }
+
+        /* 顶部看板 */
+        .diary-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .diary-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 15px rgba(255, 71, 126, 0.15);
+            margin-bottom: 10px;
+        }
+
+        .diary-header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* 手账写日记卡片 */
+        .write-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 40px;
+        }
+
+        .write-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 日记表单域 */
+        .diary-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+            }
+        }
+
+        .form-select, .form-input, .form-textarea {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: var(--transition-normal);
+            font-size: 0.95rem;
+        }
+
+        .form-select {
+            padding: 12px;
+            min-width: 140px;
+            cursor: pointer;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            flex: 1;
+        }
+
+        .form-textarea {
+            padding: 15px;
+            width: 100%;
+            height: 120px;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* 心情选择器 */
+        .mood-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            border-radius: 12px;
+        }
+
+        .mood-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .mood-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mood-btn {
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            opacity: 0.5;
+            user-select: none;
+        }
+
+        .mood-btn.selected {
+            opacity: 1;
+            transform: scale(1.3);
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .btn-submit-diary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit-diary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        /* 时间线时光轴 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 10px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary) 0%, var(--accent-purple) 50%, var(--secondary) 100%);
+            border-radius: 1px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        /* 时间线圆点 */
+        .timeline-dot {
+            position: absolute;
+            left: -29px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+            z-index: 3;
+            transition: var(--transition-normal);
+        }
+
+        .timeline-item:hover .timeline-dot {
+            transform: scale(1.4);
+            background: var(--secondary);
+            border-color: #fff;
+            box-shadow: 0 0 10px var(--secondary-glow);
+        }
+
+        /* 日记卡片 */
+        .diary-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: var(--shadow-glow);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .diary-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--glass-hover);
+        }
+
+        .diary-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .diary-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .diary-date {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .diary-author {
+            font-size: 0.8rem;
+            background: rgba(255, 71, 126, 0.15);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+        }
+
+        .author-b {
+            background: rgba(0, 245, 212, 0.15);
+            color: var(--secondary);
+        }
+
+        .diary-mood {
+            font-size: 1.4rem;
+        }
+
+        .diary-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .btn-delete-diary {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, color 0.2s;
+            padding: 4px;
+        }
+
+        .diary-card:hover .btn-delete-diary {
+            opacity: 1;
+        }
+
+        .btn-delete-diary:hover {
+            color: var(--primary);
+        }
+
+        /* 缺省为空白状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            display: block;
+            color: rgba(255,255,255,0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-circle circle-1"></div>
+        <div class="glow-circle circle-2"></div>
+    </div>
+
+    <div class="diary-container">
+        <!-- 返回主页 -->
+        <a href="../index.html" class="btn-back-home">↩ 返回主页</a>
+
+        <!-- 顶部看板 -->
+        <header class="diary-header">
+            <h1>📔 我们的心动手账</h1>
+            <p>记录属于祖哲和珊珊的甜蜜手账，让每一刻都永久留存 ✨</p>
+        </header>
+
+        <!-- 撰写日记卡片 -->
+        <div class="write-card">
+            <h3 class="write-title"><i class="fas fa-pen-fancy"></i> 记录今天的甜蜜片段</h3>
+            <div class="diary-form">
+                <div class="form-row">
+                    <select class="form-select" id="authorSelect">
+                        <option value="珊珊">👩 珊珊视角</option>
+                        <option value="祖哲">👨 祖哲视角</option>
+                    </select>
+                    <input type="date" class="form-input" id="dateInput">
+                </div>
+
+                <div class="mood-selector">
+                    <span class="mood-label">今天的心情：</span>
+                    <div class="mood-options">
+                        <span class="mood-btn selected" data-mood="💖">💖</span>
+                        <span class="mood-btn" data-mood="😊">😊</span>
+                        <span class="mood-btn" data-mood="🍲">🍲</span>
+                        <span class="mood-btn" data-mood="✈️">✈️</span>
+                        <span class="mood-btn" data-mood="😢">😢</span>
+                    </div>
+                </div>
+
+                <textarea class="form-textarea" id="contentInput" placeholder="写下我们今天的故事，例如一起去吃了好吃的，或者有什么想对对方说的悄悄话..."></textarea>
+
+                <button class="btn-submit-diary" id="btnSubmit">
+                    <i class="fas fa-feather-alt"></i> 封存入手账本
+                </button>
+            </div>
+        </div>
+
+        <!-- 历史日记时间线 -->
+        <div class="timeline" id="diaryTimeline">
+            <!-- JS 填充 -->
+        </div>
+    </div>
+
+    <!-- Canvas Confetti 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // 初始化当前日期
+        const dateInput = document.getElementById('dateInput');
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+
+        // 绑定心情选择器事件
+        let selectedMood = "💖";
+        const moodBtns = document.querySelectorAll('.mood-btn');
+        moodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                moodBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedMood = btn.getAttribute('data-mood');
+            });
+        });
+
+        // 绑定视角初始化（从 localStorage 获取）
+        const authorSelect = document.getElementById('authorSelect');
+        const savedRole = localStorage.getItem('myRole');
+        if (savedRole === 'zuzhe') {
+            authorSelect.value = '祖哲';
+        } else if (savedRole === 'shanshan') {
+            authorSelect.value = '珊珊';
+        }
+
+        // 音效控制
+        let audioCtx = null;
+        function playSuccessChime() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch(e) {}
+        }
+
+        // --- 获取日记列表 ---
+        function loadDiaries() {
+            const timeline = document.getElementById('diaryTimeline');
+            timeline.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> 正在翻开手账本...</div>';
+
+            fetch('/api/diary')
+                .then(res => res.json())
+                .then(list => {
+                    if (!list || list.length === 0) {
+                        timeline.innerHTML = `
+                            <div class="empty-state">
+                                <i class="far fa-paper-plane"></i>
+                                <span>手账本还是空白的哦，写下你们的第一篇恋爱日记吧！</span>
+                            </div>
+                        `;
+                        return;
+                    }
+                    timeline.innerHTML = "";
+                    list.forEach(entry => {
+                        const item = document.createElement('div');
+                        item.className = "timeline-item";
+                        
+                        // 校验作者样式
+                        const authorClass = entry.author === '珊珊' ? 'author-b' : '';
+
+                        item.innerHTML = `
+                            <div class="timeline-dot"></div>
+                            <div class="diary-card">
+                                <button class="btn-delete-diary" onclick="deleteDiary('${entry.id}')" title="删除日记"><i class="fas fa-trash-alt"></i></button>
+                                <div class="diary-card-header">
+                                    <div class="diary-meta">
+                                        <span class="diary-date">${entry.date}</span>
+                                        <span class="diary-author ${authorClass}">${entry.author}视角</span>
+                                    </div>
+                                    <span class="diary-mood">${entry.mood || '💖'}</span>
+                                </div>
+                                <div class="diary-content">${escapeHTML(entry.content)}</div>
+                            </div>
+                        `;
+                        timeline.appendChild(item);
+                    });
+                })
+                .catch(e => {
+                    timeline.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> 读取日记失败了，请稍后刷新重试</div>';
+                });
+        }
+
+        // --- 保存日记 ---
+        document.getElementById('btnSubmit').addEventListener('click', () => {
+            const author = authorSelect.value;
+            const date = dateInput.value;
+            const content = document.getElementById('contentInput').value.trim();
+
+            if (!content) {
+                alert("请输入日记内容哦！");
+                return;
+            }
+
+            const newEntry = {
+                author,
+                date,
+                mood: selectedMood,
+                content,
+                timestamp: new Date(date + 'T12:00:00').getTime() || Date.now()
+            };
+
+            fetch('/api/diary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newEntry)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('contentInput').value = "";
+                    playSuccessChime();
+                    confetti({
+                        particleCount: 80,
+                        spread: 50,
+                        origin: { y: 0.7 }
+                    });
+                    loadDiaries();
+                } else {
+                    alert("保存失败了，请稍后重试");
+                }
+            })
+            .catch(e => {
+                alert("保存失败了，网络连接异常");
+            });
+        });
+
+        // --- 删除日记 ---
+        window.deleteDiary = function(id) {
+            if (!confirm("确定要删除这篇珍贵的手账记录吗？此操作不可撤销哦。")) return;
+            
+            fetch(`/api/diary?id=${id}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadDiaries();
+                } else {
+                    alert("删除失败，请稍后重试");
+                }
+            })
+            .catch(e => {
+                alert("删除失败，网络连接异常");
+            });
+        }
+
+        // HTML 转义辅助函数
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // 初始化加载
+        loadDiaries();
+    </script>
+</body>
+</html>

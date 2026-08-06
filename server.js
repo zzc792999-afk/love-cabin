@@ -859,6 +859,15 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify({ error: '无法读取本地配置数据' }));
                     return;
                 }
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.config_countdown_target === '2026-08-05') {
+                        parsed.config_countdown_target = '2026-11-13';
+                        parsed.config_countdown_title = '在一起第 300 天';
+                        fs.writeFileSync(CONFIG_FILE, JSON.stringify(parsed, null, 4), 'utf8');
+                        data = JSON.stringify(parsed);
+                    }
+                } catch(e) {}
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(data);
             });

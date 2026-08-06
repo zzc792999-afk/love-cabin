@@ -397,10 +397,10 @@
     <div id="password-overlay">
         <div class="glass lock-box">
             <div class="lock-icon">🔒</div>
-            <h2>Private Memory</h2>
-            <p style="color: var(--text-sub); margin-top: 10px; font-size: 0.9rem;">The 300th Day Milestone</p>
-            <input type="password" id="pwd-input" placeholder="Enter Password" autocomplete="off">
-            <button class="btn" onclick="checkPassword()">Unlock Memories</button>
+            <h2>专属浪漫会议室 🔒</h2>
+            <p style="color: var(--text-sub); margin-top: 10px; font-size: 0.9rem;">在一起的第 300 天 · 专属纪念</p>
+            <input type="password" id="pwd-input" placeholder="输入解锁密码..." autocomplete="off">
+            <button class="btn" onclick="checkPassword()">验证解锁</button>
             <div class="error-msg" id="pwd-error"></div>
             <div class="tooltip">提示：我们复合日期(0118)加上前缀(11)的结合...</div>
         </div>
@@ -411,33 +411,33 @@
         
         <!-- Header -->
         <div class="glass" style="padding: 50px 20px;">
-            <p style="letter-spacing: 4px; color: var(--text-sub); text-transform: uppercase;">Celebrating Our Love</p>
+            <p style="letter-spacing: 4px; color: var(--text-sub); text-transform: uppercase;">庆祝我们在一起的时光</p>
             <div class="milestone-title">300</div>
-            <p style="font-size: 1.5rem; font-weight: 300;">Days of Infinite Sweetness</p>
+            <p style="font-size: 1.5rem; font-weight: 300;">在一起的第 300 天 · 专属浪漫纪念</p>
             
             <div class="countdown" id="countdown">
-                <div class="time-box"><div class="time-val" id="cd-days">00</div><div class="time-label">Days</div></div>
-                <div class="time-box"><div class="time-val" id="cd-hours">00</div><div class="time-label">Hours</div></div>
-                <div class="time-box"><div class="time-val" id="cd-mins">00</div><div class="time-label">Mins</div></div>
-                <div class="time-box"><div class="time-val" id="cd-secs">00</div><div class="time-label">Secs</div></div>
+                <div class="time-box"><div class="time-val" id="cd-days">00</div><div class="time-label">天</div></div>
+                <div class="time-box"><div class="time-val" id="cd-hours">00</div><div class="time-label">时</div></div>
+                <div class="time-box"><div class="time-val" id="cd-mins">00</div><div class="time-label">分</div></div>
+                <div class="time-box"><div class="time-val" id="cd-secs">00</div><div class="time-label">秒</div></div>
             </div>
         </div>
 
         <!-- Stats -->
         <div class="glass">
-            <h2 style="margin-bottom: 20px; font-weight: 600;">Our Timeline ⏳</h2>
+            <h2 style="margin-bottom: 20px; font-weight: 600;">我们的时光轨迹 ⏳</h2>
             <div class="stats-grid">
                 <div class="stat-item">
                     <h3 id="stat-met">0</h3>
-                    <p>Days since we first met (2024-05-03)</p>
+                    <p>相识天数 (2024-05-03)</p>
                 </div>
                 <div class="stat-item">
                     <h3 id="stat-reunited">0</h3>
-                    <p>Days since our reunion (2026-01-18)</p>
+                    <p>复合天数 (2026-01-18)</p>
                 </div>
                 <div class="stat-item">
                     <h3 id="stat-target">0</h3>
-                    <p>Days to 300 days (2026-11-13)</p>
+                    <p>距离 300 天还有</p>
                 </div>
             </div>
         </div>
@@ -445,8 +445,8 @@
         <!-- Memory Game -->
         <div class="glass" id="game-section">
             <div class="game-header">
-                <h2>Memory Match Game 🧩</h2>
-                <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 5px;">Find all the matching moments to unlock my letter to you</p>
+                <h2>默契对对碰游戏 🧩</h2>
+                <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 5px;">配对出所有甜蜜回忆，即可解锁哲哲写给你的专属情书</p>
             </div>
             <div class="game-grid" id="game-grid">
                 <!-- Cards injected by JS -->
@@ -480,8 +480,8 @@
 
     <!-- Controls -->
     <div class="controls">
-        <a href="index.html" class="icon-btn" title="Back to Home">🏠</a>
-        <button class="icon-btn" id="music-btn" title="Toggle Music">🎵</button>
+        <a href="index.html" class="icon-btn" title="返回主页">🏠</a>
+        <button class="icon-btn" id="music-btn" title="播放/暂停背景音乐">🎵</button>
     </div>
 
     <!-- Hidden Audio -->

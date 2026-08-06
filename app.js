@@ -477,6 +477,12 @@
      *  数据存储与加载 (Local Storage)
      * ================================================================ */
     function initLocalStorageData() {
+        // 客户端自动热升级：若本地缓存仍为200天倒计时，立即迁移为300天倒计时
+        if (safeGet('config_countdown_target') === '2026-08-05') {
+            safeSet('config_countdown_target', '2026-11-13');
+            safeSet('config_countdown_title', '在一起第 300 天');
+        }
+
         const todayStr = new Date().toDateString();
 
         state.theme = localStorage.getItem('theme') || 'light';

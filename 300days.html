@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>300 Days of Love - 珊珊 & 哲哲</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.7);
+            --accent: #ff4d6d;
+            --accent-glow: rgba(255, 77, 109, 0.5);
+            --success: #00f5d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(255, 77, 109, 0.2);
+        }
+
+        /* Overlay Password */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .lock-box {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .lock-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px var(--accent-glow); }
+            50% { transform: scale(1.1); text-shadow: 0 0 20px var(--accent-glow); }
+            100% { transform: scale(1); text-shadow: 0 0 10px var(--accent-glow); }
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 15px 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="password"]:focus {
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(135deg, #ff4d6d, #c9184a);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .tooltip {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-top: 15px;
+        }
+
+        .error-msg {
+            color: #ffb3c1;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        /* Glowing Milestone */
+        .milestone-title {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 20px 0;
+            background: linear-gradient(to right, #ff4d6d, #ffb3c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(255, 77, 109, 0.4);
+        }
+
+        /* Countdown */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .time-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 15px;
+            min-width: 100px;
+        }
+
+        .time-val {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .time-label {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .stat-item p {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        /* Memory Game */
+        .game-header {
+            margin-bottom: 20px;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .card {
+            background: transparent;
+            height: 100px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            color: var(--accent);
+            font-size: 2rem;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, rgba(255,77,109,0.2), rgba(201,24,74,0.2));
+            transform: rotateY(180deg);
+            color: white;
+            flex-direction: column;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255, 77, 109, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(255,77,109,0.3);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+            opacity: 0;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Core Content / Letter */
+        #core-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .letter {
+            text-align: left;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            padding: 20px;
+        }
+
+        .letter p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 40px;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        /* Audio & Navigation */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .icon-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,77,109,0.8);
+            transform: scale(1.1);
+        }
+
+        .music-playing {
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for Floating Hearts -->
+    <canvas id="canvas"></canvas>
+
+    <!-- Password Overlay -->
+    <div id="password-overlay">
+        <div class="glass lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2>Private Memory</h2>
+            <p style="color: var(--text-sub); margin-top: 10px; font-size: 0.9rem;">The 300th Day Milestone</p>
+            <input type="password" id="pwd-input" placeholder="Enter Password" autocomplete="off">
+            <button class="btn" onclick="checkPassword()">Unlock Memories</button>
+            <div class="error-msg" id="pwd-error"></div>
+            <div class="tooltip">提示：我们复合日期(0118)加上前缀(11)的结合...</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="main-container" style="display: none;">
+        
+        <!-- Header -->
+        <div class="glass" style="padding: 50px 20px;">
+            <p style="letter-spacing: 4px; color: var(--text-sub); text-transform: uppercase;">Celebrating Our Love</p>
+            <div class="milestone-title">300</div>
+            <p style="font-size: 1.5rem; font-weight: 300;">Days of Infinite Sweetness</p>
+            
+            <div class="countdown" id="countdown">
+                <div class="time-box"><div class="time-val" id="cd-days">00</div><div class="time-label">Days</div></div>
+                <div class="time-box"><div class="time-val" id="cd-hours">00</div><div class="time-label">Hours</div></div>
+                <div class="time-box"><div class="time-val" id="cd-mins">00</div><div class="time-label">Mins</div></div>
+                <div class="time-box"><div class="time-val" id="cd-secs">00</div><div class="time-label">Secs</div></div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="glass">
+            <h2 style="margin-bottom: 20px; font-weight: 600;">Our Timeline ⏳</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3 id="stat-met">0</h3>
+                    <p>Days since we first met (2024-05-03)</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="stat-reunited">0</h3>
+                    <p>Days since our reunion (2026-01-18)</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="stat-target">0</h3>
+                    <p>Days to 300 days (2026-11-13)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Game -->
+        <div class="glass" id="game-section">
+            <div class="game-header">
+                <h2>Memory Match Game 🧩</h2>
+                <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 5px;">Find all the matching moments to unlock my letter to you</p>
+            </div>
+            <div class="game-grid" id="game-grid">
+                <!-- Cards injected by JS -->
+            </div>
+        </div>
+
+        <!-- Core Content / Letter -->
+        <div class="glass" id="core-content">
+            <h2 style="margin-bottom: 30px; font-size: 2rem; color: var(--accent);">致我最爱的珊珊 💌</h2>
+            <div class="letter">
+                <p>亲爱的珊珊（小猪猪）：</p>
+                <p>展信佳。不知不觉，从我们复合的那一天算起，马上就要或者已经迎来了整整300天了。300天，听起来像是一段很长的时间，但在我的感觉里，这300天仿佛就是由无数个充满欢笑、温暖和甜蜜的瞬间拼凑而成，过得飞快，却又无比深刻。</p>
+                <p>我时常回想起2026年1月18日那天，我们决定重新牵起彼此的手。那一刻，我觉得自己是世界上最幸运的人。失而复得的爱情，让我更加懂得珍惜，也让我更加确信，你就是那个我想要一直走下去的人。</p>
+                <p>你总是那么可爱，那么迷人。不管是你开心时明媚的笑容，还是你偶尔耍小脾气时嘟起的小嘴；不管是你认真工作时的专注，还是你抱着美食大快朵颐时的满足，在我眼里，都是最美的风景。你有着一颗温暖善良的心，你的每一个小动作、每一句温柔的话语，都能轻易地融化我的心。</p>
+                <p>这300天里，我们一起创造了太多太多美好的回忆。第一次重新牵手的悸动，每一个温暖拥抱带来的安心，那些甜蜜干饭的时光，深夜电话里说不完的情话，还有我们在岁月长河里的每一次时光漫步……这些都已经被我珍藏在我们的时光手账里，熠熠生辉。</p>
+                <p>我想对你说，谢谢你，谢谢你愿意给我第二次机会，谢谢你让我重新成为那个能够保护你、照顾你、陪伴你的人。我无比珍视我们的这段感情，珍视与你在一起的每一分每一秒。</p>
+                <p>300天只是一个小小的里程碑，我的承诺远不止于此。我向你保证，我会爱你接下来的3000天，30000天，直到永远。我会用我全部的真心去呵护你，用我所有的力量去爱你，让你每一天都能感受到被爱的幸福。</p>
+                <p>未来的日子还很长，我期待着和你一起去经历更多的风风雨雨，一起去看遍这世界的繁华与宁静。无论未来会遇到什么，只要有你在我身边，我就无所畏惧。</p>
+                <p>我爱你，珊珊。比昨天多一点，比明天少一点。</p>
+                <div class="signature">
+                    永远爱你的哲哲 (Zuzhe)<br>
+                    <span>2026年 纪念</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Message here</div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <a href="index.html" class="icon-btn" title="Back to Home">🏠</a>
+        <button class="icon-btn" id="music-btn" title="Toggle Music">🎵</button>
+    </div>
+
+    <!-- Hidden Audio -->
+    <audio id="bgm" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/16/audio_33bc214ff9.mp3?filename=romantic-acoustic-guitar-background-music-for-videos-111166.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Constants & Dates
+        const PASSWORD = '110417';
+        const DATE_MET = new Date('2024-05-03T00:00:00+08:00');
+        const DATE_REUNITED = new Date('2026-01-18T00:00:00+08:00');
+        const DATE_300 = new Date('2026-11-13T00:00:00+08:00');
+
+        // Elements
+        const overlay = document.getElementById('password-overlay');
+        const mainContainer = document.getElementById('main-container');
+        const pwdInput = document.getElementById('pwd-input');
+        const pwdError = document.getElementById('pwd-error');
+        const toast = document.getElementById('toast');
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('music-btn');
+
+        // --- Auth Logic ---
+        function checkAutoUnlock() {
+            const now = new Date();
+            if (now >= DATE_300) {
+                unlock();
+            }
+        }
+
+        function checkPassword() {
+            if (pwdInput.value === PASSWORD) {
+                unlock();
+            } else {
+                pwdError.innerText = "密码错误，请再试一次哦 💔";
+                pwdInput.value = '';
+                setTimeout(() => pwdError.innerText = "", 3000);
+            }
+        }
+
+        pwdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        function unlock() {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContainer.style.display = 'flex';
+                initTimers();
+                initGame();
+                playMusic();
+            }, 800);
+        }
+
+        // --- Timers & Stats ---
+        function diffDays(d1, d2) {
+            return Math.floor(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24));
+        }
+
+        function initTimers() {
+            // Stats
+            const now = new Date();
+            document.getElementById('stat-met').innerText = diffDays(DATE_MET, now);
+            document.getElementById('stat-reunited').innerText = diffDays(DATE_REUNITED, now);
+            
+            let daysToTarget = diffDays(now, DATE_300);
+            if (now > DATE_300) daysToTarget = 0;
+            document.getElementById('stat-target').innerText = daysToTarget;
+
+            // Countdown
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = DATE_300 - now;
+
+            if (diff <= 0) {
+                document.getElementById('cd-days').innerText = '00';
+                document.getElementById('cd-hours').innerText = '00';
+                document.getElementById('cd-mins').innerText = '00';
+                document.getElementById('cd-secs').innerText = '00';
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('cd-days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('cd-hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('cd-mins').innerText = m.toString().padStart(2, '0');
+            document.getElementById('cd-secs').innerText = s.toString().padStart(2, '0');
+        }
+
+        // --- Memory Game ---
+        const labels = [
+            "第一次牵手 🤝", "温暖拥抱 🫂", "甜蜜干饭 🍲", 
+            "深夜电话 📞", "时光漫步 🚶", "时光手账 📔"
+        ];
+        
+        const quotes = {
+            "第一次牵手 🤝": "那一刻，掌心的温度直达心底。💖",
+            "温暖拥抱 🫂": "在你的怀里，我找到了全世界的安宁。✨",
+            "甜蜜干饭 🍲": "和你一起吃遍天下美食，是人生最开心的事！😋",
+            "深夜电话 📞": "即使相隔再远，你的声音也能伴我入眠。🌙",
+            "时光漫步 🚶": "每一步都有你的陪伴，这风景才完美。🌸",
+            "时光手账 📔": "记录下的点点滴滴，都是我们爱的见证。📖"
+        };
+
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initGame() {
+            const grid = document.getElementById('game-grid');
+            let deck = [...labels, ...labels];
+            
+            // Shuffle
+            deck.sort(() => Math.random() - 0.5);
+
+            deck.forEach((label, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.label = label;
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">❓</div>
+                        <div class="card-back">${label}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => flipCard(card));
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flippedCards;
+            
+            if (c1.dataset.label === c2.dataset.label) {
+                c1.classList.add('matched');
+                c2.classList.add('matched');
+                matchedPairs++;
+                
+                showToast(quotes[c1.dataset.label]);
+                
+                if (matchedPairs === labels.length) {
+                    setTimeout(() => {
+                        showToast("恭喜解锁隐藏信件！💌");
+                        document.getElementById('core-content').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('core-content').style.opacity = '1';
+                        }, 50);
+                    }, 1500);
+                }
+                flippedCards = [];
+            } else {
+                setTimeout(() => {
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- Audio Controls ---
+        let isPlaying = false;
+        
+        function playMusic() {
+            bgm.volume = 0.5;
+            bgm.play().then(() => {
+                isPlaying = true;
+                musicBtn.classList.add('music-playing');
+            }).catch(e => console.log("Audio autoplay prevented by browser"));
+        }
+
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgm.pause();
+                musicBtn.classList.remove('music-playing');
+            } else {
+                bgm.play();
+                musicBtn.classList.add('music-playing');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // --- Canvas Hearts Effect ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Heart {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 100;
+                this.size = Math.random() * 15 + 5;
+                this.speed = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.color = `rgba(255, 77, 109, ${this.opacity})`;
+                this.swing = Math.random() * 3;
+                this.swingSpeed = Math.random() * 0.05;
+                this.angle = Math.random() * Math.PI * 2;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + Math.sin(this.angle) * this.swing * 10, this.y);
+                ctx.scale(this.size/20, this.size/20);
+                
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-10, -10, -20, 10, 0, 20);
+                ctx.bezierCurveTo(20, 10, 10, -10, 0, 0);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.y -= this.speed;
+                this.angle += this.swingSpeed;
+                if (this.y < -50) {
+                    this.y = canvas.height + 50;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        function initHearts() {
+            for (let i = 0; i < 40; i++) {
+                hearts.push(new Heart());
+            }
+            animateHearts();
+        }
+
+        function animateHearts() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hearts.forEach(heart => {
+                heart.update();
+                heart.draw();
+            });
+            requestAnimationFrame(animateHearts);
+        }
+
+        initHearts();
+        checkAutoUnlock();
+
+    </script>
+</body>
+</html>

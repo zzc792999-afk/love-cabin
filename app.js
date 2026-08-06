@@ -537,6 +537,7 @@
             ];
             localStorage.setItem('stickyNotes', JSON.stringify(state.stickyNotes));
         }
+        checkLocalBadges();
     }
 
     /* ================================================================
@@ -2213,10 +2214,16 @@
      *  勋章墙解锁检测
      * ================================================================ */
     function checkLocalBadges(cfg) {
+        const getVal = (key) => {
+            if (cfg && cfg[key] !== undefined) return cfg[key];
+            return safeGet(key, 'false');
+        };
+
         // 终身契约
         const badgeContract = document.getElementById('badge-contract');
         if (badgeContract) {
-            if (cfg.sweetpact_contract_signed === 'true') {
+            const val = getVal('sweetpact_contract_signed');
+            if (val === 'true' || val === true) {
                 badgeContract.classList.add('unlocked');
             } else {
                 badgeContract.classList.remove('unlocked');
@@ -2225,7 +2232,8 @@
         // 安全诊断
         const badgeDiagnose = document.getElementById('badge-diagnose');
         if (badgeDiagnose) {
-            if (cfg.sweetpact_prank_diagnosed === 'true') {
+            const val = getVal('sweetpact_prank_diagnosed');
+            if (val === 'true' || val === true) {
                 badgeDiagnose.classList.add('unlocked');
             } else {
                 badgeDiagnose.classList.remove('unlocked');
@@ -2234,7 +2242,8 @@
         // 金币富豪
         const badgeCoins = document.getElementById('badge-coins');
         if (badgeCoins) {
-            if (parseInt(cfg.sweetpact_love_coins) >= 120) {
+            const val = parseInt(getVal('sweetpact_love_coins')) || 0;
+            if (val >= 120) {
                 badgeCoins.classList.add('unlocked');
             } else {
                 badgeCoins.classList.remove('unlocked');
@@ -2243,7 +2252,8 @@
         // 飞行棋
         const badgeBoardgame = document.getElementById('badge-boardgame');
         if (badgeBoardgame) {
-            if (cfg.sweetpact_boardgame_won === 'true') {
+            const val = getVal('sweetpact_boardgame_won');
+            if (val === 'true' || val === true) {
                 badgeBoardgame.classList.add('unlocked');
             } else {
                 badgeBoardgame.classList.remove('unlocked');

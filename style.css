@@ -1312,7 +1312,7 @@ h1.header-title {
    ========================================== */
 .vinyl-music-player {
     position: fixed;
-    bottom: 25px;
+    bottom: 110px;
     right: 25px;
     width: 65px;
     height: 65px;
@@ -1386,7 +1386,7 @@ h1.header-title {
     gap: 3px;
     height: 20px;
     position: fixed;
-    bottom: 48px;
+    bottom: 132px;
     right: 100px;
     z-index: 1000;
     opacity: 0;

@@ -2062,15 +2062,8 @@
         }
 
         // 统一初始化动作
-        if (is200DaysReached) {
-            // 如果到了 200 天，则自动解锁真心话信纸，并播放打字效果
-            const lockOverlay = document.getElementById('letter-lock-overlay');
-            if (lockOverlay) lockOverlay.style.display = 'none';
-            initTypewriter();
-        } else {
-            // 否则初始化游戏矩阵
-            initMemoryGame();
-        }
+        // 无论是否到达 200 天，都必须先通关对对碰游戏才能解锁查看真心话情书！
+        initMemoryGame();
         initVideoHoverPlay();
 
         // 背景音乐交互

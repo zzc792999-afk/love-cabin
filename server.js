@@ -87,8 +87,8 @@ function ensureConfigFile() {
         const defaultConfigs = {
             config_meet_date: "2024-05-03",
             config_reunion_date: "2026-01-18",
-            config_countdown_target: "2026-08-05",
-            config_countdown_title: "在一起第 200 天",
+            config_countdown_target: "2026-11-13",
+            config_countdown_title: "在一起第 300 天",
             config_custom_announcement: "",
             gashapon_extra_spins: "0",
             gashapon_infinite_spins: "false",
@@ -769,8 +769,8 @@ const server = http.createServer((req, res) => {
                                     id: "global",
                                     config_meet_date: "2024-05-03",
                                     config_reunion_date: "2026-01-18",
-                                    config_countdown_target: "2026-08-05",
-                                    config_countdown_title: "在一起第 200 天",
+                                    config_countdown_target: "2026-11-13",
+                                    config_countdown_title: "在一起第 300 天",
                                     config_custom_announcement: "",
                                     gashapon_extra_spins: "0",
                                     gashapon_infinite_spins: "false",
@@ -818,6 +818,14 @@ const server = http.createServer((req, res) => {
                                     sweetpact_wheel_options: ""
                                 };
                                 return col.insertOne(defaultConfigs).then(() => defaultConfigs);
+                            }
+                            if (cfg) {
+                                if (cfg.config_countdown_target === '2026-08-05') {
+                                    cfg.config_countdown_target = '2026-11-13';
+                                    cfg.config_countdown_title = '在一起第 300 天';
+                                    col.updateOne({ id: "global" }, { $set: { config_countdown_target: '2026-11-13', config_countdown_title: '在一起第 300 天' } })
+                                        .catch(err => console.error("Auto upgrade database to 300 days failed:", err));
+                                }
                             }
                             return cfg;
                         })

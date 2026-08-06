@@ -973,23 +973,23 @@
         }
         calculateCountdown(targetReunion, 'ra-days', 'ra-hours', 'ra-minutes', 'ra-seconds');
 
-        // 200天/自定义纪念日倒计时 (可从管理员控制台动态覆盖目标日期和名称)
-        const configTargetDate = safeGet('config_countdown_target', '2026-08-05');
-        const configTargetTitle = safeGet('config_countdown_title', '在一起第 200 天');
-        const target200Day = `${configTargetDate}T00:00:00`;
-        const d200Container = document.getElementById('200day-countdown');
-        if (d200Container) {
-            const h4El = d200Container.previousElementSibling;
-            const now200 = new Date();
-            const t200 = new Date(target200Day);
+        // 300天/自定义纪念日倒计时 (可从管理员控制台动态覆盖目标日期和名称)
+        const configTargetDate = safeGet('config_countdown_target', '2026-11-13');
+        const configTargetTitle = safeGet('config_countdown_title', '在一起第 300 天');
+        const targetMilestoneDay = `${configTargetDate}T00:00:00`;
+        const milestoneContainer = document.getElementById('300day-countdown');
+        if (milestoneContainer) {
+            const h4El = milestoneContainer.previousElementSibling;
+            const nowMilestone = new Date();
+            const tMilestone = new Date(targetMilestoneDay);
             
-            // 计算目标日期的月日显示，例如 (8月5日)
-            const dateObj = new Date(target200Day);
+            // 计算目标日期的月日显示，例如 (11月13日)
+            const dateObj = new Date(targetMilestoneDay);
             const dateStr = isNaN(dateObj.getTime()) ? '' : ` (${dateObj.getMonth() + 1}月${dateObj.getDate()}日)`;
             
-            if (now200 >= t200) {
+            if (nowMilestone >= tMilestone) {
                 // 已过目标日期 - 显示庆祝模式
-                d200Container.innerHTML = `<div style="font-size: 2rem; color: var(--primary-dark); font-weight: 800; animation: pulse 1.5s infinite;">🎉 ${configTargetTitle}已到！🎉</div>`;
+                milestoneContainer.innerHTML = `<div style="font-size: 2rem; color: var(--primary-dark); font-weight: 800; animation: pulse 1.5s infinite;">🎉 ${configTargetTitle}已到！🎉</div>`;
                 if (h4El && h4El.tagName === 'H4') {
                     h4El.innerHTML = `🎊 我们在一起已经超过${configTargetTitle}了！🎊`;
                 }
@@ -997,7 +997,7 @@
                 if (h4El && h4El.tagName === 'H4') {
                     h4El.innerHTML = `🎉 ${configTargetTitle}倒计时${dateStr}`;
                 }
-                calculateCountdown(target200Day, 'd200-days', 'd200-hours', 'd200-minutes', 'd200-seconds');
+                calculateCountdown(targetMilestoneDay, 'd300-days', 'd300-hours', 'd300-minutes', 'd300-seconds');
             }
         }
     }

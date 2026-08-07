@@ -15,9 +15,11 @@ let configCollection = null;
 let wishlistCollection = null;
 let diaryCollection = null;
 let decisionsCollection = null;
+let polaroidsCollection = null;
 const mongoURI = process.env.MONGODB_URI || "";
 const DIARY_FILE = path.join(__dirname, 'other', 'diary.json');
 const DECISIONS_FILE = path.join(__dirname, 'other', 'decisions.json');
+const POLAROIDS_FILE = path.join(__dirname, 'other', 'polaroids.json');
 
 if (mongoURI) {
     console.log("检测到 MONGODB_URI，正在建立云数据库连接...");
@@ -30,7 +32,8 @@ if (mongoURI) {
             wishlistCollection = db.collection('wishlist');
             diaryCollection = db.collection('diary');
             decisionsCollection = db.collection('decisions');
-            console.log("💖 MongoDB 云数据库连接成功！留言、配置、心愿单、日记和决策数据已开启云端永久化。");
+            polaroidsCollection = db.collection('polaroids');
+            console.log("💖 MongoDB 云数据库连接成功！留言、配置、心愿单、日记、拍立得和决策数据已开启云端永久化。");
         })
         .catch(err => {
             console.error("⚠️ MongoDB 连接失败，自动降级为本地 JSON 文件存储:", err.message);
@@ -39,6 +42,7 @@ if (mongoURI) {
             wishlistCollection = null;
             diaryCollection = null;
             decisionsCollection = null;
+            polaroidsCollection = null;
         });
 }
 
@@ -59,6 +63,7 @@ function getDatabaseCollection(collectionName) {
             else if (collectionName === 'wishlist') col = wishlistCollection;
             else if (collectionName === 'diary') col = diaryCollection;
             else if (collectionName === 'decisions') col = decisionsCollection;
+            else if (collectionName === 'polaroids') col = polaroidsCollection;
 
             if (col) {
                 clearInterval(interval);
@@ -155,6 +160,17 @@ function ensureDecisionsFile() {
     }
     if (!fs.existsSync(DECISIONS_FILE)) {
         fs.writeFileSync(DECISIONS_FILE, JSON.stringify([], null, 4), 'utf8');
+    }
+}
+
+// 确保本地拍立得相册数据文件存在
+function ensurePolaroidsFile() {
+    const dir = path.dirname(POLAROIDS_FILE);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(POLAROIDS_FILE)) {
+        fs.writeFileSync(POLAROIDS_FILE, JSON.stringify([], null, 4), 'utf8');
     }
 }
 
@@ -657,7 +673,128 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 3.11 获取决策记录列表
+    // 3.11 获取拍立得相册数据
+    if (pathname === '/api/polaroids' && req.method === 'GET') {
+        getDatabaseCollection('polaroids')
+            .then(col => {
+                if (col) {
+                    return col.find({}).sort({ timestamp: -1 }).toArray()
+                        .then(docs => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(docs));
+                        });
+                } else {
+                    ensurePolaroidsFile();
+                    fs.readFile(POLAROIDS_FILE, 'utf8', (err, data) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地相册失败' }));
+                            return;
+                        }
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(data || '[]');
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取相册数据失败' }));
+            });
+        return;
+    }
+
+    // 3.12 新增拍立得相片
+    if (pathname === '/api/polaroids' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const item = JSON.parse(body);
+                item.timestamp = item.timestamp || Date.now();
+                item.id = item.id || 'pol_' + Date.now();
+                getDatabaseCollection('polaroids')
+                    .then(col => {
+                        if (col) {
+                            return col.insertOne(item)
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, item }));
+                                });
+                        } else {
+                            ensurePolaroidsFile();
+                            fs.readFile(POLAROIDS_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                if (!readErr) {
+                                    try { list = JSON.parse(data); } catch(e) {}
+                                }
+                                list.unshift(item);
+                                fs.writeFile(POLAROIDS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                    if (writeErr) {
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: '保存本地相册失败' }));
+                                        return;
+                                    }
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, item }));
+                                });
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '保存相片失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
+    // 3.13 删除拍立得相片
+    if (pathname === '/api/polaroids' && req.method === 'DELETE') {
+        const id = url.searchParams.get('id');
+        if (!id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: '缺失 id 参数' }));
+            return;
+        }
+        getDatabaseCollection('polaroids')
+            .then(col => {
+                if (col) {
+                    return col.deleteOne({ id: id })
+                        .then(() => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                } else {
+                    ensurePolaroidsFile();
+                    fs.readFile(POLAROIDS_FILE, 'utf8', (readErr, data) => {
+                        if (readErr) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地相册失败' }));
+                            return;
+                        }
+                        let list = [];
+                        try { list = JSON.parse(data); } catch(e) {}
+                        list = list.filter(item => item.id !== id);
+                        fs.writeFile(POLAROIDS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                            if (writeErr) {
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: '更新本地相册失败' }));
+                                return;
+                            }
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                    });
+                }
+            });
+        return;
+    }
+
+    // 3.14 获取决策记录列表
     if (pathname === '/api/decisions' && req.method === 'GET') {
         getDatabaseCollection('decisions')
             .then(col => {

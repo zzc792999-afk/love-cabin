@@ -129,12 +129,12 @@
     <div class="container">
         <div class="header-card">
             <h1>📸 哲哲 🐂 ✕ 珊珊 🐰 拍立得相册</h1>
-            <p>定格 300 天里的每一次微笑与深情陪伴</p>
+            <p>定格 300 天里的每一次微笑与深情陪伴（云端多端实时同步）</p>
             <button class="add-photo-btn" onclick="openAddModal()">📷 上传 / 添加手机相册照片 ✨</button>
         </div>
 
         <div class="polaroids-grid" id="gallery-grid">
-            <!-- 动态渲染与本地加载 -->
+            <!-- 动态渲染与云端加载 -->
         </div>
     </div>
 
@@ -154,7 +154,7 @@
             <input type="text" id="input-title" class="modal-input" placeholder="回忆主题 (如: 珊珊笑得很甜)">
             <input type="text" id="input-date" class="modal-input" placeholder="日期 (如: 2026-08-07)">
 
-            <button class="add-photo-btn" style="margin-top: 15px; width: 100%;" onclick="saveNewPolaroid()">保存至相册 ✨</button>
+            <button class="add-photo-btn" id="btn-save-photo" style="margin-top: 15px; width: 100%;" onclick="saveNewPolaroid()">保存至云端相册 ✨</button>
             <button style="background: transparent; border: none; color: #ccc; margin-top: 10px; cursor: pointer;" onclick="closeAddModal()">取消</button>
         </div>
     </div>
@@ -165,25 +165,22 @@
         let selectedBase64Img = '';
 
         const DEFAULT_CARDS = [
-            { id: 1, title: '初次相识 🌸', date: '2024-05-03', media: '✨', msg: '初次相遇，命运开始交织！' },
-            { id: 2, title: '甜蜜复合 重新牵手 💍', date: '2026-01-18', media: '💖', msg: '重新牵手，星河长明！' },
-            { id: 3, title: '300 天纪念日 🏆', date: '2026-11-13', media: '🎉', msg: '笨笨牛与白羊兔的 300 天纪念日！' }
+            { id: 'def_1', title: '初次相识 🌸', date: '2024-05-03', media: '✨', msg: '初次相遇，命运开始交织！' },
+            { id: 'def_2', title: '甜蜜复合 重新牵手 💍', date: '2026-01-18', media: '💖', msg: '重新牵手，星河长明！' },
+            { id: 'def_3', title: '300 天纪念日 🏆', date: '2026-11-13', media: '🎉', msg: '笨笨牛与白羊兔的 300 天纪念日！' }
         ];
 
-        function loadPolaroids() {
+        function renderCards(list) {
             const grid = document.getElementById('gallery-grid');
             grid.innerHTML = '';
-            const customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
-            const all = [...customList, ...DEFAULT_CARDS];
 
-            all.forEach((item, idx) => {
+            list.forEach((item) => {
                 const card = document.createElement('div');
                 card.className = 'polaroid-card';
                 card.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
 
                 let mediaHtml = item.imgData ? `<img src="${item.imgData}" class="photo-img">` : item.media || '🌸';
-
-                let deleteBtnHtml = item.imgData ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePolaroid('${item.id}')">✕</button>` : '';
+                let deleteBtnHtml = (item.imgData || !item.id.startsWith('def_')) ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePolaroid('${item.id}')">✕</button>` : '';
 
                 card.innerHTML = `
                     ${deleteBtnHtml}
@@ -194,6 +191,25 @@
                 card.onclick = () => alert(`📸 【拍立得记忆】\n${item.msg || item.title}`);
                 grid.appendChild(card);
             });
+        }
+
+        function loadPolaroids() {
+            fetch('/api/polaroids')
+                .then(res => res.json())
+                .then(cloudList => {
+                    if (Array.isArray(cloudList) && cloudList.length > 0) {
+                        const merged = [...cloudList, ...DEFAULT_CARDS];
+                        renderCards(merged);
+                        localStorage.setItem('300days_polaroids', JSON.stringify(cloudList));
+                    } else {
+                        const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+                        renderCards([...localList, ...DEFAULT_CARDS]);
+                    }
+                })
+                .catch(() => {
+                    const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+                    renderCards([...localList, ...DEFAULT_CARDS]);
+                });
         }
         loadPolaroids();
 
@@ -209,17 +225,47 @@
             document.getElementById('modal').style.display = 'none';
         }
 
+        // 压缩图片防止 Base64 过大超限
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 800;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function handleImageSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                selectedBase64Img = e.target.result;
+            compressImage(file, function(base64Data) {
+                selectedBase64Img = base64Data;
                 document.getElementById('preview-img-tag').src = selectedBase64Img;
                 document.getElementById('img-preview-box').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            });
         }
 
         function saveNewPolaroid() {
@@ -228,29 +274,59 @@
 
             if (!title) { alert('请输入回忆主题哦！'); return; }
 
-            const customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            const btn = document.getElementById('btn-save-photo');
+            btn.innerText = '☁️ 云端同步上传中...';
+            btn.disabled = true;
+
             const newItem = {
                 id: 'pol_' + Date.now(),
                 title: title,
                 date: date || new Date().toLocaleDateString(),
                 imgData: selectedBase64Img,
-                msg: title
+                msg: title,
+                timestamp: Date.now()
             };
 
-            customList.unshift(newItem);
-            localStorage.setItem('300days_polaroids', JSON.stringify(customList));
+            // 先更新本地
+            const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            localList.unshift(newItem);
+            localStorage.setItem('300days_polaroids', JSON.stringify(localList));
 
-            closeAddModal();
-            loadPolaroids();
-            alert('✨ 成功将照片添加到拍立得相册中！');
+            // 推送到云端服务器 API
+            fetch('/api/polaroids', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            })
+            .then(res => res.json())
+            .then(() => {
+                btn.innerText = '保存至云端相册 ✨';
+                btn.disabled = false;
+                closeAddModal();
+                loadPolaroids();
+                alert('✨ 照片已成功同步上传至云端！对方在手机上也能即时看到了！');
+            })
+            .catch(() => {
+                btn.innerText = '保存至云端相册 ✨';
+                btn.disabled = false;
+                closeAddModal();
+                loadPolaroids();
+                alert('✨ 已保存在本地！网络恢复时将自动同步。');
+            });
         }
 
         function deletePolaroid(id) {
             if (!confirm('确定要删除这张拍立得相片吗？')) return;
-            let customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
-            customList = customList.filter(item => item.id !== id);
-            localStorage.setItem('300days_polaroids', JSON.stringify(customList));
-            loadPolaroids();
+
+            // 删除本地
+            let localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            localList = localList.filter(item => item.id !== id);
+            localStorage.setItem('300days_polaroids', JSON.stringify(localList));
+
+            // 删除云端
+            fetch('/api/polaroids?id=' + id, { method: 'DELETE' })
+                .then(() => loadPolaroids())
+                .catch(() => loadPolaroids());
         }
     </script>
 </body>

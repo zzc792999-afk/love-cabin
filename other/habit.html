@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>每日爱意打卡 · 哲哲 🐂 ✕ 珊珊 🐰</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #190a28;
+            --rose-gold: #ffcad4;
+            --pink-accent: #f4acb7;
+            --glass-bg: rgba(255, 229, 236, 0.08);
+            --glass-border: rgba(255, 202, 212, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: linear-gradient(135deg, #241033, #381a47, #13071f);
+            color: white; min-height: 100vh; padding: 20px 15px 100px 15px; position: relative;
+        }
+
+        .container { max-width: 850px; margin: 0 auto; position: relative; z-index: 10; }
+
+        .header-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 30px 20px; text-align: center;
+            backdrop-filter: blur(16px); margin-bottom: 25px;
+        }
+
+        .header-card h1 {
+            font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 800;
+            background: linear-gradient(90deg, #fff, var(--rose-gold), var(--pink-accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .habits-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px;
+        }
+
+        .habit-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 20px; backdrop-filter: blur(12px);
+            text-align: center; display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .habit-icon { font-size: 2.2rem; }
+        .habit-name { font-size: 1.1rem; font-weight: 800; color: white; }
+
+        .check-btn {
+            background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border: none; color: #2b1836; font-weight: 800; padding: 10px 0;
+            border-radius: 18px; cursor: pointer; transition: transform 0.2s;
+        }
+
+        .check-btn:active { transform: scale(0.95); }
+        .check-btn.checked { background: rgba(255,255,255,0.2); color: #fff; cursor: default; }
+
+        .back-btn {
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px;
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(255,229,236,0.15);
+            border: 1px solid rgba(255,202,212,0.3); backdrop-filter: blur(10px);
+            color: white; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 1.2rem; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-card">
+            <h1>📅 哲哲 🐂 ✕ 珊珊 🐰 每日爱意打卡</h1>
+            <p>小一步打卡，积攒无尽浪漫爱意能量</p>
+        </div>
+
+        <div class="habits-grid">
+            <div class="habit-card">
+                <div class="habit-icon">💖</div>
+                <div class="habit-name">今天超级想你</div>
+                <button class="check-btn" onclick="doCheck(this)">打卡想念 ✨</button>
+            </div>
+
+            <div class="habit-card">
+                <div class="habit-icon">🌙</div>
+                <div class="habit-name">早安晚安问候</div>
+                <button class="check-btn" onclick="doCheck(this)">打卡问候 🌸</button>
+            </div>
+
+            <div class="habit-card">
+                <div class="habit-icon">🍲</div>
+                <div class="habit-name">按时好好吃饭</div>
+                <button class="check-btn" onclick="doCheck(this)">打卡干饭 🥣</button>
+            </div>
+
+            <div class="habit-card">
+                <div class="habit-icon">🫂</div>
+                <div class="habit-name">给对方超深抱抱</div>
+                <button class="check-btn" onclick="doCheck(this)">打卡抱抱 充能 💖</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="../index.html" class="back-btn" title="返回主页"><i class="fas fa-home"></i></a>
+
+    <script>
+        function doCheck(btn) {
+            btn.innerText = '已打卡 💖';
+            btn.classList.add('checked');
+            btn.onclick = null;
+            alert('🎉 打卡成功！为哲哲和珊珊的爱意库增加 10 点心动能量！');
+        }
+    </script>
+</body>
+</html>

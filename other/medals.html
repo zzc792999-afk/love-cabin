@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>心动勋章墙 · 哲哲 🐂 ✕ 珊珊 🐰</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #181024;
+            --rose-gold: #ffcad4;
+            --pink-accent: #f4acb7;
+            --gold-shine: #ffe5a3;
+            --glass-bg: rgba(255, 229, 236, 0.08);
+            --glass-border: rgba(255, 202, 212, 0.25);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #2e183b 0%, #150921 70%, #0a0412 100%);
+            color: #ffffff; min-height: 100vh; padding: 20px 15px 100px 15px;
+            position: relative; overflow-x: hidden;
+        }
+
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; }
+
+        .container { position: relative; z-index: 10; max-width: 900px; margin: 0 auto; }
+
+        .header-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 30px 20px; text-align: center;
+            backdrop-filter: blur(16px); margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .header-card h1 {
+            font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 800;
+            background: linear-gradient(90deg, #fff, var(--rose-gold), var(--pink-accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header-card p { font-size: 0.9rem; color: rgba(255, 230, 240, 0.8); }
+
+        .medals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .medal-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 22px; padding: 25px 20px; text-align: center;
+            backdrop-filter: blur(12px); transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+
+        .medal-card:hover { transform: translateY(-6px) scale(1.02); border-color: var(--pink-accent); }
+
+        .medal-icon-box {
+            width: 85px; height: 85px; border-radius: 50%;
+            margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center;
+            font-size: 2.8rem; background: linear-gradient(135deg, rgba(255,202,212,0.2), rgba(244,172,183,0.3));
+            border: 2px solid var(--pink-accent); box-shadow: 0 0 25px rgba(244, 172, 183, 0.4);
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(244, 172, 183, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(244, 172, 183, 0.7); }
+        }
+
+        .medal-name { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        .medal-desc { font-size: 0.8rem; color: rgba(255,230,240,0.75); margin-bottom: 12px; }
+        .medal-status {
+            display: inline-block; font-size: 0.75rem; font-weight: 800;
+            padding: 4px 14px; border-radius: 12px;
+            background: linear-gradient(90deg, var(--pink-accent), var(--rose-gold));
+            color: #2b1836;
+        }
+
+        .back-btn {
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255, 229, 236, 0.15); border: 1px solid rgba(255, 202, 212, 0.3);
+            backdrop-filter: blur(10px); color: white; display: flex;
+            align-items: center; justify-content: center; text-decoration: none;
+            font-size: 1.2rem; z-index: 100; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        #custom-toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, rgba(244, 172, 183, 0.95), rgba(255, 202, 212, 0.95));
+            color: #2b1836; padding: 10px 22px; border-radius: 30px; font-weight: 800;
+            font-size: 0.88rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 99999;
+            opacity: 0; transition: all 0.4s ease; pointer-events: none; text-align: center;
+        }
+        #custom-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div class="header-card">
+            <h1>🏆 哲哲 🐂 ✕ 珊珊 🐰 心动勋章墙</h1>
+            <p>铭记每一个值得骄傲的爱情里程碑与极光时刻</p>
+        </div>
+
+        <div class="medals-grid">
+            <div class="medal-card" onclick="showMedalDetail('300天星河航海家', '成功携手穿过 300 天星河，达成终极专属纪念勋章！')">
+                <div class="medal-icon-box">🚀</div>
+                <div class="medal-name">300天星河航海家</div>
+                <div class="medal-desc">成功携手穿过 300 天星河</div>
+                <div class="medal-status">已达成 🏆</div>
+            </div>
+
+            <div class="medal-card" onclick="showMedalDetail('处女座✕白羊座契约', '处女座笨笨牛的沉稳细致，完美包容白羊座小兔的热情可爱！')">
+                <div class="medal-icon-box">💖</div>
+                <div class="medal-name">处女座 ✕ 白羊座 契约</div>
+                <div class="medal-desc">生肖与星座 100% 默契绝配</div>
+                <div class="medal-status">已达成 🏆</div>
+            </div>
+
+            <div class="medal-card" onclick="showMedalDetail('2026复合守候者', '2026年1月18日重新牵起彼此的手，坚定奔赴未来！')">
+                <div class="medal-icon-box">🌸</div>
+                <div class="medal-name">2026 复合守候者</div>
+                <div class="medal-desc">失而复得，更知相守珍贵</div>
+                <div class="medal-status">已达成 🏆</div>
+            </div>
+
+            <div class="medal-card" onclick="showMedalDetail('200天风雨同行勋章', '经历考验，积攒无数欢声笑语！')">
+                <div class="medal-icon-box">🎖️</div>
+                <div class="medal-name">200天风雨同行</div>
+                <div class="medal-desc">走过四季，心依然紧紧贴近</div>
+                <div class="medal-status">已达成 🏆</div>
+            </div>
+
+            <div class="medal-card" onclick="showMedalDetail('100天萌芽里程碑', '最初的心动萌芽，拉开浪漫序幕！')">
+                <div class="medal-icon-box">🌱</div>
+                <div class="medal-name">100天萌芽里程碑</div>
+                <div class="medal-desc">最初的心动萌芽，甜蜜起步</div>
+                <div class="medal-status">已达成 🏆</div>
+            </div>
+
+            <div class="medal-card" onclick="showMedalDetail('未来 3000 天远航勋章', '终极成就：承诺陪对方走过接下来的 3000 天！')">
+                <div class="medal-icon-box">👑</div>
+                <div class="medal-name">3000天远航成就</div>
+                <div class="medal-desc">目标：永远守护白羊小兔</div>
+                <div class="medal-status" style="background: rgba(255,255,255,0.15); color: #fff;">解锁中 ⏳</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="../index.html" class="back-btn" title="返回主页"><i class="fas fa-home"></i></a>
+    <div id="custom-toast"></div>
+
+    <script>
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+
+            const stars = Array.from({ length: 90 }, () => ({
+                x: Math.random() * w, y: Math.random() * h,
+                size: Math.random() * 2 + 0.8, alpha: Math.random(),
+                speed: Math.random() * 0.02 + 0.005
+            }));
+
+            function loop() {
+                ctx.clearRect(0, 0, w, h);
+                stars.forEach(s => {
+                    s.alpha += s.speed;
+                    if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+                    ctx.fillStyle = `rgba(255, 202, 212, ${s.alpha})`;
+                    ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+        initBackground();
+
+        function showMedalDetail(name, desc) {
+            const toast = document.getElementById('custom-toast');
+            toast.innerText = `🏅 【勋章详解：${name}】\n${desc}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+    </script>
+</body>
+</html>

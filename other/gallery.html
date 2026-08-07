@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>300天拍立得相册 · 哲哲 🐂 ✕ 珊珊 🐰</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #1a1024;
+            --rose-gold: #ffcad4;
+            --pink-accent: #f4acb7;
+            --glass-bg: rgba(255, 229, 236, 0.08);
+            --glass-border: rgba(255, 202, 212, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: linear-gradient(135deg, #241133, #381a47, #150921);
+            color: white; min-height: 100vh; padding: 20px 15px 100px 15px; position: relative;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; z-index: 10; position: relative; }
+
+        .header-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 30px 20px; text-align: center;
+            backdrop-filter: blur(16px); margin-bottom: 25px;
+        }
+
+        .header-card h1 {
+            font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 800;
+            background: linear-gradient(90deg, #fff, var(--rose-gold), var(--pink-accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .header-card p { font-size: 0.88rem; color: rgba(255,230,240,0.8); margin-top: 5px; }
+
+        .polaroids-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;
+        }
+
+        .polaroid-card {
+            background: #ffffff; color: #333; border-radius: 14px;
+            padding: 14px 14px 22px 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transform: rotate(var(--rot)); transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer; position: relative;
+        }
+
+        .polaroid-card:hover { transform: scale(1.05) rotate(0deg); z-index: 20; box-shadow: 0 15px 35px rgba(244, 172, 183, 0.5); }
+
+        .photo-box {
+            width: 100%; height: 210px; border-radius: 8px; overflow: hidden;
+            background: linear-gradient(135deg, #ffd6e0, #ffefedd4);
+            display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
+            position: relative;
+        }
+
+        .photo-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .caption {
+            margin-top: 14px; text-align: center; font-weight: 800; font-size: 1rem; color: #2b1836;
+        }
+
+        .caption-date { font-size: 0.75rem; color: #888; margin-top: 4px; font-weight: 600; text-align: center; }
+
+        .back-btn {
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px;
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(255,229,236,0.15);
+            border: 1px solid rgba(255,202,212,0.3); backdrop-filter: blur(10px);
+            color: white; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 1.2rem; z-index: 100;
+        }
+
+        .add-photo-btn {
+            display: block; margin: 18px auto 0 auto; background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border: none; color: #2b1836; font-weight: 800; padding: 12px 28px; border-radius: 25px;
+            cursor: pointer; box-shadow: 0 6px 20px rgba(244,172,183,0.4); font-size: 0.95rem;
+        }
+
+        .select-file-btn {
+            width: 100%; background: rgba(255, 182, 193, 0.15);
+            border: 1px dashed var(--pink-accent); color: var(--rose-gold);
+            font-weight: 700; padding: 12px; border-radius: 12px; cursor: pointer;
+            margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .select-file-btn:active { background: rgba(244, 172, 183, 0.3); }
+
+        #img-preview-box {
+            width: 100%; height: 100px; border-radius: 10px; overflow: hidden;
+            display: none; margin-top: 8px; border: 1px solid var(--pink-accent);
+        }
+
+        #img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        #modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
+            display: none; justify-content: center; align-items: center; z-index: 9999; padding: 20px;
+        }
+
+        .modal-content {
+            background: rgba(26, 16, 36, 0.96); border: 1px solid var(--pink-accent);
+            border-radius: 22px; padding: 25px; width: 100%; max-width: 400px; text-align: center;
+        }
+
+        .modal-input {
+            width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 12px;
+            border: 1px solid rgba(255,202,212,0.3); background: rgba(255,255,255,0.08); color: white; outline: none;
+            font-size: 16px;
+        }
+
+        .delete-btn {
+            position: absolute; top: 8px; right: 8px; background: rgba(255,71,87,0.85);
+            color: white; border: none; border-radius: 50%; width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+            cursor: pointer; opacity: 0; transition: opacity 0.2s;
+        }
+
+        .polaroid-card:hover .delete-btn { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-card">
+            <h1>📸 哲哲 🐂 ✕ 珊珊 🐰 拍立得相册</h1>
+            <p>定格 300 天里的每一次微笑与深情陪伴</p>
+            <button class="add-photo-btn" onclick="openAddModal()">📷 上传 / 添加手机相册照片 ✨</button>
+        </div>
+
+        <div class="polaroids-grid" id="gallery-grid">
+            <!-- 动态渲染与本地加载 -->
+        </div>
+    </div>
+
+    <!-- 隐藏的手机图片选择器 -->
+    <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+
+    <!-- 弹窗 -->
+    <div id="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--rose-gold); margin-bottom: 15px;">🌸 添加新回忆拍立得</h3>
+            
+            <button class="select-file-btn" onclick="document.getElementById('file-picker').click()">
+                <i class="fas fa-camera"></i> 点击选择手机相册照片
+            </button>
+            <div id="img-preview-box"><img id="preview-img-tag" src=""></div>
+
+            <input type="text" id="input-title" class="modal-input" placeholder="回忆主题 (如: 珊珊笑得很甜)">
+            <input type="text" id="input-date" class="modal-input" placeholder="日期 (如: 2026-08-07)">
+
+            <button class="add-photo-btn" style="margin-top: 15px; width: 100%;" onclick="saveNewPolaroid()">保存至相册 ✨</button>
+            <button style="background: transparent; border: none; color: #ccc; margin-top: 10px; cursor: pointer;" onclick="closeAddModal()">取消</button>
+        </div>
+    </div>
+
+    <a href="../index.html" class="back-btn" title="返回主页"><i class="fas fa-home"></i></a>
+
+    <script>
+        let selectedBase64Img = '';
+
+        const DEFAULT_CARDS = [
+            { id: 1, title: '初次相识 🌸', date: '2024-05-03', media: '✨', msg: '初次相遇，命运开始交织！' },
+            { id: 2, title: '甜蜜复合 重新牵手 💍', date: '2026-01-18', media: '💖', msg: '重新牵手，星河长明！' },
+            { id: 3, title: '300 天纪念日 🏆', date: '2026-11-13', media: '🎉', msg: '笨笨牛与白羊兔的 300 天纪念日！' }
+        ];
+
+        function loadPolaroids() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+            const customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            const all = [...customList, ...DEFAULT_CARDS];
+
+            all.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'polaroid-card';
+                card.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
+
+                let mediaHtml = item.imgData ? `<img src="${item.imgData}" class="photo-img">` : item.media || '🌸';
+
+                let deleteBtnHtml = item.imgData ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePolaroid('${item.id}')">✕</button>` : '';
+
+                card.innerHTML = `
+                    ${deleteBtnHtml}
+                    <div class="photo-box">${mediaHtml}</div>
+                    <div class="caption">${item.title}</div>
+                    <div class="caption-date">${item.date}</div>
+                `;
+                card.onclick = () => alert(`📸 【拍立得记忆】\n${item.msg || item.title}`);
+                grid.appendChild(card);
+            });
+        }
+        loadPolaroids();
+
+        function openAddModal() {
+            selectedBase64Img = '';
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('img-preview-box').style.display = 'none';
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeAddModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedBase64Img = e.target.result;
+                document.getElementById('preview-img-tag').src = selectedBase64Img;
+                document.getElementById('img-preview-box').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveNewPolaroid() {
+            const title = document.getElementById('input-title').value.trim();
+            const date = document.getElementById('input-date').value.trim();
+
+            if (!title) { alert('请输入回忆主题哦！'); return; }
+
+            const customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            const newItem = {
+                id: 'pol_' + Date.now(),
+                title: title,
+                date: date || new Date().toLocaleDateString(),
+                imgData: selectedBase64Img,
+                msg: title
+            };
+
+            customList.unshift(newItem);
+            localStorage.setItem('300days_polaroids', JSON.stringify(customList));
+
+            closeAddModal();
+            loadPolaroids();
+            alert('✨ 成功将照片添加到拍立得相册中！');
+        }
+
+        function deletePolaroid(id) {
+            if (!confirm('确定要删除这张拍立得相片吗？')) return;
+            let customList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            customList = customList.filter(item => item.id !== id);
+            localStorage.setItem('300days_polaroids', JSON.stringify(customList));
+            loadPolaroids();
+        }
+    </script>
+</body>
+</html>

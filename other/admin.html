@@ -734,6 +734,7 @@
             <button class="tab-btn" data-target="tab-chat"><i class="fas fa-comment-dots"></i> 甜蜜话语剧本</button>
             <button class="tab-btn" data-target="tab-games"><i class="fas fa-puzzle-piece"></i> 答题与拼图管家</button>
             <button class="tab-btn" data-target="tab-messages"><i class="fas fa-comments"></i> 留言板数据中心</button>
+            <button class="tab-btn" data-target="tab-capsules"><i class="fas fa-envelope-open-text"></i> 时光慢递小作文</button>
             <button class="tab-btn" data-target="tab-assets"><i class="fas fa-palette"></i> 网站素材配置</button>
         </div>
 
@@ -1082,6 +1083,34 @@
 
                 <button class="btn-submit" id="btn-save-chat-script">
                     <i class="fas fa-save"></i> 保存并更新甜蜜对话回复
+                </button>
+            </div>
+        </div>
+
+        <!-- 📮 时光慢递小作文后台管理模块 -->
+        <div class="admin-card" id="tab-capsules">
+            <div class="card-header">
+                <i class="fas fa-envelope-open-text"></i>
+                <h2>📮 时光慢递小作文后台管理控制台</h2>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.6;">
+                在此撰写与管理给珊珊在第 500 天、第 1000 天与第 3000 天的慢递真心话小作文。前端页面仅显示火漆封印卡片，在此处编辑保存后将在对应日期到来时自动对珊珊解封！
+            </p>
+            <div class="config-form">
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                    <label><i class="fas fa-heart"></i> 慢递胶囊 #1 · 给第 500 天的我们 (解封日期: 2027年6月2日)</label>
+                    <textarea id="capsule-input-1" rows="5" placeholder="写下第 500 天的小作文..." style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; width: 100%; resize: vertical; font-family: inherit; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                    <label><i class="fas fa-heart"></i> 慢递胶囊 #2 · 给第 1000 天的我们 (解封日期: 2028年10月14日)</label>
+                    <textarea id="capsule-input-2" rows="5" placeholder="写下第 1000 天的小作文..." style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; width: 100%; resize: vertical; font-family: inherit; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                    <label><i class="fas fa-heart"></i> 慢递胶囊 #3 · 给第 3000 天的我们 (解封日期: 2034年4月6日)</label>
+                    <textarea id="capsule-input-3" rows="5" placeholder="写下第 3000 天的小作文..." style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; width: 100%; resize: vertical; font-family: inherit; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                </div>
+                <button class="btn-submit" id="btn-save-capsules-admin">
+                    <i class="fas fa-save"></i> 保存三封时光慢递小作文 ✨
                 </button>
             </div>
         </div>
@@ -2743,6 +2772,34 @@
                 config_playlist: JSON.stringify(adminPlaylist)
             }, '🎨 网站图片、音乐、情书和状态文案配置同步保存成功！');
         });
+
+        // 📮 时光慢递小作文后台管理逻辑
+        const DEFAULT_CAPSULE_LETTERS = {
+            1: `亲爱的珊珊（我的白羊座小兔）：\n\n当你拆开这封信的时候，我们已经迎来了在一起的第 500 天！\n从 2026年1月18日 重新牵手到今天，500 个日日夜夜里，谢谢你一直给我的温柔与阳光。\n\n我是个处女座笨笨牛，不擅长说太多甜言蜜语，但我会永远用行动照顾好你。不管是未来的 500 天，还是更久，笨笨牛都将坚定不移地守护在他的小兔身边！爱你！\n\n—— 哲哲 (笨笨牛 🐂)`,
+            2: `亲爱的珊珊宝贝：\n\n见字如面！今天是我们携手走过的第 1000 天了！\n从相识（2024-05-03）到 1000 天的里程碑，我们共同经历了好多风风雨雨，也收获了无数甜蜜。\n\n白羊座小兔的开朗与热情，是我生命中最美好的礼物。感谢命运让我们重新相遇相爱。希望第 1000 天的我们依然像最初一样甜蜜快乐！\n\n—— 永远爱你的哲哲 💖`,
+            3: `致亲爱的珊珊（我们结婚/相守的第 3000 天）：\n\n展信佳。3000 天，接近整整 8 年多的时光。\n当看到这封信的时候，我们一定已经一起走过了大半个世界，看遍了许多风景。\n\n谢谢你从 2011年4月17日 降临这个世界，谢谢你在 2026年1月18日 重新牵起我的手。笨笨牛兑现了他的承诺，陪着他的白羊小兔走过了 3000 天。未来的每一个 3000 天，我们依然不离不弃！\n\n—— 你的笨笨牛 哲哲 🐂💖🐰`
+        };
+
+        function loadCapsuleAdminInputs() {
+            for (let i = 1; i <= 3; i++) {
+                const input = document.getElementById('capsule-input-' + i);
+                if (input) {
+                    input.value = localStorage.getItem('capsule_letter_' + i) || DEFAULT_CAPSULE_LETTERS[i];
+                }
+            }
+        }
+
+        document.getElementById('btn-save-capsules-admin')?.addEventListener('click', () => {
+            for (let i = 1; i <= 3; i++) {
+                const val = document.getElementById('capsule-input-' + i).value.trim();
+                if (val) {
+                    localStorage.setItem('capsule_letter_' + i, val);
+                }
+            }
+            showAdminToast('📮 成功保存三封时光慢递小作文至后台！');
+        });
+
+        loadCapsuleAdminInputs();
 
     </script>
 </body>

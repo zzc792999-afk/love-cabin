@@ -16,10 +16,14 @@ let wishlistCollection = null;
 let diaryCollection = null;
 let decisionsCollection = null;
 let polaroidsCollection = null;
+let foodMenuCollection = null;
+let foodOrdersCollection = null;
 const mongoURI = process.env.MONGODB_URI || "";
 const DIARY_FILE = path.join(__dirname, 'other', 'diary.json');
 const DECISIONS_FILE = path.join(__dirname, 'other', 'decisions.json');
 const POLAROIDS_FILE = path.join(__dirname, 'other', 'polaroids.json');
+const FOOD_MENU_FILE = path.join(__dirname, 'other', 'food_menu.json');
+const FOOD_ORDERS_FILE = path.join(__dirname, 'other', 'food_orders.json');
 
 if (mongoURI) {
     console.log("检测到 MONGODB_URI，正在建立云数据库连接...");
@@ -33,7 +37,9 @@ if (mongoURI) {
             diaryCollection = db.collection('diary');
             decisionsCollection = db.collection('decisions');
             polaroidsCollection = db.collection('polaroids');
-            console.log("💖 MongoDB 云数据库连接成功！留言、配置、心愿单、日记、拍立得和决策数据已开启云端永久化。");
+            foodMenuCollection = db.collection('food_menu');
+            foodOrdersCollection = db.collection('food_orders');
+            console.log("💖 MongoDB 云数据库连接成功！留言、配置、心愿单、日记、拍立得、外卖点餐和决策数据已开启云端永久化。");
         })
         .catch(err => {
             console.error("⚠️ MongoDB 连接失败，自动降级为本地 JSON 文件存储:", err.message);
@@ -43,6 +49,8 @@ if (mongoURI) {
             diaryCollection = null;
             decisionsCollection = null;
             polaroidsCollection = null;
+            foodMenuCollection = null;
+            foodOrdersCollection = null;
         });
 }
 
@@ -64,6 +72,8 @@ function getDatabaseCollection(collectionName) {
             else if (collectionName === 'diary') col = diaryCollection;
             else if (collectionName === 'decisions') col = decisionsCollection;
             else if (collectionName === 'polaroids') col = polaroidsCollection;
+            else if (collectionName === 'food_menu') col = foodMenuCollection;
+            else if (collectionName === 'food_orders') col = foodOrdersCollection;
 
             if (col) {
                 clearInterval(interval);
@@ -171,6 +181,46 @@ function ensurePolaroidsFile() {
     }
     if (!fs.existsSync(POLAROIDS_FILE)) {
         fs.writeFileSync(POLAROIDS_FILE, JSON.stringify([], null, 4), 'utf8');
+    }
+}
+
+// 默认爱心外卖菜单
+const DEFAULT_FOOD_MENU = [
+    // 🍳 元气早餐
+    { id: "dish_1", category: "breakfast", name: "爱心太阳蛋烤吐司", emoji: "🍳🥪", desc: "香脆吐司搭配溏心太阳蛋与火腿片，哲哲亲手现烤，元气满满！", price: "亲亲 1 次 💋", tag: "招牌早点", available: true },
+    { id: "dish_2", category: "breakfast", name: "暖胃皮蛋瘦肉粥", emoji: "🥣", desc: "精选大米慢熬40分钟，肉丝滑嫩，暖胃更暖心，适合赖床早晨~", price: "说一句想我 🌸", tag: "温润暖胃", available: true },
+    { id: "dish_3", category: "breakfast", name: "芝士厚蛋烧", emoji: "🧀🥚", desc: "层层蛋皮包裹浓郁拉丝芝士，奶香扑鼻，口感超级细腻！", price: "抱抱 10 秒 🫂", tag: "奶香浓郁", available: true },
+
+    // 🍲 招牌大餐
+    { id: "dish_4", category: "main", name: "哲哲秘制可乐鸡翅", emoji: "🍗", desc: "经典可乐慢煨入味，色泽红亮鲜甜多汁，骨肉分离超级下饭！", price: "夸哲哲帅 🌟", tag: "必点招牌", available: true },
+    { id: "dish_5", category: "main", name: "番茄浓汤牛腩面", emoji: "🍜🍅", desc: "大块牛腩炖煮两小时，沙软番茄熬出浓汤，酸甜开胃，汤都能喝光！", price: "亲亲 2 次 💋💋", tag: "大份量", available: true },
+    { id: "dish_6", category: "main", name: "经典黑椒牛肉意面", emoji: "🍝", desc: "现炒嫩牛肉搭配浓郁黑椒酱汁，面条Q弹劲道，西餐厅同款享受！", price: "给哲哲捏肩 💆", tag: "主厨推荐", available: true },
+    { id: "dish_7", category: "main", name: "黄金香酥炸鸡块", emoji: "🍟🍗", desc: "外皮金黄香脆，里面爆汁鲜嫩，搭配哲哲专属甜辣蘸酱~", price: "撒娇一次 🥺", tag: "香脆解馋", available: true },
+
+    // 🍢 深夜夜宵
+    { id: "dish_8", category: "night", name: "深夜灵魂泡面加双蛋", emoji: "🍜🥓", desc: "夜深肚子饿？哲哲为你煮专属泡面，加双份荷包蛋与烤肠！", price: "贴贴 5 分钟 🥰", tag: "夜宵顶流", available: true },
+    { id: "dish_9", category: "night", name: "热腾腾日式关东煮", emoji: "🍢", desc: "高汤慢煨白萝卜、福袋、魔芋丝与爆汁鱼豆腐，冬夜超级治愈！", price: "一起听首歌 🎵", tag: "暖心暖身", available: true },
+    { id: "dish_10", category: "night", name: "哲哲风味香烤小肉串", emoji: "🥩", desc: "现烤孜然椒盐小肉串，肉香四溢，夜宵追剧绝配！", price: "亲哲哲额头 💋", tag: "追剧神器", available: true },
+
+    // 🧋 特调饮品
+    { id: "dish_11", category: "drinks", name: "珊珊专属多肉葡萄", emoji: "🍇🧋", desc: "手剥新鲜葡萄果肉，搭配清爽茶底与浓郁芝士厚乳奶盖，去冰微糖！", price: "亲亲 1 次 💋", tag: "珊珊最爱", available: true },
+    { id: "dish_12", category: "drinks", name: "手摇黑糖珍珠鲜奶", emoji: "🧋", desc: "手熬黑糖波霸珍珠，醇厚鲜奶温热包裹，甜丝丝的恋爱味道！", price: "抱抱充能 🫂", tag: "甜蜜满分", available: true },
+    { id: "dish_13", category: "drinks", name: "蜜桃乌龙果粒冰茶", emoji: "🍑🍹", desc: "大颗水蜜桃果肉搭配高山乌龙，清爽解腻，果香满溢！", price: "说一句爱哲哲 💖", tag: "清爽解腻", available: true },
+
+    // 🍰 治愈甜品
+    { id: "dish_14", category: "desserts", name: "焦糖鸡蛋布丁", emoji: "🍮", desc: "duangduang超嫩滑布丁，焦糖微苦甘甜，入口即化~", price: "早点睡觉 🌙", tag: "入口即化", available: true },
+    { id: "dish_15", category: "desserts", name: "草莓软糯雪媚娘", emoji: "🍓🍰", desc: "奶香拉丝糯米皮，包裹轻盈动物奶油与一整颗新鲜甜草莓！", price: "超深大拥抱 🫂", tag: "少女心爆棚", available: true }
+];
+
+// 确保本地外卖菜单与订单数据文件存在
+function ensureFoodFiles() {
+    const dir = path.dirname(FOOD_MENU_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(FOOD_MENU_FILE)) {
+        fs.writeFileSync(FOOD_MENU_FILE, JSON.stringify(DEFAULT_FOOD_MENU, null, 4), 'utf8');
+    }
+    if (!fs.existsSync(FOOD_ORDERS_FILE)) {
+        fs.writeFileSync(FOOD_ORDERS_FILE, JSON.stringify([], null, 4), 'utf8');
     }
 }
 
@@ -794,7 +844,322 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 3.14 获取决策记录列表
+    // 3.14 获取爱心外卖菜单列表
+    if (pathname === '/api/food/menu' && req.method === 'GET') {
+        getDatabaseCollection('food_menu')
+            .then(col => {
+                if (col) {
+                    return col.find({}).toArray()
+                        .then(docs => {
+                            if (!docs || docs.length === 0) {
+                                // 初始化默认菜单
+                                return col.insertMany(DEFAULT_FOOD_MENU)
+                                    .then(() => {
+                                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify(DEFAULT_FOOD_MENU));
+                                    });
+                            }
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(docs));
+                        });
+                } else {
+                    ensureFoodFiles();
+                    fs.readFile(FOOD_MENU_FILE, 'utf8', (err, data) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地菜单失败' }));
+                            return;
+                        }
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(data || JSON.stringify(DEFAULT_FOOD_MENU));
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取菜单失败' }));
+            });
+        return;
+    }
+
+    // 3.15 新增或编辑外卖菜品
+    if (pathname === '/api/food/menu' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const dish = JSON.parse(body);
+                dish.id = dish.id || 'dish_' + Date.now();
+                getDatabaseCollection('food_menu')
+                    .then(col => {
+                        if (col) {
+                            return col.updateOne({ id: dish.id }, { $set: dish }, { upsert: true })
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, dish }));
+                                });
+                        } else {
+                            ensureFoodFiles();
+                            fs.readFile(FOOD_MENU_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                try { list = JSON.parse(data); } catch(e) {}
+                                const idx = list.findIndex(d => d.id === dish.id);
+                                if (idx >= 0) list[idx] = dish;
+                                else list.push(dish);
+                                fs.writeFile(FOOD_MENU_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                    if (writeErr) {
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: '保存本地菜单失败' }));
+                                        return;
+                                    }
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, dish }));
+                                });
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '保存菜品失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
+    // 3.16 删除外卖菜品
+    if (pathname === '/api/food/menu' && req.method === 'DELETE') {
+        const id = url.searchParams.get('id');
+        if (!id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: '缺失 id 参数' }));
+            return;
+        }
+        getDatabaseCollection('food_menu')
+            .then(col => {
+                if (col) {
+                    return col.deleteOne({ id })
+                        .then(() => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                } else {
+                    ensureFoodFiles();
+                    fs.readFile(FOOD_MENU_FILE, 'utf8', (readErr, data) => {
+                        let list = [];
+                        try { list = JSON.parse(data); } catch(e) {}
+                        list = list.filter(d => d.id !== id);
+                        fs.writeFile(FOOD_MENU_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                            if (writeErr) {
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: '更新本地菜单失败' }));
+                                return;
+                            }
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '删除菜品失败' }));
+            });
+        return;
+    }
+
+    // 3.17 获取外卖订单列表
+    if (pathname === '/api/food/orders' && req.method === 'GET') {
+        getDatabaseCollection('food_orders')
+            .then(col => {
+                if (col) {
+                    return col.find({}).sort({ timestamp: -1 }).toArray()
+                        .then(docs => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(docs || []));
+                        });
+                } else {
+                    ensureFoodFiles();
+                    fs.readFile(FOOD_ORDERS_FILE, 'utf8', (err, data) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: '读取本地订单失败' }));
+                            return;
+                        }
+                        try {
+                            const list = JSON.parse(data);
+                            list.sort((a, b) => b.timestamp - a.timestamp);
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(list));
+                        } catch(e) {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify([]));
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取订单失败' }));
+            });
+        return;
+    }
+
+    // 3.18 珊珊提交新外卖订单
+    if (pathname === '/api/food/orders' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const order = JSON.parse(body);
+                order.id = 'ord_' + Date.now();
+                order.timestamp = order.timestamp || Date.now();
+                order.status = 'pending'; // pending (待接单) -> cooking (烹饪中) -> delivering (配送中) -> completed (已完成)
+
+                getDatabaseCollection('food_orders')
+                    .then(col => {
+                        if (col) {
+                            return col.insertOne(order)
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, order }));
+                                });
+                        } else {
+                            ensureFoodFiles();
+                            fs.readFile(FOOD_ORDERS_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                try { list = JSON.parse(data); } catch(e) {}
+                                list.unshift(order);
+                                fs.writeFile(FOOD_ORDERS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                    if (writeErr) {
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: '保存本地订单失败' }));
+                                        return;
+                                    }
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, order }));
+                                });
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '提交订单失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
+    // 3.19 哲哲更新外卖订单状态
+    if (pathname === '/api/food/orders' && req.method === 'PUT') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const updatePayload = JSON.parse(body);
+                const orderId = updatePayload.id;
+                const newStatus = updatePayload.status;
+
+                if (!orderId || !newStatus) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: '缺失 id 或 status 参数' }));
+                    return;
+                }
+
+                getDatabaseCollection('food_orders')
+                    .then(col => {
+                        if (col) {
+                            return col.updateOne({ id: orderId }, { $set: { status: newStatus, updateTime: Date.now() } })
+                                .then(() => {
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ success: true, id: orderId, status: newStatus }));
+                                });
+                        } else {
+                            ensureFoodFiles();
+                            fs.readFile(FOOD_ORDERS_FILE, 'utf8', (readErr, data) => {
+                                let list = [];
+                                try { list = JSON.parse(data); } catch(e) {}
+                                const idx = list.findIndex(o => o.id === orderId);
+                                if (idx >= 0) {
+                                    list[idx].status = newStatus;
+                                    list[idx].updateTime = Date.now();
+                                    fs.writeFile(FOOD_ORDERS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                                        if (writeErr) {
+                                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                                            res.end(JSON.stringify({ error: '更新本地订单失败' }));
+                                            return;
+                                        }
+                                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ success: true, id: orderId, status: newStatus }));
+                                    });
+                                } else {
+                                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ error: '找不到该订单' }));
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: '更新订单失败' }));
+                    });
+            } catch(e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '无效的 JSON 格式' }));
+            }
+        });
+        return;
+    }
+
+    // 3.20 删除外卖订单
+    if (pathname === '/api/food/orders' && req.method === 'DELETE') {
+        const id = url.searchParams.get('id');
+        if (!id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: '缺失 id 参数' }));
+            return;
+        }
+        getDatabaseCollection('food_orders')
+            .then(col => {
+                if (col) {
+                    return col.deleteOne({ id })
+                        .then(() => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                } else {
+                    ensureFoodFiles();
+                    fs.readFile(FOOD_ORDERS_FILE, 'utf8', (readErr, data) => {
+                        let list = [];
+                        try { list = JSON.parse(data); } catch(e) {}
+                        list = list.filter(o => o.id !== id);
+                        fs.writeFile(FOOD_ORDERS_FILE, JSON.stringify(list, null, 4), 'utf8', (writeErr) => {
+                            if (writeErr) {
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: '删除本地订单失败' }));
+                                return;
+                            }
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: true }));
+                        });
+                    });
+                }
+            })
+            .catch(err => {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '删除订单失败' }));
+            });
+        return;
+    }
+
+    // 3.21 获取决策记录列表
     if (pathname === '/api/decisions' && req.method === 'GET') {
         getDatabaseCollection('decisions')
             .then(col => {

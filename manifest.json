@@ -1,0 +1,24 @@
+{
+  "name": "时光小屋 · 哲哲 🐂 ✕ 珊珊 🐰",
+  "short_name": "时光小屋",
+  "description": "陈祖哲与白珊珊的专属浪漫恋爱小屋，定格300天的每一份甜蜜回忆",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#1a0f20",
+  "theme_color": "#ff758c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/2.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

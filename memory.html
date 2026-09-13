@@ -1069,7 +1069,7 @@
     <canvas id="bg-canvas"></canvas>
 
     <!-- 🎵 音频元素 -->
-    <audio id="bgm-audio" src="other/1.mp3" loop preload="auto"></audio>
+    <audio id="bgm-audio" src="music.mp3" loop preload="auto"></audio>
 
     <!-- ================= 1. 电影级开场时空之门 ================= -->
     <div id="stargate-overlay" onclick="openTimeGate()">
@@ -1287,18 +1287,18 @@
                     </div>
                 </div>
 
-                <!-- 10. 顶峰之约期许 -->
+                <!-- 10. 通话记录 · 电波陪伴 -->
                 <div class="film-card" onclick="cardClick(9)">
                     <div class="film-photo-box">
-                        <img src="images/memory/10.jpg" onerror="handleImgError(this, 10, '高三毕业重逢愿景图')" alt="顶峰相见">
-                        <span class="film-badge">10 · 顶峰相见</span>
+                        <img src="images/memory/10.jpg" onerror="handleImgError(this, 10, '长途通话记录截图')" alt="通话记录">
+                        <span class="film-badge">10 · 舍不得挂</span>
                     </div>
                     <div class="film-info">
                         <div class="film-title">
-                            <span>顶峰相见 · 毕业之约</span>
-                            <i class="fas fa-mountain" style="color: #a17fe0; font-size: 0.9rem;"></i>
+                            <span>密密麻麻的通话 · 舍不得挂断</span>
+                            <i class="fas fa-phone-alt" style="color: #00f5d4; font-size: 0.9rem;"></i>
                         </div>
-                        <div class="film-desc">考完交卷走出考场的那天，哲哲一定会手捧鲜花在阳光下等你！</div>
+                        <div class="film-desc">一通又一通连绵不断的通话记录，跳动的每一分每一秒，都是我们舍不得挂断的牵挂。</div>
                         <div class="film-action-hint"><i class="fas fa-expand-alt"></i> 轻触查看大图特写</div>
                     </div>
                 </div>
@@ -1447,43 +1447,63 @@
     </div>
 
     <script>
-        /* ================= 1. 音效合成系统 (Web Audio API) ================= */
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playChime(freq = 880, duration = 0.5) {
+        /* ================= 1. 治愈系「叮咚」水晶双音音效 ================= */
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playDingDong(pitchFactor = 1.0) {
             try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + duration);
-                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                // 🔔 第一声「叮」：清亮纯净高音
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(1174.66 * pitchFactor, now); // D6
+                osc1.frequency.exponentialRampToValueAtTime(1170 * pitchFactor, now + 0.25);
+
+                gain1.gain.setValueAtTime(0.08, now);
+                gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.3);
+
+                // 🔔 第二声「咚」：温润柔和低音 (间隔 75ms)
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880 * pitchFactor, now + 0.075); // A5
+                osc2.frequency.exponentialRampToValueAtTime(875 * pitchFactor, now + 0.4);
+
+                gain2.gain.setValueAtTime(0.0001, now);
+                gain2.gain.setValueAtTime(0.1, now + 0.075);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now + 0.075);
+                osc2.stop(now + 0.45);
             } catch (e) {}
         }
 
+        function playChime(freq, dur) {
+            playDingDong(1.0);
+        }
+
         function playSealSound() {
-            try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                // 模拟盖章低沉重音
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-                // 伴随清脆水晶音
-                setTimeout(() => playChime(1200, 0.6), 150);
-            } catch (e) {}
+            playDingDong(0.9);
+            setTimeout(() => playDingDong(1.2), 160);
         }
 
         /* ================= 2. 启封时空之门 ================= */
@@ -1770,7 +1790,7 @@
         }, { passive: true });
 
         /* ================= 6. 毕业倒计时与数据统计 ================= */
-        const graduationDate = new Date('2027-06-07T00:00:00+08:00').getTime();
+        const graduationDate = new Date('2028-06-07T00:00:00+08:00').getTime();
         const metDate = new Date('2024-05-03T00:00:00+08:00').getTime();
         const reunitedDate = new Date('2026-01-18T00:00:00+08:00').getTime();
 

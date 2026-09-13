@@ -326,6 +326,7 @@
             transform: rotate(-0.5deg);
             transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
+            cursor: pointer;
         }
         .polaroid-card:nth-child(even) {
             transform: rotate(0.8deg);
@@ -338,7 +339,7 @@
 
         .photo-wrapper {
             width: 100%;
-            height: 220px;
+            height: 240px;
             border-radius: 8px;
             overflow: hidden;
             background: #f0e6ed;
@@ -525,6 +526,57 @@
             flex-grow: 1;
         }
 
+        /* 图片放大弹窗 Lightbox */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .lightbox-box {
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 12px;
+            object-fit: contain;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+        }
+        .lightbox-title {
+            color: #ffd3dc;
+            font-size: 1rem;
+            margin-top: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* 底部操作与返回 */
         .bottom-bar {
             text-align: center;
@@ -635,32 +687,32 @@
         <div class="chapter-section">
             <div class="chapter-header">
                 <span class="chapter-badge">第一章</span>
-                <span class="chapter-title">🌸 故事的起点 · 最初的心动</span>
+                <span class="chapter-title">🌸 故事的起点 · 心动的信物与牵手</span>
             </div>
-            <p class="chapter-intro">2024年5月3日，人海茫茫中与你相遇。从第一句试探性的问候，到后来的无话不谈，那是我青春里最美好的开端。</p>
+            <p class="chapter-intro">从初次相识到紧紧牵手，手腕上的小信物与掌心的温度，是我青春里最珍贵的心动起点。</p>
 
             <div class="polaroid-grid">
-                <!-- 照片 1 -->
-                <div class="polaroid-card">
+                <!-- 照片 1：蓝色发圈 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/1.jpg', '手腕上的蓝色发圈 · 专属标记')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/1.jpg" class="photo-img" onerror="handleImgError(this, 1, '初次相遇 / 最初心动的照片')" alt="初遇回忆">
+                        <img src="images/memory/1.jpg" class="photo-img" onerror="handleImgError(this, 1, '手腕上的发圈信物照片')" alt="专属发圈">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">2024.05.03 · 初次相遇</div>
-                        <div class="caption-date">【照片 1】images/memory/1.jpg</div>
-                        <div class="caption-quote">“那天阳光很好，而你刚好撞进了我的心房。”</div>
+                        <div class="caption-title">手腕上的发圈 · 专属标记</div>
+                        <div class="caption-date">【珍贵信物】images/memory/1.jpg</div>
+                        <div class="caption-quote">“戴上你的浅蓝色发圈，向全世界宣布我心中唯一的女孩。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 2 -->
-                <div class="polaroid-card">
+                <!-- 照片 2：拍立得十指紧扣 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/2.jpg', '拍立得 · 十指紧扣的温度')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/2.jpg" class="photo-img" onerror="handleImgError(this, 2, '最初分享生活 / 第一次心动的聊天截图或生活照')" alt="最初悸动">
+                        <img src="images/memory/2.jpg" class="photo-img" onerror="handleImgError(this, 2, '十指紧扣牵手照片')" alt="十指相扣">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">初识微光 · 聊不完的日常</div>
-                        <div class="caption-date">【照片 2】images/memory/2.jpg</div>
-                        <div class="caption-quote">“原来世界上真的有一个人，能接住我所有的奇奇怪怪。”</div>
+                        <div class="caption-title">拍立得 · 十指紧扣的温度</div>
+                        <div class="caption-date">【浪漫牵手】images/memory/2.jpg</div>
+                        <div class="caption-quote">“第一次牵紧你的手，就笃定想要握住一辈子。”</div>
                     </div>
                 </div>
             </div>
@@ -670,56 +722,56 @@
         <div class="chapter-section">
             <div class="chapter-header">
                 <span class="chapter-badge">第二章</span>
-                <span class="chapter-title">🍲 那些闪闪发光的甜蜜瞬间</span>
+                <span class="chapter-title">🥰 那些闪闪发光的搞怪与甜蜜</span>
             </div>
-            <p class="chapter-intro">一起吃过的街头小吃、一起压过的马路、你笑起来眼角弯弯的模样，都是我记忆中最宝贵的收藏。</p>
+            <p class="chapter-intro">做彼此最真实的开心果，一起大笑搞怪，隔着屏幕视频通话，每一个日常瞬间都灿烂夺目。</p>
 
             <div class="polaroid-grid">
-                <!-- 照片 3 -->
-                <div class="polaroid-card">
+                <!-- 照片 3：搞怪大嘴巴合影 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/3.jpg', '奇奇怪怪 · 专属可爱')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/3.jpg" class="photo-img" onerror="handleImgError(this, 3, '两个人一起吃过的最难忘的美食 / 奶茶小吃')" alt="烟火美食">
+                        <img src="images/memory/3.jpg" class="photo-img" onerror="handleImgError(this, 3, '搞怪滤镜合照')" alt="奇奇怪怪">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">人间烟火 · 甜蜜干饭日</div>
-                        <div class="caption-date">【照片 3】images/memory/3.jpg</div>
-                        <div class="caption-quote">“和你在一起，哪怕路边摊也胜过米其林。”</div>
+                        <div class="caption-title">奇奇怪怪 · 专属可爱</div>
+                        <div class="caption-date">【搞怪合影】images/memory/3.jpg</div>
+                        <div class="caption-quote">“做彼此最真实的开心果，一起搞怪，一起大笑。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 4 -->
-                <div class="polaroid-card">
+                <!-- 照片 4：阳台牵手 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/4.jpg', '手牵着手 · 漫步时光')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/4.jpg" class="photo-img" onerror="handleImgError(this, 4, '一起散步、吹风、看风景的街景或风景照')" alt="浪漫足迹">
+                        <img src="images/memory/4.jpg" class="photo-img" onerror="handleImgError(this, 4, '手牵手照片')" alt="浪漫足迹">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">手牵着手 · 漫步时光</div>
-                        <div class="caption-date">【照片 4】images/memory/4.jpg</div>
-                        <div class="caption-quote">“晚风轻踩着云朵，月亮在贩售快乐，而我在看你。”</div>
+                        <div class="caption-title">手牵着手 · 漫步四季</div>
+                        <div class="caption-date">【温暖牵手】images/memory/4.jpg</div>
+                        <div class="caption-quote">“手心的温热，穿过微风与四季，化作我一生的心安。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 5 -->
-                <div class="polaroid-card">
+                <!-- 照片 5：深夜视频通话 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/5.jpg', '深夜视频 · 屏幕里的可爱你')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/5.jpg" class="photo-img" onerror="handleImgError(this, 5, '珊珊最可爱、搞怪或灿烂笑容的抓拍照片')" alt="可爱抓拍">
+                        <img src="images/memory/5.jpg" class="photo-img" onerror="handleImgError(this, 5, '视频通话抓拍')" alt="视频通话">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">灵动瞬间 · 专属小可爱</div>
-                        <div class="caption-date">【照片 5】images/memory/5.jpg</div>
-                        <div class="caption-quote">“你一笑，整个世界都变得温柔而明朗。”</div>
+                        <div class="caption-title">深夜视频 · 屏幕里的可爱你</div>
+                        <div class="caption-date">【日常抓拍】images/memory/5.jpg</div>
+                        <div class="caption-quote">“哪怕隔着屏幕，只要看见你的笑容，整个世界都亮了。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 6 -->
-                <div class="polaroid-card">
+                <!-- 照片 6：兔兔牙与黑框眼镜 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/6.jpg', '搞怪双人组 · 最甜的默契')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/6.jpg" class="photo-img" onerror="handleImgError(this, 6, '两人最有爱、最甜蜜的情侣合照')" alt="甜蜜合影">
+                        <img src="images/memory/6.jpg" class="photo-img" onerror="handleImgError(this, 6, '情侣滤镜合照')" alt="甜蜜合影">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">定格心动 · 我们的合照</div>
-                        <div class="caption-date">【照片 6】images/memory/6.jpg</div>
-                        <div class="caption-quote">“镜头定格的不仅是瞬间，更是我们相爱的证据。”</div>
+                        <div class="caption-title">兔兔牙与黑框 · 专属默契</div>
+                        <div class="caption-date">【甜蜜合影】images/memory/6.jpg</div>
+                        <div class="caption-quote">“能陪你一起疯一起闹的人，是我这辈子最大的幸运。”</div>
                     </div>
                 </div>
             </div>
@@ -729,32 +781,32 @@
         <div class="chapter-section">
             <div class="chapter-header">
                 <span class="chapter-badge">第三章</span>
-                <span class="chapter-title">💖 经历风雨 · 重新牵手的珍贵</span>
+                <span class="chapter-title">💖 经历风雨 · 重新牵手的坚定</span>
             </div>
-            <p class="chapter-intro">2026年1月18日，历经波折后我们再次紧握彼此的手。那一次重逢让我更加笃定，你是我生命中无法割舍的唯一。</p>
+            <p class="chapter-intro">历经波折后的相视一笑，心照不宣的对话，让我们更加笃定彼此是无可替代的存在。</p>
 
             <div class="polaroid-grid">
-                <!-- 照片 7 -->
-                <div class="polaroid-card">
+                <!-- 照片 7：聊起复合的聊天记录 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/7.jpg', '心照不宣 · 聊起复合的瞬间')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/7.jpg" class="photo-img" onerror="handleImgError(this, 7, '2026.01.18 复合纪念物 / 重新牵手时的照片')" alt="复合纪念">
+                        <img src="images/memory/7.jpg" class="photo-img" onerror="handleImgError(this, 7, '复合聊天记录截图')" alt="复合纪念">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">2026.01.18 · 重新牵手</div>
-                        <div class="caption-date">【照片 7】images/memory/7.jpg</div>
-                        <div class="caption-quote">“千帆过尽，兜兜转转，我的终点依然是你。”</div>
+                        <div class="caption-title">心照不宣 · 聊起复合的瞬间</div>
+                        <div class="caption-date">【珍贵记录】images/memory/7.jpg</div>
+                        <div class="caption-quote">“‘你不想和我复合吗？’——兜兜转转，我的心始终属于你。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 8 -->
-                <div class="polaroid-card">
+                <!-- 照片 8：胡子墨镜合影 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/8.jpg', '风雨同舟 · 最合拍的搭档')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/8.jpg" class="photo-img" onerror="handleImgError(this, 8, '互相陪伴打气、日常温暖点滴记录')" alt="温暖日常">
+                        <img src="images/memory/8.jpg" class="photo-img" onerror="handleImgError(this, 8, '胡子墨镜搞怪合照')" alt="默契搭档">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">心意相通 · 守护与陪伴</div>
-                        <div class="caption-date">【照片 8】images/memory/8.jpg</div>
-                        <div class="caption-quote">“无论是恋人还是挚友，我永远是你最坚实的后盾。”</div>
+                        <div class="caption-title">风雨同舟 · 最合拍的搭档</div>
+                        <div class="caption-date">【默契合影】images/memory/8.jpg</div>
+                        <div class="caption-quote">“无论是恋人还是挚友，我们永远是最懂彼此的存在。”</div>
                     </div>
                 </div>
             </div>
@@ -764,31 +816,31 @@
         <div class="chapter-section">
             <div class="chapter-header">
                 <span class="chapter-badge">第四章</span>
-                <span class="chapter-title">📚 青春备战 · 各自努力的背影</span>
+                <span class="chapter-title">📚 青春备战 · 她帮我写暑假作业的偏爱</span>
             </div>
-            <p class="chapter-intro">现在，高三的号角已经吹响。课桌上的厚厚试卷、熬夜做题的台灯，都是我们为了更好相聚而付出的努力。</p>
+            <p class="chapter-intro">那一本本密密麻麻的手写作业，见证了属于我们青春里最温暖、最毫无保留的偏爱与守护。</p>
 
             <div class="polaroid-grid">
-                <!-- 照片 9 -->
-                <div class="polaroid-card">
+                <!-- 照片 9：她帮我写的暑假作业 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/9.jpg', '8月16日 · 她帮我写暑假作业')">
                     <div class="photo-wrapper">
-                        <img src="images/memory/9.jpg" class="photo-img" onerror="handleImgError(this, 9, '课桌、做题笔记、各自努力奋斗的剪影')" alt="奋斗剪影">
+                        <img src="images/memory/9.jpg" class="photo-img" onerror="handleImgError(this, 9, '她帮我写暑假作业的手写照片')" alt="暑假作业偏爱">
                     </div>
                     <div class="polaroid-caption">
-                        <div class="caption-title">笔耕不辍 · 追光的少年</div>
-                        <div class="caption-date">【照片 9】images/memory/9.jpg</div>
-                        <div class="caption-quote">“今天写下的每一个答案，都在通往更灿烂的未来。”</div>
+                        <div class="caption-title">8月16日 · 她帮我写暑假作业</div>
+                        <div class="caption-date">【青春偏爱】images/memory/9.jpg</div>
+                        <div class="caption-quote">“一笔一划写下的字迹，都是属于我们青春里最温暖的偏爱与守护。”</div>
                     </div>
                 </div>
 
-                <!-- 照片 10 -->
-                <div class="polaroid-card">
+                <!-- 照片 10：顶峰之约 -->
+                <div class="polaroid-card" onclick="openLightbox('images/memory/10.jpg', '顶峰相见 · 毕业之约')">
                     <div class="photo-wrapper">
                         <img src="images/memory/10.jpg" class="photo-img" onerror="handleImgError(this, 10, '毕业旅行期许 / 约定高考后重逢的愿景图')" alt="顶峰之约">
                     </div>
                     <div class="polaroid-caption">
                         <div class="caption-title">顶峰相见 · 毕业之约</div>
-                        <div class="caption-date">【照片 10】images/memory/10.jpg</div>
+                        <div class="caption-date">【毕业期许】images/memory/10.jpg</div>
                         <div class="caption-quote">“等高三毕业钟声响起，我们重新牵手，奔赴下一场山海。”</div>
                     </div>
                 </div>
@@ -862,6 +914,15 @@
         </div>
     </div>
 
+    <!-- 图片放大查看 Lightbox 弹窗 -->
+    <div class="lightbox-overlay" id="lightbox-modal" onclick="closeLightbox()">
+        <div class="lightbox-box" onclick="event.stopPropagation()">
+            <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+            <img src="" id="lightbox-zoom-img" class="lightbox-img" alt="大图预览">
+            <div id="lightbox-zoom-title" class="lightbox-title"></div>
+        </div>
+    </div>
+
     <script>
         // 处理图片未上传时的美观占位
         function handleImgError(img, idx, hintText) {
@@ -874,6 +935,23 @@
                     <div class="placeholder-hint">${hintText}</div>
                 </div>
             `;
+        }
+
+        // 打开大图预览
+        function openLightbox(src, title) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-zoom-img');
+            const titleEl = document.getElementById('lightbox-zoom-title');
+            if (modal && img) {
+                img.src = src;
+                if (titleEl) titleEl.innerText = title || '';
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal) modal.style.display = 'none';
         }
 
         // 高考与重逢倒计时 (目标：2027年6月7日 09:00)

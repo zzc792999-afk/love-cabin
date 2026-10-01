@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>白珊珊 & 陈祖哲 · 我们的时光小屋</title>
+    <!-- 安卓 / 手机专属原生 App 配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff758c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="时光小屋">
+    <link rel="apple-touch-icon" href="images/1.jpg">
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入毛玻璃拟态专属 CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 渐变星空背景 Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- 鼠标/触屏粉心流光粒子 Canvas -->
+    <canvas id="heart-trail-canvas"></canvas>
+
+    <!-- 欢迎气泡 -->
+    <div id="welcome-toast" class="toast-message">珊珊宝贝，欢迎来到属于我们的时光小屋！mua~ ❤️</div>
+
+    <div class="container">
+        <!-- 头部标题 (带主题切换按钮) -->
+        <header>
+            <!-- 👩‍❤️‍👨 角色视角切换按钮 -->
+            <button id="role-toggle" class="role-toggle-btn" title="切换当前玩家视角 (祖哲 / 珊珊)" style="position: absolute; top: 20px; left: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); border: var(--border-glass); box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: all 0.3s; z-index: 100;">
+                <span id="role-indicator-icon">👩</span>
+            </button>
+            <button id="theme-toggle" class="theme-toggle-btn" title="一键切换 梦幻樱粉 / 极光暗夜">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1 class="header-title"><i class="fas fa-heart"></i> 致<span id="header-girlfriend-name">珊珊</span>宝贝 <i class="fas fa-heart"></i></h1>
+            <p class="subtitle">记录我们的相遇、重逢与未来的每一天</p>
+        </header>
+
+        <!-- 📢 管理员公告条 -->
+        <div id="admin-custom-announcement" style="display:none; background: linear-gradient(90deg, rgba(255,117,151,0.18), rgba(161,127,224,0.18)); border: var(--border-glass); border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; font-size: 0.9rem; text-align: center; color: var(--secondary); font-weight: bold; box-shadow: var(--shadow-glass);"><i class="fas fa-bullhorn" style="margin-right:8px;"></i> <span id="announcement-text"></span></div>
+
+
+        <!-- ================================================================
+             Tab 1: 🏠 时光小屋 (首页)
+             ================================================================ -->
+        <section id="tab-home" class="tab-content active">
+            <!-- 📖 青春回忆录与毕业之约入口横幅 -->
+            <div class="glass-panel" style="background: linear-gradient(135deg, rgba(255, 117, 151, 0.22), rgba(161, 127, 224, 0.2), rgba(249, 168, 38, 0.15)); border: 1px solid rgba(255, 117, 151, 0.45); border-radius: 20px; padding: 18px 20px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 25px rgba(255, 117, 151, 0.2);" onclick="window.location.href='memory.html'">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 2.2rem; background: rgba(255, 255, 255, 0.15); border-radius: 16px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📖</div>
+                    <div>
+                        <h4 style="font-size: 1.08rem; color: #fff; margin-bottom: 4px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                            时光回忆录 · 青春与毕业之约 <span style="font-size: 0.72rem; background: var(--primary); padding: 2px 8px; border-radius: 10px; font-weight: bold;">NEW</span>
+                        </h4>
+                        <p style="font-size: 0.82rem; color: #ffd3dc;">「暂别的日子里，我们在各自跑道上拼尽全力，顶峰相见！」</p>
+                    </div>
+                </div>
+                <button class="btn-primary" style="padding: 9px 18px; font-size: 0.85rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0;">翻开 <i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- 欢迎与寄语 -->
+            <div class="glass-panel welcome-card">
+                <div class="card-glare"></div>
+                <p>亲爱的珊珊宝贝：</p>
+                <p>这个小小的时光小屋是我为你精心制作的，用来纪念我们之间的点点滴滴。从2024年5月3日我们初次相识，到今天一起走过风雨，经历过误解，但也迎来了更成熟的重新开始。</p>
+                <p>在这个属于我们的小屋里：你可以去<strong>“相册”</strong>重温定格的每一个温柔瞬间，去<strong>“留言便签墙”</strong>给我贴满甜甜的悄悄话，翻开属于高三毕业后的顶峰之约回忆录。希望每一个细微的瞬间，都能化作属于我们的浪漫宇宙。✨</p>
+            </div>
+
+            <!-- 恋爱天数大卡片 -->
+            <div class="counter-grid">
+                <!-- 复合时光卡片 -->
+                <div class="glass-panel counter-card">
+                    <div class="card-glare"></div>
+                    <h3>💞 我们重新走到一起</h3>
+                    <div class="counter-num" id="together-days-card">正在计算...</div>
+                    <p class="subtitle" id="reunion-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
+                        复合纪念日：2026年1月18日
+                    </p>
+                    <p style="margin-top: 10px; color: var(--primary-dark); font-size: 0.9rem; font-weight: 600;">
+                        “兜兜转转还是你，这次绝不放手。”
+                    </p>
+                </div>
+
+                <!-- 招牌天数卡片 -->
+                <div class="glass-panel counter-card">
+                    <div class="card-glare"></div>
+                    <h3>🌱 我们的爱意已萌芽</h3>
+                    <div class="counter-num" id="meet-days-card">正在计算...</div>
+                    <p class="subtitle" id="meet-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
+                        初次相遇：2024年5月3日
+                    </p>
+                    <p style="margin-top: 10px; color: var(--secondary); font-size: 0.9rem; font-weight: 600;">
+                        “阳光正好，你的笑容格外温暖。”
+                    </p>
+                </div>
+            </div>
+
+            <!-- 🏆 恋爱成就勋章墙 -->
+            <div class="glass-panel" style="margin-bottom: 25px;">
+                <div class="card-glare"></div>
+                <h3 style="color: var(--primary-dark); text-align: center; margin-bottom: 25px; font-size: 1.5rem;"><i class="fas fa-trophy"></i> 我们的心动勋章墙</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; justify-content: center;">
+                    <!-- Badge 1: 终身契约 -->
+                    <div class="medal-badge" id="badge-contract" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="签署心动契约">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🤝</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">终身契约</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">签署心动契约</p>
+                    </div>
+                    <!-- Badge 2: 安全诊断 -->
+                    <div class="medal-badge" id="badge-diagnose" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="通过安全中心诊断">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🛡️</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">安全仙女</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">完成安全中心诊断</p>
+                    </div>
+                    <!-- Badge 3: 金币达人 -->
+                    <div class="medal-badge" id="badge-coins" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="爱意金币累计达到 120">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🪙</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">金币富豪</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">金币达到 120 个</p>
+                    </div>
+                    <!-- Badge 4: 大富翁 -->
+                    <div class="medal-badge" id="badge-boardgame" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="顺利通关一次心动飞行棋">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🎲</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">大富翁</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">通关一次飞行棋</p>
+                    </div>
+                    <!-- Badge 6: 时光寄语 -->
+                    <div class="medal-badge" id="badge-diary" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="在恋爱手账里写下第一篇日记">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">✉️</div>
+                        <h5 style="color: var(--text-color); font-size: 0.85rem; margin-bottom: 4px;">时光手账家</h5>
+                        <p style="font-size: 0.65rem; color: var(--text-muted);">写下第一篇日记</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 倒计时区域 -->
+            <div class="glass-panel">
+                <div class="card-glare"></div>
+                <h3 style="color: var(--text-color); text-align: center; margin-bottom: 25px; font-size: 1.5rem;"><i class="far fa-clock"></i> 属于我们的重要日子</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <!-- 🎉 300天纪念日倒计时 (重点高亮) -->
+                    <div style="background: linear-gradient(135deg, rgba(255,117,151,0.15), rgba(161,127,224,0.15)); border-radius: 16px; padding: 20px; text-align: center; border: 2px solid rgba(255,117,151,0.35); transition: background 0.8s, border 0.8s; grid-column: 1 / -1; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 10px; right: 15px; font-size: 0.75rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 4px 14px; border-radius: 20px; font-weight: 700;">🎯 里程碑</div>
+                        <h4 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 1.2rem;">🎉 在一起第 300 天倒计时 (11月13日)</h4>
+                        <div class="countdown-flex" id="300day-countdown">
+                            <div class="countdown-box" style="border: 1px solid rgba(255,117,151,0.25);"><span class="num" id="d300-days" style="color: var(--primary-dark);">00</span><span class="label">天</span></div>
+                            <div class="countdown-box" style="border: 1px solid rgba(255,117,151,0.25);"><span class="num" id="d300-hours" style="color: var(--primary-dark);">00</span><span class="label">时</span></div>
+                            <div class="countdown-box" style="border: 1px solid rgba(255,117,151,0.25);"><span class="num" id="d300-minutes" style="color: var(--primary-dark);">00</span><span class="label">分</span></div>
+                            <div class="countdown-box" style="border: 1px solid rgba(255,117,151,0.25);"><span class="num" id="d300-seconds" style="color: var(--primary-dark);">00</span><span class="label">秒</span></div>
+                        </div>
+                        <a href="300days.html" style="display: inline-block; margin-top: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 8px 22px; border-radius: 25px; text-decoration: none; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(255,117,151,0.25); transition: all 0.3s;">💝 打开300天专属惊喜页</a>
+                    </div>
+                    <!-- 恋爱纪念日倒计时 -->
+                    <div style="background: rgba(255,255,255,0.4); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.6); transition: background 0.8s, border 0.8s;">
+                        <h4 style="color: var(--primary-dark); margin-bottom: 15px;">下一个周年纪念 (5月3日)</h4>
+                        <div class="countdown-flex" id="anniversary-countdown">
+                            <div class="countdown-box"><span class="num" id="days">00</span><span class="label">天</span></div>
+                            <div class="countdown-box"><span class="num" id="hours">00</span><span class="label">时</span></div>
+                            <div class="countdown-box"><span class="num" id="minutes">00</span><span class="label">分</span></div>
+                            <div class="countdown-box"><span class="num" id="seconds">00</span><span class="label">秒</span></div>
+                        </div>
+                    </div>
+                    <!-- 复合纪念日倒计时 -->
+                    <div style="background: rgba(255,255,255,0.4); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.6); transition: background 0.8s, border 0.8s;">
+                        <h4 style="color: var(--secondary); margin-bottom: 15px;">复合一周年倒计时 (1月18日)</h4>
+                        <div class="countdown-flex" id="reunion-anniversary-countdown">
+                            <div class="countdown-box"><span class="num" id="ra-days">00</span><span class="label">天</span></div>
+                            <div class="countdown-box"><span class="num" id="ra-hours">00</span><span class="label">时</span></div>
+                            <div class="countdown-box"><span class="num" id="ra-minutes">00</span><span class="label">分</span></div>
+                            <div class="countdown-box"><span class="num" id="ra-seconds">00</span><span class="label">秒</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时光任意门 (常用 vs 不常用分类) -->
+            <div class="glass-panel" style="text-align: center;">
+                <div class="card-glare"></div>
+                <h3 style="color: var(--text-color); margin-bottom: 8px;"><i class="fas fa-rocket"></i> 时光任意门</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 22px;">常用高频互动与专属纪念藏宝箱</p>
+
+                <!-- ⭐ 常用·日常高频互动 (3个特色工具) -->
+                <div class="fav-tools-grid">
+                    <a href="other/takeout.html" class="fav-tool-card">
+                        <div class="fav-tool-icon" style="background: linear-gradient(135deg, #ff758c, #ff7eb3);">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="fav-tool-info">
+                            <div class="fav-tool-title">哲哲爱心外卖店</div>
+                            <div class="fav-tool-sub">🍱 珊珊专属美味点餐</div>
+                        </div>
+                        <i class="fas fa-chevron-right fav-tool-arrow"></i>
+                    </a>
+
+                    <a href="other/scratch.html" class="fav-tool-card">
+                        <div class="fav-tool-icon" style="background: linear-gradient(135deg, #ff5279, #ff758c);">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="fav-tool-info">
+                            <div class="fav-tool-title">恋爱心动刮刮乐</div>
+                            <div class="fav-tool-sub">🎟️ 刮开今日专属甜蜜</div>
+                        </div>
+                        <i class="fas fa-chevron-right fav-tool-arrow"></i>
+                    </a>
+
+                    <a href="other/gashapon.html" class="fav-tool-card">
+                        <div class="fav-tool-icon" style="background: linear-gradient(135deg, #a17fe0, #885fd1);">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="fav-tool-info">
+                            <div class="fav-tool-title">恋爱特权扭蛋机</div>
+                            <div class="fav-tool-sub">🔮 摇取专属恋爱特权</div>
+                        </div>
+                        <i class="fas fa-chevron-right fav-tool-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- 📁 不常用·更多专属纪念与趣味页面 (简约折叠面板) -->
+                <details class="secondary-tools-drawer">
+                    <summary class="drawer-summary">
+                        <i class="fas fa-layer-group"></i>
+                        <span>查看更多纪念与专属页面</span>
+                        <span class="drawer-count">14</span>
+                        <i class="fas fa-chevron-down drawer-arrow"></i>
+                    </summary>
+                    <div class="secondary-tools-list">
+                        <a href="other/contract.html" class="secondary-pill"><i class="fas fa-file-contract"></i> 📜 终身真爱誓约书</a>
+                        <a href="200days.html" class="secondary-pill"><i class="fas fa-crown"></i> 🎉 200天纪念专属页</a>
+                        <a href="100.html" class="secondary-pill"><i class="fas fa-heart"></i> 💯 100天纪念</a>
+                        <a href="yd.html" class="secondary-pill"><i class="fas fa-hand-holding-heart"></i> 🤝 不分手约定声效</a>
+                        <a href="index2.html" class="secondary-pill"><i class="fas fa-gift"></i> 💝 情人节专属礼物</a>
+                        <a href="other/boardgame.html" class="secondary-pill"><i class="fas fa-dice"></i> 🎲 心动双人飞行棋</a>
+                        <a href="other/airplane.html" class="secondary-pill"><i class="fas fa-paper-plane"></i> ✈️ 恋爱漂流纸飞机</a>
+                        <a href="other/time_capsule.html" class="secondary-pill"><i class="fas fa-envelope-open-text"></i> 📮 时光慢递信箱</a>
+                        <a href="other/habit.html" class="secondary-pill"><i class="fas fa-calendar-check"></i> 📅 每日爱意打卡</a>
+                        <a href="xin.html" class="secondary-pill"><i class="fas fa-globe"></i> 🌌 我们的恋爱宇宙</a>
+                        <a href="other/diary.html" class="secondary-pill"><i class="fas fa-book"></i> 📔 恋爱心动手账</a>
+                        <a href="other/messages.html" class="secondary-pill"><i class="fas fa-sticky-note"></i> 📜 留言历史回廊</a>
+                        <a href="other/prank.html" class="secondary-pill"><i class="fas fa-mobile-alt"></i> 📱 仙女系统安全中心</a>
+                        <a href="index1.html" class="secondary-pill"><i class="fas fa-search-heart"></i> 🔍 悄悄看他在干嘛</a>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Tab 2: 📸 回忆相册
+             ================================================================ -->
+        <section id="tab-album" class="tab-content">
+            <div class="glass-panel gallery-container">
+                <div class="card-glare"></div>
+                <div style="text-align: center; max-width: 600px;">
+                    <h2 style="color: var(--primary-dark); font-size: 1.8rem; margin-bottom: 10px;">📸 我们的相册流 📸</h2>
+                    <p style="color: var(--text-muted);">时光会流逝，但照片会定格我们所有的温存。点击中间的卡片可全屏高清放大查看哦。</p>
+                </div>
+
+                <!-- 3D 轮播卡片 -->
+                <div class="carousel-3d" id="carousel-3d">
+                    <!-- JS 注入卡片 -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             Tab 5: 💌 留言板 (3D 便签墙)
+             ================================================================ -->
+        <section id="tab-notes" class="tab-content">
+            <div class="glass-panel wall-container">
+                <div class="card-glare"></div>
+                <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: var(--primary-dark); font-size: 1.8rem; margin-bottom: 10px;">💌 甜蜜便签留言墙</h2>
+                    <p style="color: var(--text-muted);">在这里贴上你想说的心里话，支持拖拽排版。你也可以去 <a href="other/messages.html" style="color: var(--primary-dark); font-weight: 700; text-decoration: underline;"><i class="fas fa-history"></i> 留言历史回廊 📜</a> 查看云端的所有留言记录。</p>
+                </div>
+
+                <!-- 写留言区 -->
+                <div class="wall-input-panel">
+                    <div class="wall-textarea-wrapper">
+                        <textarea id="wall-textarea" class="wall-textarea" placeholder="写点悄悄话... 比如：今天也要开开心心哦，想你啦~"></textarea>
+                        <div class="wall-author-wrapper" style="margin-top: 10px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.6);">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-color); white-space: nowrap;"><i class="fas fa-pen"></i> 签名：</span>
+                            <input type="text" id="wall-author-input" style="width: 100%; border: none; background: transparent; outline: none; font-size: 0.85rem; color: var(--text-color); font-weight: 700;" placeholder="你的名字（默认：白珊珊）" value="白珊珊">
+                        </div>
+                    </div>
+                    <div class="wall-controls">
+                        <div>
+                            <p style="font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color);">1. 选择便签底色：</p>
+                            <div class="color-picker">
+                                <div class="color-option selected note-bg-pink" data-color="pink" title="桃花粉"></div>
+                                <div class="color-option note-bg-green" data-color="green" title="薄荷绿"></div>
+                                <div class="color-option note-bg-blue" data-color="blue" title="天空蓝"></div>
+                                <div class="color-option note-bg-yellow" data-color="yellow" title="暖阳黄"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p style="font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color);">2. 快捷表情插入：</p>
+                            <div class="emoji-selector">
+                                <span class="emoji-option">❤️</span>
+                                <span class="emoji-option">💕</span>
+                                <span class="emoji-option">✨</span>
+                                <span class="emoji-option">🥰</span>
+                                <span class="emoji-option">🐾</span>
+                                <span class="emoji-option">👑</span>
+                                <span class="emoji-option">🧁</span>
+                            </div>
+                        </div>
+                        <button id="publish-note-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 13px 0;">
+                            <i class="fas fa-paper-plane"></i> 挂上便签墙
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 留言板黑板区 -->
+                <div class="wall-board" id="wall-board">
+                    <!-- JS 动态注入 -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             Tab 7: 🤝 我们的约定
+             ================================================================ -->
+        <section id="tab-promise" class="tab-content">
+            <div class="glass-panel">
+                <div class="card-glare"></div>
+                <div class="promise-intro">
+                    <h2 style="color: var(--primary-dark); font-size: 1.8rem; margin-bottom: 10px;">🤝 不分手约定 🤝</h2>
+                    <p style="color: var(--text-muted);">真挚的手写签名与永恒誓言，这是见证我们承诺与守护的地方。</p>
+                </div>
+
+                <!-- 签名展示 -->
+                <div class="promise-grid">
+                    <div class="promise-card">
+                        <div class="promise-img-wrapper">
+                            <img src="images/1.jpg" alt="签名 1" id="sig-1">
+                        </div>
+                        <div class="promise-label">白珊珊专属手印 🐾</div>
+                    </div>
+                    <div class="promise-card">
+                        <div class="promise-img-wrapper">
+                            <img src="images/2.jpg" alt="签名 2" id="sig-2">
+                        </div>
+                        <div class="promise-label">陈祖哲专属手印 🐾</div>
+                    </div>
+                </div>
+
+                <!-- 音频誓言播放 -->
+                <div class="promise-audio-wrapper">
+                    <div class="audio-title"><i class="fas fa-volume-up"></i> 我们的声音回忆</div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto 15px;">点击下方播放按钮，聆听我们坚定的不分手誓言，感受声音里承载的决意与柔情。</p>
+                    <audio controls style="outline: none;">
+                        <source src="other/yd.mp3" type="audio/mpeg">
+                        您的浏览器不支持音频播放功能。
+                    </audio>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ================================================================
+         全局悬浮组件 (BGM 黑胶留声机唱片 & 音频声波均衡条)
+         ================================================================ -->
+    <div class="vinyl-music-player" id="vinyl-player" title="点击播放/暂停背景音乐">
+        <div class="grooves"></div>
+    </div>
+
+    <div class="equalizer" id="audio-equalizer">
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+    </div>
+
+    <!-- 背景音乐音频元素 (other/1.mp3) -->
+    <audio id="bg-music" loop>
+        <source src="other/1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ================================================================
+         相册大图预览灯箱 (Lightbox)
+         ================================================================ -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close"><i class="fas fa-times"></i></span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="放大图">
+            <div id="lightbox-caption" class="lightbox-caption">图片标题</div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         底部 Tab 切换固定导航栏
+         ================================================================ -->
+    <nav class="nav-bar">
+        <div class="nav-item active" data-tab="home"><i class="fas fa-home"></i> 首页</div>
+        <div class="nav-item" data-tab="album"><i class="fas fa-images"></i> 相册</div>
+        <div class="nav-item" data-tab="notes"><i class="fas fa-sticky-note"></i> 留言板</div>
+        <div class="nav-item" data-tab="promise"><i class="fas fa-handshake"></i> 约定</div>
+    </nav>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2026 属于我们的时光小屋 | 版权所有 © 白珊珊 & 陈祖哲</p>
+        <p>愿我们珍惜彼此，携手从心动走到心安 <span class="heart">❤️</span></p>
+        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻高级版 | 用心定格我们每一次的心跳</p>
+    </footer>
+
+    <!-- 引入核心逻辑 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+
+        // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台
+        let heartClickCount = 0;
+        let lastHeartClickTime = 0;
+        const footerHeart = document.querySelector('footer .heart');
+        if (footerHeart) {
+            footerHeart.style.cursor = 'pointer';
+            footerHeart.addEventListener('click', () => {
+                const now = Date.now();
+                if (now - lastHeartClickTime > 2000) {
+                    heartClickCount = 1;
+                } else {
+                    heartClickCount++;
+                }
+                lastHeartClickTime = now;
+                
+                if (heartClickCount >= 5) {
+                    heartClickCount = 0;
+                    window.location.href = 'other/admin.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

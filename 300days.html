@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>300天纪念 · 笨笨牛 🐂 守护 珊珊小兔 🐰💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* 🌸 高级低饱和度玫瑰金 & 柔和淡粉色系 (Pastel Rose Gold & Sakura Palette) */
+            --bg-grad-1: #1a1024;
+            --bg-grad-2: #2d1836;
+            --bg-grad-3: #120919;
+            --rose-gold: #ffcad4;
+            --pink-accent: #f4acb7;
+            --pink-soft: #ffe5ec;
+            --cream-gold: #ffe5d9;
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 235, 240, 0.85);
+            --glass-bg: rgba(255, 229, 236, 0.08);
+            --glass-border: rgba(255, 202, 212, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3));
+            background-size: 400% 400%;
+            animation: gradientAnim 14s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @keyframes gradientAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 🌸 优雅星尘背景 */
+        #bg-canvas, #sparkle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+        }
+        #bg-canvas { z-index: 0; }
+        #sparkle-canvas { z-index: 1; }
+
+        /* 🔐 玫瑰金唯美锁屏 (完美适配 OPPO 长屏与挖孔屏) */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(20, 12, 28, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .zodiac-avatar-pair {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-circle {
+            width: clamp(70px, 20vw, 85px);
+            height: clamp(70px, 20vw, 85px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2.2rem, 7vw, 2.8rem);
+            border: 2px solid rgba(255, 202, 212, 0.4);
+            box-shadow: 0 0 25px rgba(244, 172, 183, 0.4);
+            animation: floatAnim 3s ease-in-out infinite alternate;
+        }
+
+        .avatar-ox { background: linear-gradient(135deg, #f4acb7, #ffcad4); }
+        .avatar-rabbit { background: linear-gradient(135deg, #ffe5ec, #f4acb7); animation-delay: 1.5s; }
+
+        @keyframes floatAnim {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .lock-title {
+            font-size: clamp(1.4rem, 5vw, 1.7rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #ffffff, var(--rose-gold), var(--pink-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .lock-subtitle {
+            font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+            color: var(--text-sub);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .pwd-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .pwd-input-field {
+            width: 100%;
+            background: rgba(255, 229, 236, 0.08);
+            border: 1px solid rgba(255, 202, 212, 0.3);
+            border-radius: 30px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 16px; /* 防止手机浏览器放大 */
+            text-align: center;
+            letter-spacing: 6px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .pwd-input-field:focus {
+            border-color: var(--pink-accent);
+            box-shadow: 0 0 20px rgba(244, 172, 183, 0.5);
+        }
+
+        .pwd-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border: none;
+            border-radius: 30px;
+            padding: 13px 0;
+            color: #2b1836;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(244, 172, 183, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .pwd-submit-btn:active { transform: scale(0.97); }
+
+        .pwd-err-msg {
+            color: #f4acb7;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* 🚀 主内容容器 (适配手机底部全面屏安全区) */
+        #main-container {
+            display: none;
+            position: relative;
+            z-index: 10;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 15px 12px calc(120px + env(safe-area-inset-bottom)) 12px;
+        }
+
+        /* 顶部高级卡片 */
+        .hero-banner {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: clamp(25px, 6vw, 35px) 15px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .banner-tag {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--pink-accent), var(--rose-gold));
+            color: #2b1836;
+            font-weight: 800;
+            font-size: clamp(0.72rem, 3vw, 0.8rem);
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .big-300-title {
+            font-size: clamp(4.2rem, 16vw, 8.5rem);
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(180deg, #ffffff 20%, var(--rose-gold) 65%, var(--pink-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 6px 0;
+            text-shadow: 0 0 35px rgba(244, 172, 183, 0.4);
+        }
+
+        .banner-subtitle {
+            font-size: clamp(0.95rem, 4vw, 1.15rem);
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* 🎮 游戏导航标签页 (手机滑动优化) */
+        .game-nav-tabs {
+            display: flex;
+            justify-content: flex-start;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (min-width: 600px) {
+            .game-nav-tabs { justify-content: center; }
+        }
+
+        .game-tab-btn {
+            background: rgba(255, 229, 236, 0.06);
+            border: 1px solid rgba(255, 202, 212, 0.2);
+            color: rgba(255, 235, 240, 0.85);
+            padding: 9px 16px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-tab-btn.active, .game-tab-btn:hover {
+            background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border-color: #ffffff;
+            color: #2b1836;
+            box-shadow: 0 0 18px rgba(244, 172, 183, 0.4);
+        }
+
+        /* 🐮 & 🐰 个人档案卡 (手机网格适配) */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 16px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.3s;
+        }
+
+        .profile-card:hover { transform: translateY(-3px); border-color: var(--pink-accent); }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(244, 172, 183, 0.15);
+            border: 1px solid var(--pink-accent);
+        }
+
+        .profile-info h4 { font-size: 1.1rem; font-weight: 800; color: white; }
+        .profile-info p { font-size: 0.76rem; color: var(--text-sub); }
+
+        .badges-list { display: flex; gap: 6px; flex-wrap: wrap; }
+        .mini-tag {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255, 229, 236, 0.08);
+            border: 1px solid rgba(255, 202, 212, 0.25);
+            color: #ffe5ec;
+            font-weight: 600;
+        }
+
+        /* 契约仪表盘 */
+        .synergy-board {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px 14px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 20px;
+        }
+
+        .synergy-header { text-align: center; margin-bottom: 12px; }
+        .synergy-header h3 { font-size: 1.15rem; color: var(--rose-gold); }
+
+        .synergy-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .synergy-items { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .syn-box {
+            background: rgba(255, 229, 236, 0.04);
+            border: 1px solid rgba(255, 202, 212, 0.15);
+            border-radius: 14px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .syn-title { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
+        .syn-value { font-size: 1.15rem; font-weight: 800; color: var(--rose-gold); }
+
+        /* 游戏卡片面板 */
+        .game-panel-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 20px 14px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .game-panel-header { margin-bottom: 15px; }
+        .game-panel-header h3 { font-size: 1.25rem; font-weight: 800; color: white; margin-bottom: 4px; }
+        .game-panel-header p { font-size: 0.8rem; color: var(--text-sub); }
+
+        /* 🎮 游戏一：街机 Canvas (手机屏幕自适应) */
+        #arcade-canvas-box {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            height: clamp(280px, 45vh, 350px);
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 202, 212, 0.25);
+            background: rgba(18, 9, 25, 0.7);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+            touch-action: none;
+        }
+
+        #arcade-canvas { display: block; width: 100%; height: 100%; }
+
+        .arcade-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 10, 30, 0.88);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            z-index: 5;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border: none;
+            color: #2b1836;
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 12px 28px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(244, 172, 183, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .action-btn:active { transform: scale(0.95); }
+
+        .arcade-touch-ctrls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+        }
+
+        .ctrl-pad-btn {
+            background: rgba(255, 229, 236, 0.1);
+            border: 1px solid rgba(255, 202, 212, 0.25);
+            color: white;
+            width: 70px;
+            height: 50px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* 🌾 游戏二：拔胡萝卜网格 */
+        .carrot-field {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 440px;
+            margin: 0 auto 15px auto;
+        }
+
+        @media (max-width: 480px) { .carrot-field { grid-template-columns: repeat(3, 1fr); } }
+
+        .carrot-item {
+            background: rgba(255, 229, 236, 0.08);
+            border: 1px solid rgba(255, 202, 212, 0.25);
+            border-radius: 14px;
+            padding: 12px 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .carrot-item:hover {
+            transform: scale(1.06);
+            background: rgba(244, 172, 183, 0.25);
+            border-color: var(--rose-gold);
+        }
+
+        .carrot-item.pulled {
+            opacity: 0.4;
+            transform: scale(0.9);
+            filter: grayscale(0.8);
+            pointer-events: none;
+        }
+
+        .carrot-icon { font-size: 1.8rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .carrot-label { font-size: 0.72rem; color: #fff; font-weight: 700; }
+
+        /* 🎰 游戏三：摇奖机 */
+        .slot-machine-box {
+            background: rgba(20, 10, 30, 0.5);
+            border: 2px solid var(--pink-accent);
+            border-radius: 18px;
+            padding: 20px 12px;
+            max-width: 420px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slot-display {
+            background: #0d0514;
+            border: 2px inset rgba(255, 202, 212, 0.25);
+            border-radius: 12px;
+            padding: 16px 18px;
+            width: 100%;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: var(--rose-gold);
+            text-align: center;
+            box-shadow: inset 0 0 15px rgba(244, 172, 183, 0.3);
+        }
+
+        /* 🎹 物理晶体八音盒 (手机屏幕完美自适应横排) */
+        .piano-keys-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            margin-top: 15px;
+            width: 100%;
+            overflow-x: auto;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .piano-key {
+            background: rgba(255, 229, 236, 0.12);
+            border: 1px solid rgba(255, 202, 212, 0.3);
+            border-radius: 8px;
+            flex: 1;
+            min-width: 38px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 6px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: var(--rose-gold);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .piano-key.active-playing {
+            background: var(--pink-accent) !important;
+            color: #2b1836 !important;
+            transform: translateY(4px);
+            box-shadow: 0 0 15px var(--pink-accent);
+        }
+
+        .piano-key:active {
+            background: var(--pink-accent);
+            color: #2b1836;
+            transform: translateY(4px);
+        }
+
+        /* 🎼 参考乐谱指南 (手机排版) */
+        .sheet-music-card {
+            margin-top: 15px;
+            background: rgba(255, 229, 236, 0.05);
+            border: 1px dashed rgba(255, 202, 212, 0.3);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .sheet-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--rose-gold);
+            margin-bottom: 10px;
+        }
+
+        .song-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .song-item {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 202, 212, 0.18);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .song-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .song-notes {
+            font-size: 0.72rem;
+            color: var(--rose-gold);
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .play-demo-btn {
+            background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold));
+            border: none;
+            color: #2b1836;
+            font-weight: 800;
+            font-size: 0.72rem;
+            padding: 5px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.2s;
+        }
+
+        .play-demo-btn:active { transform: scale(0.95); }
+
+        /* 💌 影院级真心话情书 (手机版) */
+        #letter-container {
+            display: none;
+            background: rgba(22, 12, 32, 0.94);
+            border: 1px solid var(--pink-accent);
+            border-radius: 22px;
+            padding: 24px 16px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 45px rgba(244, 172, 183, 0.35);
+            margin-bottom: 25px;
+            animation: fadeIn 1s ease;
+        }
+
+        .letter-title { font-size: 1.25rem; font-weight: 800; color: var(--rose-gold); text-align: center; margin-bottom: 16px; }
+        .letter-content { font-size: 0.96rem; line-height: 1.8; color: #ffe5ec; white-space: pre-wrap; text-align: justify; }
+        .typing-cursor { display: inline-block; width: 3px; height: 1.2em; background: var(--pink-accent); vertical-align: middle; animation: blink 0.7s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .letter-sign-block { margin-top: 20px; text-align: right; font-weight: 700; color: var(--rose-gold); font-size: 0.98rem; opacity: 0; transition: opacity 1s ease; }
+
+        /* 🌟 许愿瓶 */
+        .wish-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px 14px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .wish-input-box { display: flex; gap: 8px; max-width: 480px; margin: 12px auto 0 auto; }
+        .wish-input-field { flex: 1; background: rgba(255, 229, 236, 0.08); border: 1px solid rgba(255, 202, 212, 0.25); border-radius: 20px; padding: 10px 14px; color: white; outline: none; font-size: 16px; }
+        .wish-add-btn { background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold)); border: none; color: #2b1836; font-weight: 800; padding: 0 16px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 0.85rem; }
+        .wish-items-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 140px; overflow-y: auto; }
+        .wish-bubble { background: rgba(255, 229, 236, 0.06); border: 1px dashed rgba(255, 202, 212, 0.2); padding: 8px 12px; border-radius: 12px; font-size: 0.82rem; display: flex; justify-content: space-between; }
+
+        /* 飘窗 Toast */
+        #custom-toast-popup {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, rgba(244, 172, 183, 0.95), rgba(255, 202, 212, 0.95));
+            color: #2b1836;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 99999;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            max-width: 90vw;
+            text-align: center;
+        }
+
+        #custom-toast-popup.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* 悬浮控制按钮 (针对手机右下角避让) */
+        .fixed-tools-bar {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom)); right: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .tool-circle-btn {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 229, 236, 0.15);
+            border: 1px solid rgba(255, 202, 212, 0.3);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.1rem; cursor: pointer; text-decoration: none;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .tool-circle-btn:hover { transform: scale(1.1); background: rgba(244, 172, 183, 0.35); }
+        .spinning { animation: spin 4s linear infinite; }
+    </style>
+</head>
+<body>
+
+    <!-- 🌸 背景 Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="sparkle-canvas"></canvas>
+
+    <!-- 🎵 音频 -->
+    <audio id="bg-audio-player" src="other/1.mp3" loop></audio>
+
+    <!-- 🔐 密码锁屏 -->
+    <div id="lock-screen">
+        <div class="zodiac-avatar-pair">
+            <div class="avatar-circle avatar-ox" title="陈祖哲 · 笨笨牛 🐂">🐮</div>
+            <div style="font-size: 1.6rem;">💖</div>
+            <div class="avatar-circle avatar-rabbit" title="白珊珊 · 珊珊小兔 🐰">🐰</div>
+        </div>
+        <div class="lock-title">🔐 笨笨牛 🐂 守护 珊珊小兔 🐰💖</div>
+        <div class="lock-subtitle">输入专属密码，解锁属于哲哲与珊珊的 300 天浪漫宇宙</div>
+        <div class="pwd-input-group">
+            <input type="password" id="pwd-field" class="pwd-input-field" maxlength="6" inputmode="numeric" placeholder="••••••" autofocus>
+            <button class="pwd-submit-btn" onclick="checkUnlockPassword()">解锁 300 天浪漫 💖</button>
+            <div id="pwd-err-text" class="pwd-err-msg">密码有误，请重新输入哦 💔</div>
+        </div>
+    </div>
+
+    <!-- 🚀 主内容容器 -->
+    <div id="main-container">
+
+        <!-- 顶部 300 天英雄卡片 -->
+        <div class="hero-banner">
+            <div class="banner-tag">🌸 处女座笨笨牛 ✕ 白羊座珊珊兔 💖</div>
+            <div class="big-300-title">300</div>
+            <div class="banner-subtitle">在一起第 300 天 · 专属浪漫里程碑</div>
+        </div>
+
+        <!-- 🎮 互动玩法导航标签 -->
+        <div class="game-nav-tabs">
+            <button class="game-tab-btn active" onclick="switchGameMode('arcade')">🎮 抓胡萝卜街机</button>
+            <button class="game-tab-btn" onclick="switchGameMode('pull')">🌾 拔胡萝卜说情话</button>
+            <button class="game-tab-btn" onclick="switchGameMode('slot')">🎰 恋爱摇奖大冒险</button>
+            <button class="game-tab-btn" onclick="switchGameMode('piano')">🎹 八音盒弹奏</button>
+            <button class="game-tab-btn" onclick="switchGameMode('wishes')">🌟 许愿瓶</button>
+        </div>
+
+        <!-- 🐮 & 🐰 个人档案卡 -->
+        <div class="profiles-grid">
+            <div class="profile-card card-zuzhe">
+                <div class="profile-header">
+                    <div class="profile-icon">🐮</div>
+                    <div class="profile-info">
+                        <h4>陈祖哲 (哲哲) 👨</h4>
+                        <p>2009年09月22日 生</p>
+                    </div>
+                </div>
+                <div class="badges-list">
+                    <span class="mini-tag">🐂 属牛 (踏实深情)</span>
+                    <span class="mini-tag">♍ 处女座 (细腻包容)</span>
+                </div>
+            </div>
+            <div class="profile-card card-shanshan">
+                <div class="profile-header">
+                    <div class="profile-icon">🐰</div>
+                    <div class="profile-info">
+                        <h4>白珊珊 (珊珊) 🌸</h4>
+                        <p>2011年04月17日 生</p>
+                    </div>
+                </div>
+                <div class="badges-list">
+                    <span class="mini-tag">🐰 属兔 (灵动可爱)</span>
+                    <span class="mini-tag">♈ 白羊座 (热情真诚)</span>
+                    <span class="mini-tag">💖 最爱粉色</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 天数与契约仪表盘 -->
+        <div class="synergy-board">
+            <div class="synergy-header">
+                <h3>💖 笨笨牛 ✕ 珊珊兔 的心动契约仪表盘</h3>
+            </div>
+            <div class="synergy-items">
+                <div class="syn-box">
+                    <div class="syn-title">初次相识 (2024-05-03)</div>
+                    <div class="syn-value" id="disp-meet-days">0 天</div>
+                </div>
+                <div class="syn-box">
+                    <div class="syn-title">重新复合 (2026-01-18)</div>
+                    <div class="syn-value" id="disp-reunion-days">0 天</div>
+                </div>
+                <div class="syn-box">
+                    <div class="syn-title">300 天倒计时 (2026-11-13)</div>
+                    <div class="syn-value" id="disp-countdown" style="font-size: 1.05rem; line-height: 1.4;">计算中...</div>
+                </div>
+                <div class="syn-box">
+                    <div class="syn-title">生肖契约度</div>
+                    <div class="syn-value" style="color: var(--rose-gold);">100% 默契绝配</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎮 玩法一：接胡萝卜 Canvas 街机 -->
+        <div id="mode-arcade" class="game-panel-card game-block">
+            <div class="game-panel-header">
+                <h3><i class="fas fa-gamepad" style="color: var(--rose-gold);"></i> 小牛接胡萝卜街机大作战 🐮🥕</h3>
+                <p>左右控制小牛 🐮 接住落下的胡萝卜 🥕 与爱心 💖，避开小闹钟 ⏰！拿到 100 分解锁真心话情书！</p>
+            </div>
+            <div id="arcade-canvas-box">
+                <canvas id="arcade-canvas"></canvas>
+                <div id="arcade-start-overlay" class="arcade-overlay">
+                    <h4 style="font-size: 1.2rem; color: var(--rose-gold);">准备好接胡萝卜了吗？</h4>
+                    <p style="font-size: 0.8rem; color: #ffe5ec;">触摸拖拽或下方按钮控制移动</p>
+                    <button class="action-btn" onclick="startArcadeGame()">开始挑战 🚀</button>
+                </div>
+            </div>
+            <div class="arcade-touch-ctrls">
+                <button class="ctrl-pad-btn" ontouchstart="moveArcadeShip(-25)" onclick="moveArcadeShip(-25)"><i class="fas fa-arrow-left"></i></button>
+                <button class="ctrl-pad-btn" ontouchstart="moveArcadeShip(25)" onclick="moveArcadeShip(25)"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 🌾 玩法二：拔胡萝卜听甜言蜜语 -->
+        <div id="mode-pull" class="game-panel-card game-block" style="display: none;">
+            <div class="game-panel-header">
+                <h3><i class="fas fa-carrot" style="color: var(--pink-accent);"></i> 帮处女座小牛 🐮 给珊珊小兔 🐰 拔胡萝卜！</h3>
+                <p>依次拔出农场里的 8 根爱心胡萝卜 🥕，听听属于你们的甜言蜜语！</p>
+            </div>
+            <div class="carrot-field" id="carrot-grid">
+                <!-- 动态渲染 -->
+            </div>
+            <div id="pulled-progress-text" style="font-weight: 800; color: var(--rose-gold); font-size: 0.9rem;">
+                已成功收获 0 / 8 根爱心胡萝卜
+            </div>
+        </div>
+
+        <!-- 🎰 玩法三：摇奖机 -->
+        <div id="mode-slot" class="game-panel-card game-block" style="display: none;">
+            <div class="game-panel-header">
+                <h3><i class="fas fa-dice" style="color: var(--rose-gold);"></i> 处女座 ✕ 白羊座 恋爱大冒险摇奖机 🎰</h3>
+                <p>拉动摇杆，摇出今天属于你们两人的甜蜜大冒险挑战！</p>
+            </div>
+            <div class="slot-machine-box">
+                <div class="slot-display" id="slot-result-display">
+                    点击下方摇杆，抽取今日专属挑战！🎰
+                </div>
+                <button class="action-btn" onclick="spinSlotMachine()">🎰 拉动命运摇杆！</button>
+            </div>
+        </div>
+
+        <!-- 🎹 玩法四：真实物理八音盒与乐谱指南 (手机横排适配) -->
+        <div id="mode-piano" class="game-panel-card game-block" style="display: none;">
+            <div class="game-panel-header">
+                <h3><i class="fas fa-music" style="color: var(--pink-accent);"></i> 笨笨牛与珊珊兔的物理晶体八音盒 🎹</h3>
+                <p>采用标准 C4-C5 十二平均律精准音高 & 真实晶体叮咚音色 decay 包络</p>
+            </div>
+
+            <!-- 琴键行 (适配手机宽与触摸) -->
+            <div class="piano-keys-row">
+                <div class="piano-key" id="key-0" ontouchstart="playMusicBoxNote(261.63, 'Do (C4)', 0)" onclick="playMusicBoxNote(261.63, 'Do (C4)', 0)"><span>Do</span></div>
+                <div class="piano-key" id="key-1" ontouchstart="playMusicBoxNote(293.66, 'Re (D4)', 1)" onclick="playMusicBoxNote(293.66, 'Re (D4)', 1)"><span>Re</span></div>
+                <div class="piano-key" id="key-2" ontouchstart="playMusicBoxNote(329.63, 'Mi (E4)', 2)" onclick="playMusicBoxNote(329.63, 'Mi (E4)', 2)"><span>Mi</span></div>
+                <div class="piano-key" id="key-3" ontouchstart="playMusicBoxNote(349.23, 'Fa (F4)', 3)" onclick="playMusicBoxNote(349.23, 'Fa (F4)', 3)"><span>Fa</span></div>
+                <div class="piano-key" id="key-4" ontouchstart="playMusicBoxNote(392.00, 'Sol (G4)', 4)" onclick="playMusicBoxNote(392.00, 'Sol (G4)', 4)"><span>Sol</span></div>
+                <div class="piano-key" id="key-5" ontouchstart="playMusicBoxNote(440.00, 'La (A4)', 5)" onclick="playMusicBoxNote(440.00, 'La (A4)', 5)"><span>La</span></div>
+                <div class="piano-key" id="key-6" ontouchstart="playMusicBoxNote(493.88, 'Si (B4)', 6)" onclick="playMusicBoxNote(493.88, 'Si (B4)', 6)"><span>Si</span></div>
+                <div class="piano-key" id="key-7" ontouchstart="playMusicBoxNote(523.25, 'High Do', 7)" onclick="playMusicBoxNote(523.25, 'High Do', 7)"><span>Do</span></div>
+            </div>
+
+            <!-- 🎼 乐谱卡片 -->
+            <div class="sheet-music-card">
+                <div class="sheet-title">
+                    <span>🎼 简易乐谱指南（可按键弹奏或点击示范）</span>
+                </div>
+                <div class="song-list">
+                    <div class="song-item">
+                        <div class="song-info">
+                            <div class="song-name">✨ 《小星星》</div>
+                            <div class="song-notes">Do-Do-Sol-Sol-La-La-Sol | Fa-Fa-Mi-Mi-Re-Re-Do</div>
+                        </div>
+                        <button class="play-demo-btn" onclick="playMelodyDemo([0,0,4,4,5,5,4, 3,3,2,2,1,1,0])">▶ 自动示范</button>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <div class="song-name">🎈 《告白气球》副歌</div>
+                            <div class="song-notes">Sol-Mi-Do-Do-Re-Mi-Fa-Mi | Sol-Mi-Do-Do-Re-Mi</div>
+                        </div>
+                        <button class="play-demo-btn" onclick="playMelodyDemo([4,2,0,0,1,2,3,2, 4,2,0,0,1,2])">▶ 自动示范</button>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <div class="song-name">🍀 《小幸运》片段</div>
+                            <div class="song-notes">Sol-Sol-Sol-Sol-Mi-Re-Do | Sol-Sol-Sol-Sol-Mi-Re-Do</div>
+                        </div>
+                        <button class="play-demo-btn" onclick="playMelodyDemo([4,4,4,4,2,1,0, 4,4,4,4,2,1,0])">▶ 自动示范</button>
+                    </div>
+                    <div class="song-item">
+                        <div class="song-info">
+                            <div class="song-name">🎂 《生日快乐歌》</div>
+                            <div class="song-notes">Do-Do-Re-Do-Fa-Mi | Do-Do-Re-Do-Sol-Fa</div>
+                        </div>
+                        <button class="play-demo-btn" onclick="playMelodyDemo([0,0,1,0,3,2, 0,0,1,0,4,3])">▶ 自动示范</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🌟 玩法五：许愿瓶 -->
+        <div id="mode-wishes" class="wish-section game-block" style="display: none;">
+            <h3 style="color: var(--pink-accent); font-size: 1.15rem; margin-bottom: 6px;"><i class="fas fa-magic"></i> 300 天许愿瓶</h3>
+            <p style="font-size: 0.8rem; color: var(--text-sub);">写入你想对珊珊/哲哲许下的 300 天愿望</p>
+            <div class="wish-input-box">
+                <input type="text" id="wish-input" class="wish-input-field" placeholder="许下一个美好的愿望..." maxlength="50">
+                <button class="wish-add-btn" onclick="addWishToBottle()">塞入星瓶 ✨</button>
+            </div>
+            <div class="wish-items-list" id="wish-display-list">
+                <!-- 列表 -->
+            </div>
+        </div>
+
+        <!-- 💌 影院级真心话情书面板 -->
+        <div id="letter-container">
+            <div class="letter-title">
+                💌 处女座小牛写给白羊座珊珊兔的 300 天真心话
+            </div>
+            <div class="letter-content" id="letter-text-box"></div><span class="typing-cursor" id="cursor-element"></span>
+            <div class="letter-sign-block" id="sign-box">
+                永远守护珊珊的笨笨牛 哲哲 🐮💖<br>
+                <span style="font-size: 0.82rem; color: var(--text-sub);">2026年11月13日 · 300天纪念</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 飘窗 Toast -->
+    <div id="custom-toast-popup"></div>
+
+    <!-- 悬浮控制按钮 -->
+    <div class="fixed-tools-bar">
+        <a href="index.html" class="tool-circle-btn" title="返回主页"><i class="fas fa-home"></i></a>
+        <div class="tool-circle-btn" id="audio-toggle-btn" onclick="toggleAudio()" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
+    </div>
+
+    <script>
+        /* ================================================================
+         * 1. 常量与日期定义
+         * ================================================================ */
+        const CORRECT_PASSWORD = '123456';
+        const DATE_FIRST_MEET = new Date('2024-05-03T00:00:00+08:00');
+        const DATE_REUNION_DAY = new Date('2026-01-18T00:00:00+08:00');
+        const DATE_300_MILESTONE = new Date('2026-11-13T00:00:00+08:00');
+
+        const CARROT_QUOTES = [
+            "白羊座珊珊小兔的直率与冲动，永远有处女座小牛默默包容 💖",
+            "小牛不善言辞，但把所有的温柔与细致都给了他的珊珊兔 🐮🐰",
+            "属牛的坚韧与属兔的灵动，注定是相守一生的绝配！✨",
+            "2009年的小牛遇上2011年的珊珊，这是时间最美的安排 🌸",
+            "小牛最喜欢看珊珊抱着美食开心大快朵颐的样子 🍲",
+            "不管未来走多远，笨笨牛永远是珊珊小兔最坚实的依靠 🛡️",
+            "300天只是个起点，小牛要陪珊珊走过接下来的3000天！🚀",
+            "哲哲永远超级超级喜欢珊珊宝贝！mua~~ 💋"
+        ];
+
+        const SLOT_EVENTS = [
+            "💋 处女座小牛要连续亲珊珊小兔的额头 3 次！",
+            "🥤 珊珊小兔可以无条件命令小牛去买一杯奶茶！",
+            "👑 今天小牛要当珊珊 10 分钟的专属听话小仆人！",
+            "抱 长达 60 秒以上的超深熊抱补充爱意能量！",
+            "🍕 小牛今晚要给珊珊点一份超级美味的爱心夜宵！",
+            "📸 两人一起拍一组超级搞怪的粉色表情包合照留念！",
+            "🧸 小牛要无条件把珊珊哄开心，不准还嘴哦！"
+        ];
+
+        const FREQ_MAP = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+
+        /* ================================================================
+         * 2. Web Audio 物理晶体八音盒音色合成器
+         * ================================================================ */
+        let audioCtx = null;
+        function playMusicBoxNote(freq, noteName, index) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(freq, now);
+
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(freq * 2, now);
+
+                gain1.gain.setValueAtTime(0.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+                gain2.gain.setValueAtTime(0.08, now);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+
+                osc1.connect(gain1);
+                osc2.connect(gain2);
+
+                gain1.connect(audioCtx.destination);
+                gain2.connect(audioCtx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 1.2);
+                osc2.stop(now + 0.6);
+            } catch(e) {}
+
+            showToast(`🎵 真实叮咚音符: ${noteName}`);
+
+            const keyEl = document.getElementById('key-' + index);
+            if (keyEl) {
+                keyEl.classList.add('active-playing');
+                setTimeout(() => keyEl.classList.remove('active-playing'), 220);
+            }
+        }
+
+        let isDemoPlaying = false;
+        function playMelodyDemo(noteIndices) {
+            if (isDemoPlaying) return;
+            isDemoPlaying = true;
+            showToast('🎶 八音盒示范演奏中...');
+
+            let i = 0;
+            function playStep() {
+                if (i < noteIndices.length) {
+                    const keyIdx = noteIndices[i];
+                    playMusicBoxNote(FREQ_MAP[keyIdx], '音符 #' + (keyIdx + 1), keyIdx);
+                    i++;
+                    setTimeout(playStep, 380);
+                } else {
+                    isDemoPlaying = false;
+                }
+            }
+            playStep();
+        }
+
+        /* ================================================================
+         * 3. 密码验证
+         * ================================================================ */
+        const lockScreen = document.getElementById('lock-screen');
+        const pwdInput = document.getElementById('pwd-field');
+        const pwdErr = document.getElementById('pwd-err-text');
+        const mainContainer = document.getElementById('main-container');
+
+        pwdInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') checkUnlockPassword();
+        });
+
+        function checkUnlockPassword() {
+            if (pwdInput.value === CORRECT_PASSWORD) {
+                executeUnlock();
+            } else {
+                playMusicBoxNote(220, '提示错误', 0);
+                pwdErr.style.opacity = '1';
+                pwdInput.value = '';
+                setTimeout(() => pwdErr.style.opacity = '0', 2500);
+            }
+        }
+
+        function executeUnlock() {
+            playMusicBoxNote(523.25, 'High Do', 7);
+            lockScreen.style.opacity = '0';
+            setTimeout(() => {
+                lockScreen.style.visibility = 'hidden';
+                mainContainer.style.display = 'block';
+                initBackgroundParticles();
+                initMouseTrailSparkles();
+                renderCalculatedStats();
+                initCarrotGame();
+                initArcadeGame();
+                loadWishes();
+                toggleAudio(true);
+            }, 800);
+        }
+
+        if (new Date() >= DATE_300_MILESTONE) {
+            executeUnlock();
+        }
+
+        /* ================================================================
+         * 4. 玩法切换
+         * ================================================================ */
+        function switchGameMode(modeId) {
+            playMusicBoxNote(440, '切换模式', 5);
+            document.querySelectorAll('.game-tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.game-block').forEach(b => b.style.display = 'none');
+            const target = document.getElementById('mode-' + modeId);
+            if (target) target.style.display = 'block';
+        }
+
+        /* ================================================================
+         * 5. 🌸 星尘 Canvas 背景
+         * ================================================================ */
+        function initBackgroundParticles() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+
+            const hearts = Array.from({ length: 90 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                size: Math.random() * 3 + 1.2,
+                alpha: Math.random(),
+                speed: Math.random() * 0.02 + 0.008
+            }));
+
+            function loop() {
+                ctx.clearRect(0, 0, w, h);
+                hearts.forEach(s => {
+                    s.alpha += s.speed;
+                    if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+                    ctx.fillStyle = `rgba(255, 202, 212, ${s.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+
+            window.addEventListener('resize', () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            });
+        }
+
+        function initMouseTrailSparkles() {
+            const canvas = document.getElementById('sparkle-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            const particles = [];
+
+            function addParticle(x, y) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    size: Math.random() * 4 + 2,
+                    color: Math.random() > 0.5 ? '#f4acb7' : '#ffcad4',
+                    life: 1
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.03;
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.life;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            const handleMove = (e) => {
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                for (let i = 0; i < 2; i++) addParticle(x, y);
+            };
+
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('touchmove', handleMove);
+        }
+
+        /* ================================================================
+         * 6. 天数计算
+         * ================================================================ */
+        function renderCalculatedStats() {
+            const now = new Date();
+            const meetDays = Math.floor((now - DATE_FIRST_MEET) / (1000 * 60 * 60 * 24));
+            const reunionDays = Math.floor((now - DATE_REUNION_DAY) / (1000 * 60 * 60 * 24));
+
+            document.getElementById('disp-meet-days').textContent = meetDays + ' 天';
+            document.getElementById('disp-reunion-days').textContent = reunionDays + ' 天';
+
+            function updateCountdown() {
+                const diff = DATE_300_MILESTONE - new Date();
+                if (diff <= 0) {
+                    document.getElementById('disp-countdown').textContent = '🎉 300天已经到达！';
+                    return;
+                }
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / (1000 * 60)) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+                document.getElementById('disp-countdown').textContent = `${d}天 ${h}时 ${m}分 ${s}秒`;
+            }
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        /* ================================================================
+         * 7. 🎮 街机游戏 (支持手指拖拽)
+         * ================================================================ */
+        let oxX = 200, arcadeScore = 0, isArcadeRunning = false;
+
+        function initArcadeGame() {
+            const canvas = document.getElementById('arcade-canvas');
+            const box = document.getElementById('arcade-canvas-box');
+            canvas.width = box.clientWidth;
+            canvas.height = box.clientHeight;
+            oxX = canvas.width / 2;
+
+            // 手机手指触控拖拽支持
+            box.ontouchmove = (e) => {
+                if (!isArcadeRunning) return;
+                const rect = canvas.getBoundingClientRect();
+                const touchX = e.touches[0].clientX - rect.left;
+                oxX = Math.max(25, Math.min(canvas.width - 25, touchX));
+            };
+        }
+
+        function moveArcadeShip(delta) {
+            oxX += delta;
+            const canvas = document.getElementById('arcade-canvas');
+            if (oxX < 25) oxX = 25;
+            if (oxX > canvas.width - 25) oxX = canvas.width - 25;
+        }
+
+        function startArcadeGame() {
+            document.getElementById('arcade-start-overlay').style.display = 'none';
+            arcadeScore = 0;
+            isArcadeRunning = true;
+            const canvas = document.getElementById('arcade-canvas');
+            const ctx = canvas.getContext('2d');
+
+            const items = [];
+
+            function spawn() {
+                if (Math.random() < 0.08) {
+                    const types = ['🥕', '💖', '🥤', '⏰'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    items.push({
+                        x: Math.random() * (canvas.width - 40) + 20,
+                        y: -20,
+                        type,
+                        speed: Math.random() * 1.5 + 2
+                    });
+                }
+            }
+
+            function loop() {
+                if (!isArcadeRunning) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                spawn();
+
+                ctx.font = '28px sans-serif';
+                ctx.fillText('🐮', oxX - 14, canvas.height - 25);
+
+                for (let i = items.length - 1; i >= 0; i--) {
+                    const it = items[i];
+                    it.y += it.speed;
+                    ctx.fillText(it.type, it.x - 12, it.y);
+
+                    if (Math.hypot(it.x - oxX, it.y - (canvas.height - 25)) < 28) {
+                        if (it.type === '⏰') {
+                            isArcadeRunning = false;
+                            playMusicBoxNote(220, '失败', 0);
+                            showToast(`💥 小牛撞到小闹钟啦！本次得分：${arcadeScore}`);
+                            document.getElementById('arcade-start-overlay').style.display = 'flex';
+                            return;
+                        } else {
+                            arcadeScore += 10;
+                            playMusicBoxNote(600, '得分', 4);
+                            items.splice(i, 1);
+
+                            if (arcadeScore >= 100) {
+                                unlockLoveLetter();
+                            }
+                        }
+                    } else if (it.y > canvas.height + 20) {
+                        items.splice(i, 1);
+                    }
+                }
+
+                ctx.fillStyle = '#ffcad4';
+                ctx.font = '800 14px sans-serif';
+                ctx.fillText(`爱心能量: ${arcadeScore}`, 15, 25);
+
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        /* ================================================================
+         * 8. 🌾 拔胡萝卜
+         * ================================================================ */
+        let pulledCount = 0;
+
+        function initCarrotGame() {
+            const grid = document.getElementById('carrot-grid');
+            grid.innerHTML = '';
+            pulledCount = 0;
+
+            for (let i = 0; i < 8; i++) {
+                const item = document.createElement('div');
+                item.className = 'carrot-item';
+                item.innerHTML = `
+                    <div class="carrot-icon">🥕</div>
+                    <div class="carrot-label">胡萝卜 #${i + 1}</div>
+                `;
+                item.onclick = () => pullCarrot(item, i);
+                grid.appendChild(item);
+            }
+        }
+
+        function pullCarrot(itemEl, idx) {
+            if (itemEl.classList.contains('pulled')) return;
+
+            itemEl.classList.add('pulled');
+            pulledCount++;
+            playMusicBoxNote(450 + pulledCount * 40, '叮咚', pulledCount % 8);
+            document.getElementById('pulled-progress-text').textContent = `已成功收获 ${pulledCount} / 8 根爱心胡萝卜`;
+
+            showToast(`🌸 【小牛拔胡萝卜】\n${CARROT_QUOTES[idx]}`);
+
+            if (pulledCount === 8) {
+                setTimeout(unlockLoveLetter, 1200);
+            }
+        }
+
+        /* ================================================================
+         * 9. 🎰 摇奖机
+         * ================================================================ */
+        function spinSlotMachine() {
+            playMusicBoxNote(750, '旋转', 5);
+            const display = document.getElementById('slot-result-display');
+            display.textContent = '🎰 命运齿轮急速旋转中...';
+
+            setTimeout(() => {
+                const randEvt = SLOT_EVENTS[Math.floor(Math.random() * SLOT_EVENTS.length)];
+                display.textContent = randEvt;
+                playMusicBoxNote(900, '揭晓', 7);
+                showToast('🎰 命运大冒险抽取成功！');
+            }, 1000);
+        }
+
+        function unlockLoveLetter() {
+            playMusicBoxNote(950, '解密', 7);
+            showToast('💖 成就解锁！处女座小牛的 300 天真心话情书已开启');
+            const letterBox = document.getElementById('letter-container');
+            letterBox.style.display = 'block';
+            letterBox.scrollIntoView({ behavior: 'smooth' });
+            startTypewriterEffect();
+        }
+
+        /* ================================================================
+         * 10. 💌 打字机真心话情书
+         * ================================================================ */
+        const CUSTOM_LETTER = `亲爱的珊珊宝贝（我的白羊座小兔）：
+
+展信佳。不知不觉，从我们 2026年1月18日 重新牵起彼此的手算起，我们已经携手走过了整整 300 天。
+
+我是个 2009年9月22日 出生的处女座笨笨牛 🐂，习惯把所有的深情与关心藏在生活细节里，偶尔笨拙，却无比坚定；而你是 2011年4月17日 出生的白羊座珊珊兔 🐰，天真烂漫，像一束温暖的阳光直接照亮了我的世界。
+
+这 300 天里，白羊座珊珊兔的直率与可爱，让每一个平淡的日子都变得闪闪发光；而处女座小牛的细致与沉稳，永远会在你身后为你遮风挡雨，给你最坚实的肩膀。
+
+谢谢你给我的所有信任与温柔。300 天只是我们漫长幸福岁月里的小小里程碑。我向你保证，笨笨牛会永远守护他的珊珊小兔，爱你的接下来的 3000 天、30000 天，直到永远！`;
+
+        let typingStarted = false;
+        function startTypewriterEffect() {
+            if (typingStarted) return;
+            typingStarted = true;
+            const container = document.getElementById('letter-text-box');
+            const sign = document.getElementById('sign-box');
+            container.textContent = '';
+            let idx = 0;
+
+            function typeNext() {
+                if (idx < CUSTOM_LETTER.length) {
+                    container.textContent += CUSTOM_LETTER.charAt(idx);
+                    idx++;
+                    if (idx % 4 === 0) playMusicBoxNote(650, '打字', 4);
+                    setTimeout(typeNext, 45);
+                } else {
+                    document.getElementById('cursor-element').style.display = 'none';
+                    sign.style.opacity = '1';
+                }
+            }
+            typeNext();
+        }
+
+        /* ================================================================
+         * 11. 🌟 许愿瓶
+         * ================================================================ */
+        function addWishToBottle() {
+            const input = document.getElementById('wish-input');
+            const val = input.value.trim();
+            if (!val) {
+                showToast('请先输入你想许下的愿望哦！');
+                return;
+            }
+            playMusicBoxNote(700, '愿望', 6);
+            const wishes = JSON.parse(localStorage.getItem('300days_custom_wishes') || '[]');
+            wishes.unshift({ text: val, date: new Date().toLocaleDateString() });
+            localStorage.setItem('300days_custom_wishes', JSON.stringify(wishes));
+            input.value = '';
+            showToast('✨ 愿望已塞入星瓶，成功保存！');
+            loadWishes();
+        }
+
+        function loadWishes() {
+            const list = document.getElementById('wish-display-list');
+            const wishes = JSON.parse(localStorage.getItem('300days_custom_wishes') || '[]');
+            if (wishes.length === 0) {
+                list.innerHTML = '<div style="font-size:0.8rem; color:var(--text-sub);">尚无封存愿望，许下你们的第一个愿望吧～</div>';
+                return;
+            }
+            list.innerHTML = wishes.map(w => `
+                <div class="wish-bubble">
+                    <span>🌸 ${w.text}</span>
+                    <span style="font-size:0.75rem; color:var(--text-sub);">${w.date}</span>
+                </div>
+            `).join('');
+        }
+
+        /* ================================================================
+         * 12. 音频与 Toast
+         * ================================================================ */
+        function toggleAudio(forcePlay = false) {
+            const audio = document.getElementById('bg-audio-player');
+            const btn = document.getElementById('audio-toggle-btn');
+            if (forcePlay || audio.paused) {
+                audio.play().then(() => {
+                    btn.classList.add('spinning');
+                }).catch(e => console.log('Autoplay prevented'));
+            } else {
+                audio.pause();
+                btn.classList.remove('spinning');
+            }
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('custom-toast-popup');
+            toast.textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+    </script>
+</body>
+</html>

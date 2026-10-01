@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>留言时光回廊 · 珊珊 & 祖哲</title>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff7597;
+            --primary-light: #ffdce5;
+            --primary-dark: #e65275;
+            --secondary: #a17fe0;
+            --bg-grad: linear-gradient(135deg, #fff2f5 0%, #f6f0ff 50%, #fff0f3 100%);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.5);
+            --shadow-glass: 0 12px 40px rgba(255, 140, 160, 0.12);
+            --text-color: #5d4f55;
+            --text-muted: #8c7880;
+            --font-family: 'STKaiti', 'KaiTi', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a17fe0;
+            --primary-light: rgba(161, 127, 224, 0.25);
+            --primary-dark: #d5b8ff;
+            --secondary: #00cec9;
+            --bg-grad: linear-gradient(135deg, #09080f 0%, #130f24 50%, #07070a 100%);
+            --card-bg: rgba(20, 18, 30, 0.6);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --text-color: #e0d0d8;
+            --text-muted: #9c8e96;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 80px 20px;
+            transition: background 0.8s, color 0.8s;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--card-bg);
+            border: var(--border-glass);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .header-title {
+            font-size: 2.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* 统一玻璃卡片 */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            border-radius: 24px;
+            box-shadow: var(--shadow-glass);
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        /* 3D 偏转卡片炫光 */
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .glass-panel:hover .card-glare {
+            opacity: 1;
+        }
+
+        /* 时间轴线 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            border-left: 3px dashed var(--primary);
+            margin-top: 20px;
+        }
+
+        /* 时间轴留言卡片 */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        /* 时间轴圆点 */
+        .timeline-dot {
+            position: absolute;
+            left: -43px;
+            top: 15px;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            border: 4px solid var(--primary-light);
+            box-shadow: 0 0 10px var(--primary);
+            z-index: 5;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 117, 151, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 117, 151, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 117, 151, 0); }
+        }
+
+        .note-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: var(--border-glass);
+            box-shadow: var(--shadow-glass);
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 15px 35px rgba(255, 117, 151, 0.15);
+        }
+
+        /* 不同颜色的留言背景微调 */
+        .note-bg-pink { background: rgba(255, 235, 240, 0.65); border-color: rgba(255, 117, 151, 0.3); }
+        .note-bg-green { background: rgba(230, 248, 235, 0.65); border-color: rgba(46, 204, 113, 0.3); }
+        .note-bg-blue { background: rgba(230, 242, 255, 0.65); border-color: rgba(52, 152, 219, 0.3); }
+        .note-bg-yellow { background: rgba(255, 250, 230, 0.65); border-color: rgba(241, 196, 15, 0.3); }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed rgba(0,0,0,0.08);
+            padding-bottom: 8px;
+        }
+
+        .note-emoji-tag {
+            font-size: 1.15rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .note-delete-btn {
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .note-delete-btn:hover {
+            color: #ff3d68;
+        }
+
+        .note-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            font-weight: 500;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 3.5rem;
+            color: var(--primary-light);
+            margin-bottom: 15px;
+            animation: floatHeart 2.5s infinite ease-in-out;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 30px 15px 60px 15px;
+            }
+            .header-title {
+                font-size: 1.8rem;
+                margin-top: 50px;
+            }
+            .btn-back {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            .timeline {
+                padding-left: 20px;
+            }
+            .timeline-dot {
+                left: -32px;
+                width: 18px;
+                height: 18px;
+                border-width: 3px;
+            }
+            .note-card {
+                padding: 18px;
+            }
+            .note-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子背景 -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <header>
+            <a href="../index.html" class="btn-back"><i class="fas fa-arrow-left"></i> 返回小屋</a>
+            <h1 class="header-title"><i class="fas fa-sticky-note"></i> 留言时光回廊</h1>
+            <p class="subtitle">在这里，我们写下的所有思念都会被安全存储，直到永远。</p>
+        </header>
+
+        <!-- 留言板卡片 -->
+        <div class="glass-panel" style="padding: 20px 25px;">
+            <div class="card-glare"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span style="font-weight: 700; color: var(--primary-dark); font-size: 1.1rem;"><i class="fas fa-history"></i> 共有 <span id="notes-count">0</span> 条珍贵悄悄话</span>
+                <button id="refresh-btn" style="background: var(--primary); border: none; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(255,117,151,0.2);"><i class="fas fa-sync-alt"></i> 刷新同步</button>
+            </div>
+        </div>
+
+        <!-- 留言时光轴 -->
+        <div class="timeline" id="notes-timeline">
+            <!-- 留言记录将在这里渲染 -->
+        </div>
+    </div>
+
+    <script>
+        // 🛡️ 安全本地存储代理：防止在 file:// 协议或某些隐私模式下，浏览器限制 localStorage 访问导致脚本崩溃
+        let isStorageAvailable = true;
+        let memStorage = {};
+        try {
+            const testKey = '__test_storage__';
+            window.localStorage.setItem(testKey, testKey);
+            window.localStorage.removeItem(testKey);
+        } catch(e) {
+            isStorageAvailable = false;
+        }
+
+        const localStorage = {
+            getItem: function(key) {
+                if (isStorageAvailable) {
+                    try { return window.localStorage.getItem(key); } catch(e) {}
+                }
+                return memStorage[key] || null;
+            },
+            setItem: function(key, val) {
+                if (isStorageAvailable) {
+                    try { window.localStorage.setItem(key, val); return; } catch(e) {}
+                }
+                memStorage[key] = String(val);
+            },
+            removeItem: function(key) {
+                if (isStorageAvailable) {
+                    try { window.localStorage.removeItem(key); return; } catch(e) {}
+                }
+                delete memStorage[key];
+            }
+        };
+
+        let apiEndpoint = null;
+        let stickyNotes = [];
+
+        // 动态检查后端 API
+        async function detectApi() {
+            // 因为本文件在 other/ 目录下：
+            // 相对本文件的 Node API 为 '/api/messages' (根路径)
+            try {
+                const resNode = await fetch('/api/messages');
+                if (resNode.ok) {
+                    apiEndpoint = '/api/messages';
+                    console.log("检测到 Node.js 服务端 API");
+                    return;
+                }
+            } catch(e) {}
+
+            // PHP 接口 'api.php' 在同级目录下
+            try {
+                const resPhp = await fetch('api.php');
+                if (resPhp.ok) {
+                    apiEndpoint = 'api.php';
+                    console.log("检测到 PHP 服务端 API");
+                    return;
+                }
+            } catch(e) {}
+        }
+
+        // 获取留言
+        async function loadNotes() {
+            if (apiEndpoint) {
+                try {
+                    const res = await fetch(apiEndpoint);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data)) {
+                            stickyNotes = data;
+                            renderNotes();
+                            return;
+                        }
+                    }
+                } catch(e) {
+                    console.error("从云端加载留言出错:", e);
+                }
+            }
+
+            // 降级使用本地 LocalStorage
+            const stored = localStorage.getItem('stickyNotes');
+            if (stored) {
+                stickyNotes = JSON.parse(stored);
+            } else {
+                stickyNotes = [];
+            }
+            renderNotes();
+        }
+
+        // 删除留言
+        async function deleteNote(id) {
+            if (!confirm("确定要在云端服务器彻底撕掉这条悄悄话吗？")) return;
+
+            // 本地状态更新
+            stickyNotes = stickyNotes.filter(n => n.id !== id);
+            renderNotes();
+            
+            // 同步 localStorage
+            localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
+
+            // 同步云端删除
+            if (apiEndpoint) {
+                try {
+                    await fetch(`${apiEndpoint}?id=${id}`, { method: 'DELETE' });
+                } catch(e) {
+                    console.error("云端删除失败:", e);
+                }
+            }
+        }
+
+        // 渲染页面
+        function renderNotes() {
+            const timeline = document.getElementById('notes-timeline');
+            const countEl = document.getElementById('notes-count');
+            
+            countEl.textContent = stickyNotes.length;
+            timeline.innerHTML = '';
+
+            if (stickyNotes.length === 0) {
+                timeline.innerHTML = `
+                    <div class="glass-panel empty-state">
+                        <div class="empty-icon"><i class="fas fa-heart-broken"></i></div>
+                        <p style="font-weight: 700; font-size: 1.1rem; color: var(--text-color);">还没有任何留言哦</p>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">快让珊珊宝贝在留言板挂上第一张浪漫便签吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按时间最新排序
+            const sortedNotes = [...stickyNotes].sort((a, b) => b.id - a.id);
+
+            sortedNotes.forEach(note => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                
+                // 便签颜色映射
+                const bgClass = `note-bg-${note.color || 'pink'}`;
+
+                item.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="note-card ${bgClass}">
+                        <div class="note-header">
+                            <span class="note-emoji-tag">${note.emoji || '💖'} 悄悄话</span>
+                            <button class="note-delete-btn" onclick="deleteNote(${note.id})" title="彻底撕掉">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="note-text">${note.text}</div>
+                        <div class="note-footer">
+                            —— ${note.author || '匿名'} (${note.date || ''})
+                        </div>
+                    </div>
+                `;
+                timeline.appendChild(item);
+            });
+        }
+
+        // 3D 卡片炫光鼠标跟踪
+        function initCardGlares() {
+            const panels = document.querySelectorAll('.glass-panel');
+            panels.forEach(panel => {
+                panel.addEventListener('mousemove', e => {
+                    const rect = panel.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    panel.style.setProperty('--mouse-x', `${x}px`);
+                    panel.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+        }
+
+        // 星空背景绘制 (Canvas)
+        function initStarsBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // 生成星光
+            for (let i = 0; i < 60; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.01 + 0.005
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制背景暗度渐变 (如果是暗黑模式)
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                
+                stars.forEach(star => {
+                    star.alpha += star.speed;
+                    if (star.alpha > 1 || star.alpha < 0) {
+                        star.speed = -star.speed;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = star.alpha;
+                    ctx.fillStyle = isDark ? '#ffffff' : '#ff7597';
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+                
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 同步主站的主题
+            const activeTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', activeTheme);
+
+            initStarsBackground();
+            initCardGlares();
+            
+            document.getElementById('refresh-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('refresh-btn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+                await loadNotes();
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> 刷新同步';
+                }, 800);
+            });
+
+            await detectApi();
+            await loadNotes();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SweetPact 心动契约 | 情侣游戏与沟通和谐助手</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ----------------------------------------------------
+           SweetPact (心动契约) - Styling & Design System
+           Modern Dark Glassmorphism & Romantic Glow Aesthetic
+        ---------------------------------------------------- */
+
+        :root {
+            --bg-primary: #0b0d19;
+            --bg-gradient: linear-gradient(135deg, #0b0d19 0%, #1a0f2e 50%, #160b24 100%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-hover: rgba(255, 255, 255, 0.09);
+            
+            --primary-rose: #ff4d8d;
+            --primary-rose-glow: rgba(255, 77, 141, 0.4);
+            --accent-purple: #9d4edd;
+            --accent-purple-glow: rgba(157, 78, 221, 0.4);
+            --accent-gold: #ffb703;
+            --accent-emerald: #06d6a0;
+            --accent-red: #ef476f;
+            
+            --text-main: #f8f9fa;
+            --text-muted: #a0a5c0;
+            --text-dim: #6c757d;
+            
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
+            
+            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Outfit', -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px 16px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* App Container */
+        .app-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Hero Header */
+        .hero-header {
+            text-align: center;
+            padding: 32px 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--primary-rose-glow) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .logo-area {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .btn-back {
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .btn-back:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .heart-badge {
+            font-size: 2.2rem;
+            animation: heartBeat 2s infinite ease-in-out;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+        }
+
+        .logo-area h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff85b3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-area h1 span {
+            font-size: 1.6rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+
+        /* Stats Bar */
+        .hero-stats-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 180px;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            scrollbar-width: none;
+        }
+
+        .main-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex: 1;
+            white-space: nowrap;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-rose) 0%, var(--accent-purple) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 16px var(--primary-rose-glow);
+            font-weight: 700;
+        }
+
+        /* Tab Panes */
+        .tab-content-container {
+            position: relative;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Card Common */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .card-icon {
+            font-size: 1.6rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        /* Pane Layout Grids */
+        .pane-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 868px) {
+            .pane-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        .max-width-card {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .margin-top-lg {
+            margin-top: 24px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-rose) 0%, var(--accent-purple) 100%);
+            color: white;
+            box-shadow: 0 4px 16px var(--primary-rose-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--primary-rose-glow);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #7209b7 0%, #4cc9f0 100%);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #d90429 0%, #ef476f 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 71, 111, 0.4);
+        }
+
+        .btn-pulse {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(239, 71, 111, 0.4); }
+            50% { box-shadow: 0 6px 30px rgba(239, 71, 111, 0.85); transform: scale(1.02); }
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-rose);
+            color: var(--primary-rose);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-rose);
+            color: white;
+        }
+
+        /* Checklist Items */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .check-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .check-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .check-item input[type="checkbox"]:checked + .checkbox-custom {
+            background: var(--accent-emerald);
+            border-color: var(--accent-emerald);
+        }
+
+        .check-item input[type="checkbox"]:checked + .checkbox-custom::after {
+            content: '✓';
+            color: #000;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .check-text {
+            font-size: 0.95rem;
+        }
+
+        /* Emergency Circuit Breaker Timer Box */
+        .cooldown-timer-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--accent-red);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .timer-ring {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px dashed var(--accent-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotateRing 20s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #timer-display {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-red);
+        }
+
+        .breathing-guide {
+            font-size: 0.95rem;
+            color: var(--accent-gold);
+            animation: breathePulse 4s infinite ease-in-out;
+        }
+
+        @keyframes breathePulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.04); }
+        }
+
+        .random-task-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            width: 100%;
+        }
+
+        .random-task-box h4 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        #cooldown-task {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--primary-rose);
+        }
+
+        /* Game Recommender Filters & Grid */
+        .filter-pills {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pill-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .pill-btn.active, .pill-btn:hover {
+            background: var(--glass-hover);
+            color: var(--text-main);
+            border-color: var(--primary-rose);
+        }
+
+        .game-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .game-item-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition-normal);
+        }
+
+        .game-item-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .game-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+        }
+
+        .badge-safe { background: rgba(6, 214, 160, 0.2); color: var(--accent-emerald); }
+        .badge-medium { background: rgba(255, 183, 3, 0.2); color: var(--accent-gold); }
+        .badge-danger { background: rgba(239, 71, 111, 0.2); color: var(--accent-red); }
+
+        .game-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Translator / Reframer Form */
+        .translator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-fast);
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+        }
+
+        .result-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .nvc-result-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary-rose);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 16px 20px;
+            position: relative;
+        }
+
+        .nvc-tag {
+            font-size: 0.8rem;
+            color: var(--primary-rose);
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .nvc-text {
+            font-size: 1rem;
+            color: var(--text-main);
+            padding-right: 70px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Cards Deck Grid */
+        .cards-deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .love-card {
+            border-radius: var(--radius-md);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .love-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-top {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .card-body {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .card-play-btn {
+            align-self: flex-start;
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            border: none;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .card-pink { background: linear-gradient(135deg, #ff4d8d 0%, #ff85b3 100%); }
+        .card-purple { background: linear-gradient(135deg, #7209b7 0%, #b5179e 100%); }
+        .card-blue { background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%); }
+        .card-gold { background: linear-gradient(135deg, #f72585 0%, #ffb703 100%); }
+        .card-green { background: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%); }
+        .card-red { background: linear-gradient(135deg, #d90429 0%, #ef476f 100%); }
+
+        /* Breakup Contract Styles */
+        .contract-container {
+            background: #fdfbf7;
+            color: #2b2d42;
+            padding: 36px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .contract-header {
+            text-align: center;
+            border-bottom: 2px dashed #d1d5db;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .stamp-seal {
+            position: absolute;
+            right: 0;
+            top: -10px;
+            width: 85px;
+            height: 85px;
+            border: 3px double #d90429;
+            border-radius: 50%;
+            color: #d90429;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            transform: rotate(-15deg);
+            opacity: 0.4;
+            transition: var(--transition-normal);
+        }
+
+        .stamp-seal.signed {
+            opacity: 1;
+            background: rgba(217, 4, 41, 0.05);
+            box-shadow: 0 0 15px rgba(217, 4, 41, 0.3);
+        }
+
+        .contract-header h3 {
+            font-size: 1.5rem;
+            color: #1d3557;
+        }
+
+        .contract-sn {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .contract-body ol {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .contract-signatures {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .sig-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sig-box label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .sig-input {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fff;
+            color: #212529;
+        }
+
+        /* Love Jar & Rewards */
+        .jar-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .jar-dashboard { grid-template-columns: 1fr; }
+            .contract-signatures { flex-direction: column; }
+        }
+
+        .jar-balance-box {
+            background: rgba(255, 183, 3, 0.1);
+            border: 1px solid var(--accent-gold);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .jar-icon {
+            font-size: 3rem;
+        }
+
+        .balance-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .earn-ways-box {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .earn-ways-box h4 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--accent-emerald);
+        }
+
+        .earn-ways-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .reward-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .reward-icon {
+            font-size: 2rem;
+        }
+
+        .reward-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .reward-cost {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .history-log-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .log-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 6px;
+        }
+
+        .log-gain { color: var(--accent-emerald); }
+        .log-spend { color: var(--accent-red); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-content {
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            padding: 36px 24px;
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+        }
+
+        .modal-body-text {
+            color: var(--text-muted);
+            margin: 16px 0 24px 0;
+            font-size: 1.05rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--glass-border);
+            margin-top: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .logo-area h1 { font-size: 1.8rem; }
+            .hero-stats-bar { flex-direction: column; }
+            .stat-card { width: 100%; }
+            .btn-back {
+                position: relative;
+                align-self: center;
+                margin-bottom: 15px;
+                left: auto;
+            }
+            .logo-area {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header / Hero Section -->
+        <header class="hero-header">
+            <div class="logo-area">
+                <a href="../index.html" class="btn-back">↩ 返回主页</a>
+                <div class="heart-badge">💖</div>
+                <h1>SweetPact <span>心动契约</span></h1>
+            </div>
+            <p class="subtitle">情侣专属沟通与游戏防吵助手 · 别让游戏输掉了真爱</p>
+            
+            <div class="hero-stats-bar">
+                <div class="stat-card">
+                    <span class="stat-icon">🏆</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="peace-count">0</span>
+                        <span class="stat-label">和平开黑局数</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💎</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="love-points">100</span>
+                        <span class="stat-label">爱意储蓄金币</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📜</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="pact-signed-status">未签署</span>
+                        <span class="stat-label">不提分手契约</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="main-tabs">
+            <button class="tab-btn active" data-tab="peace-game">🎮 游戏和平模式</button>
+            <button class="tab-btn" data-tab="nvc-translator">💬 话术解毒器</button>
+            <button class="tab-btn" data-tab="love-cards">🃏 情侣功能卡牌</button>
+            <button class="tab-btn" data-tab="breakup-pact">📜 不提分手契约</button>
+            <button class="tab-btn" data-tab="love-jar">🪙 爱意储蓄罐</button>
+        </nav>
+
+        <!-- Main Content Sections -->
+        <main class="tab-content-container">
+
+            <!-- Tab 1: Game Peace Mode -->
+            <section id="peace-game" class="tab-pane active">
+                <div class="pane-grid">
+                    
+                    <!-- Pre-game Peace Treaty Card -->
+                    <div class="glass-card treaty-card">
+                        <div class="card-header">
+                            <span class="card-icon">⚡</span>
+                            <h2>开黑前“和平公约”一键签署</h2>
+                        </div>
+                        <p class="card-desc">每次准备双排打游戏前，勾选以下约定，开启“防吵保护罩”！</p>
+
+                        <div class="checklist" id="game-checklist">
+                            <label class="check-item">
+                                <input type="checkbox" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="check-text">绝不说教（不主动指挥操作，除非对方询问）</span>
+                            </label>
+                            <label class="check-item">
+                                <input type="checkbox" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="check-text">态度第零（不叹气、不冷嘲热讽、不阴阳怪气）</span>
+                            </label>
+                            <label class="check-item">
+                                <input type="checkbox" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="check-text">输赢放一边（打游戏是为了陪伴和开心）</span>
+                            </label>
+                            <label class="check-item">
+                                <input type="checkbox" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="check-text">失误必鼓励（死了或下饭时说“没事，下把乱杀”）</span>
+                            </label>
+                        </div>
+
+                        <button class="btn btn-primary btn-block" id="start-peace-game-btn">
+                            🚀 双方达成共识，开启和平局 (+10爱意金币)
+                        </button>
+                    </div>
+
+                    <!-- Game Tilt Emergency Circuit Breaker -->
+                    <div class="glass-card emergency-card">
+                        <div class="card-header">
+                            <span class="card-icon">🆘</span>
+                            <h2>游戏情绪“急停熔断器”</h2>
+                        </div>
+                        <p class="card-desc">打游戏玩炸了？语气开始变凶了？按下急停键，立刻冷却现场！</p>
+
+                        <div class="emergency-actions">
+                            <button class="btn btn-danger btn-pulse" id="tilt-trigger-btn">
+                                🔥 警告：我快炸了！启动3分钟暂停冷却
+                            </button>
+                        </div>
+
+                        <!-- Timer Box (Hidden by default) -->
+                        <div class="cooldown-timer-box hidden" id="cooldown-box">
+                            <div class="timer-ring">
+                                <span id="timer-display">03:00</span>
+                            </div>
+                            <p class="breathing-guide">🫁 吸气 ... 呼气 ... 眼前只是游戏像素，对面的才是亲老婆/老公</p>
+                            <div class="random-task-box">
+                                <h4>🎁 惩罚/和好小任务：</h4>
+                                <p id="cooldown-task">进行中...</p>
+                            </div>
+                            <button class="btn btn-secondary" id="stop-timer-btn">我冷静好了，恢复游戏</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Recommendations Section -->
+                <div class="glass-card full-width-card margin-top-lg">
+                    <div class="card-header">
+                        <span class="card-icon">🕹️</span>
+                        <h2>情侣避坑/推荐游戏指南</h2>
+                    </div>
+                    <div class="filter-pills">
+                        <button class="pill-btn active" data-filter="all">全部</button>
+                        <button class="pill-btn" data-filter="safe">🟢 极低冲突（治愈合家欢）</button>
+                        <button class="pill-btn" data-filter="medium">🟡 适度配合（快乐双人）</button>
+                        <button class="pill-btn" data-filter="danger">🔴 高危竞技（慎入排位）</button>
+                    </div>
+
+                    <div class="game-cards-grid" id="game-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: NVC Script Reframer -->
+            <section id="nvc-translator" class="tab-pane">
+                <div class="glass-card max-width-card">
+                    <div class="card-header">
+                        <span class="card-icon">✨</span>
+                        <h2>“语气解毒”话术生成器</h2>
+                    </div>
+                    <p class="card-desc">把内心的怨气与伤人的指责，一键翻译成软萌、真诚、高情商的沟通话术！</p>
+
+                    <div class="translator-form">
+                        <label class="form-label">选择你想表达的情绪或冲突场景：</label>
+                        <select class="form-select" id="preset-conflict-select">
+                            <option value="attitude">态度不耐烦：“你打游戏对我语气太凶、太烦了！”</option>
+                            <option value="backseat">教我做事：“你凭什么一直指挥我怎么打？”</option>
+                            <option value="breakup">提到分手：“你怎么又把分手挂在嘴边？”</option>
+                            <option value="ignore">被冷落了：“你打起游戏来根本不理我！”</option>
+                            <option value="custom">✍️ 我想自己输入原话...</option>
+                        </select>
+
+                        <div class="custom-input-box hidden" id="custom-input-box">
+                            <input type="text" class="form-input" id="custom-angry-text" placeholder="输入你原本想脱口而出的伤人原话...">
+                        </div>
+
+                        <button class="btn btn-accent btn-block" id="reframe-btn">🪄 转化为高情商软萌沟通话术</button>
+                    </div>
+
+                    <div class="reframed-results hidden" id="reframed-results-box">
+                        <h3>💬 推荐沟通表达（你可以直接念给对方听或复制）：</h3>
+                        <div class="result-cards-container" id="result-cards-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Interactive Love Cards -->
+            <section id="love-cards" class="tab-pane">
+                <div class="glass-card full-width-card">
+                    <div class="card-header">
+                        <span class="card-icon">🃏</span>
+                        <h2>情侣免死金牌与破冰卡牌</h2>
+                    </div>
+                    <p class="card-desc">任何一方随时可以出牌，对方收到后需无条件执行卡牌效果哦！</p>
+
+                    <div class="cards-deck-grid">
+                        <div class="love-card card-pink" onclick="triggerCardModal('hug')">
+                            <div class="card-top">🤗 抱抱卡</div>
+                            <div class="card-body">出牌后，对方必须无条件抱紧你10秒钟，且不许说话。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                        <div class="love-card card-purple" onclick="triggerCardModal('pause')">
+                            <div class="card-top">⏸️ 15分钟冷静卡</div>
+                            <div class="card-body">强行暂停当前争吵15分钟，期间只能吃零食、喝水或各自发呆。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                        <div class="love-card card-blue" onclick="triggerCardModal('soft')">
+                            <div class="card-top">🥺 语气软化卡</div>
+                            <div class="card-body">要求对方用最温柔/软萌的语气，重新把刚才那句话说一遍。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                        <div class="love-card card-gold" onclick="triggerCardModal('praise')">
+                            <div class="card-top">🌟 互夸爆彩卡</div>
+                            <div class="card-body">双方必须轮流说出对方今天做得最好的3个优点。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                        <div class="love-card card-green" onclick="triggerCardModal('game_immune')">
+                            <div class="card-top">🛡️ 游戏下饭豁免卡</div>
+                            <div class="card-body">打游戏下饭死掉时出牌，本局任何失误不得被追责或嘲笑。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                        <div class="love-card card-red" onclick="triggerCardModal('no_breakup')">
+                            <div class="card-top">🚫 禁用分手金牌</div>
+                            <div class="card-body">封印本次争吵中的“分手”字眼，立刻归还理性。</div>
+                            <button class="card-play-btn">使用此卡</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: Breakup Ban Pact Contract -->
+            <section id="breakup-pact" class="tab-pane">
+                <div class="glass-card max-width-card">
+                    <div class="card-header">
+                        <span class="card-icon">📜</span>
+                        <h2>正式签署《绝不轻言分手》契约书</h2>
+                    </div>
+                    <p class="card-desc">确立你们爱情的安全边界。将“分手”彻底从争吵词典中剔除！</p>
+
+                    <div class="contract-container" id="contract-view">
+                        <div class="contract-header">
+                            <div class="stamp-seal" id="contract-stamp">未盖章</div>
+                            <h3>💖 绝对理性与爱意守护契约 💖</h3>
+                            <p class="contract-sn">契约编号：SP-LOVE-2026-8888</p>
+                        </div>
+
+                        <div class="contract-body">
+                            <p>鉴于双方真心相爱，并渴望建立长久、稳定、充满安全感的亲密关系，特此制定以下红线条款：</p>
+                            <ol>
+                                <li><strong>红线第一条：</strong> 无论在任何情绪激动、打游戏输掉或吵架的情况下，<strong>绝不说出“分手”二字</strong>。分手只能在极度理性、平静地探讨后才能决定。</li>
+                                <li><strong>红线第二条：</strong> 当意识到对方语气冷淡或不耐烦时，优先表达“我受伤害的感受”，而非以暴制暴。</li>
+                                <li><strong>红线第三条：</strong> 游戏只是生活调味剂，现实中的陪伴与拥抱永远高于一切游戏输赢。</li>
+                            </ol>
+                        </div>
+
+                        <div class="contract-signatures">
+                            <div class="sig-box">
+                                <label>甲方（男方签名/昵称）：</label>
+                                <input type="text" class="sig-input" id="partner-a-name" placeholder="请输入你的名字">
+                            </div>
+                            <div class="sig-box">
+                                <label>乙方（女方签名/昵称）：</label>
+                                <input type="text" class="sig-input" id="partner-b-name" placeholder="请输入她的名字">
+                            </div>
+                        </div>
+
+                        <div class="contract-actions">
+                            <button class="btn btn-primary btn-block btn-lg" id="sign-contract-btn">
+                                🖋️ 双方确认并盖上【爱意印章】
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 5: Love Points Jar -->
+            <section id="love-jar" class="tab-pane">
+                <div class="glass-card full-width-card">
+                    <div class="card-header">
+                        <span class="card-icon">🪙</span>
+                        <h2>爱意储蓄罐与奖励兑换</h2>
+                    </div>
+                    <p class="card-desc">通过和平沟通与良好表现赚取爱意金币，兑换专属情侣特权！</p>
+
+                    <div class="jar-dashboard">
+                        <div class="jar-balance-box">
+                            <span class="jar-icon">🏺</span>
+                            <div class="balance-details">
+                                <div class="balance-title">当前爱意金币</div>
+                                <div class="balance-amount"><span id="jar-coins-display">100</span> 🪙</div>
+                            </div>
+                        </div>
+
+                        <div class="earn-ways-box">
+                            <h4>➕ 如何赚取金币？</h4>
+                            <ul>
+                                <li>🎮 完成一次和平开黑局：+10 🪙</li>
+                                <li>📜 签署《不提分手契约》：+50 🪙</li>
+                                <li>🥺 主动软化语气/道歉：+20 🪙</li>
+                                <li>🌟 连续一周未吵架：+100 🪙</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="margin-top-lg">🛍️ 特权奖励商店</h3>
+                    <div class="rewards-grid">
+                        <div class="reward-item">
+                            <div class="reward-icon">🍳</div>
+                            <div class="reward-info">
+                                <h4>指定对方做大餐一次</h4>
+                                <span class="reward-cost">50 🪙</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="redeemReward('指定对方做大餐', 50)">兑换</button>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">💆‍♂️</div>
+                            <div class="reward-info">
+                                <h4>专属30分钟按摩服务</h4>
+                                <span class="reward-cost">80 🪙</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="redeemReward('30分钟按摩', 80)">兑换</button>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">🧹</div>
+                            <div class="reward-info">
+                                <h4>免疫做家务一天卡</h4>
+                                <span class="reward-cost">100 🪙</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="redeemReward('免家务一天卡', 100)">兑换</button>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">🎮</div>
+                            <div class="reward-info">
+                                <h4>赞助清空一款游戏皮肤</h4>
+                                <span class="reward-cost">200 🪙</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="redeemReward('游戏皮肤赞助', 200)">兑换</button>
+                        </div>
+                    </div>
+
+                    <div class="history-log-box margin-top-lg">
+                        <h4>📋 爱意储蓄流水记录</h4>
+                        <ul class="log-list" id="coin-history-list">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Made with ❤️ for Couple Harmony & Peace. 祝福你们甜甜蜜蜜，永不吵架！</p>
+        </footer>
+    </div>
+
+    <!-- Interactive Card Action Modal -->
+    <div class="modal-overlay hidden" id="card-modal">
+        <div class="modal-content glass-card popup-anim">
+            <div class="modal-icon" id="modal-card-icon">💖</div>
+            <h3 id="modal-card-title">卡牌生效！</h3>
+            <p class="modal-body-text" id="modal-card-text">请立刻执行卡牌要求。</p>
+            <button class="btn btn-primary" onclick="closeModal()">遵命！已完成执行</button>
+        </div>
+    </div>
+
+    <script>
+        /* ----------------------------------------------------
+           SweetPact (心动契约) - Cloud Interactive Logic
+        ---------------------------------------------------- */
+
+        // --- Data Models & Game Database ---
+        const GAME_DATABASE = [
+            { name: "双人成行 (It Takes Two)", tag: "safe", badge: "🟢 极低冲突", desc: "TGA年度游戏！极度强调默契配合与相互救赎，剧情温情治愈，完全没有对立冲突。" },
+            { name: "星露谷物语 (Stardew Valley)", tag: "safe", badge: "🟢 极低冲突", desc: "种田、养花、钓鱼、盖房子。零时间压力，享受岁月静好的乡村情侣时光。" },
+            { name: "蛋仔派对 / 猛兽派对", tag: "medium", badge: "🟡 适度配合", desc: "Q萌爆笑派对游戏。就算失误落水也是搞笑效果，不易引发真正生气的吵架。" },
+            { name: "解限机 / 传送门2", tag: "medium", badge: "🟡 适度配合", desc: "烧脑双人解谜或合作打怪，共同克服难关能极大提升情侣间的信任与成就感。" },
+            { name: "王者荣耀 / 英雄联盟排位", tag: "danger", badge: "🔴 高危竞技", desc: "极高冲突！胜负欲过强易引发指挥说教、叹气、怪队友。建议只打娱乐大乱斗。" },
+            { name: "胡闹厨房 (Overcooked)", tag: "danger", badge: "🔴 高危竞技", desc: "俗称‘分手厨房’！高压时间限制极易引发手忙脚乱和互相指责，关系紧张时慎入！" }
+        ];
+
+        const COOLDOWN_TASKS = [
+            "🤗 两人必须保持拥抱10秒钟，并在心里默数10下。",
+            "🍵 给对方递一杯温水或一件小零食，说一句“辛苦啦”。",
+            "👀 眼神对视15秒，期间不许说话，谁先笑谁夸对方一句。",
+            "💆‍♂️ 给对方揉揉肩膀或捏捏脖子30秒。",
+            "🌟 诚恳地夸奖对方今天打游戏或生活中做得最棒的一个地方。"
+        ];
+
+        const NVC_DATABASE = {
+            attitude: [
+                { type: "表达受挫感受", text: "“宝贝，当你刚才语气突然有点硬的时候，我心里其实挺委屈和难过的。我想知道是不是我刚才哪儿没做好让你心烦了？”" },
+                { type: "寻求温和沟通", text: "“我很看重你的温柔，刚才那个不耐烦的语气让我觉得有点被排斥。我们能不能放慢语速、软一点聊聊天呀？”" },
+                { type: "关注对方状态", text: "“你是不是最近工作/学业太累了呀？如果心情不好可以和我倾诉，不要对我憋着坏脾气哦。”" }
+            ],
+            backseat: [
+                { type: "明确独立意愿", text: "“我知道你也是想帮我打好，但我自己探索游戏的乐趣会更多。如果需要指导，我一定第一时间问你，好不好？”" },
+                { type: "降低压力期望", text: "“你的技术真的很棒，但我只是想当个休闲玩家放松一下。咱们不追究完美操作，开开心心打完这局就行啦。”" }
+            ],
+            breakup: [
+                { type: "表达极度不舍", text: "“每次听到‘分手’这两个字，我心里都特别慌。我知道你现在情绪很激动，但我真的很在乎你，我们冷静一下好好解决问题，我不允许你离开。”" },
+                { type: "设立红线共识", text: "“我们吵架归吵架，但能不能把‘分手’这两个字从我们的字典里踢出去？这样我会觉得我们的关系更有安全感。”" }
+            ],
+            ignore: [
+                { type: "渴望陪伴与关注", text: "“你看游戏的时间比看我还多，我都吃醋啦！打完这局能不能陪我聊会天或者抱抱我？”" }
+            ]
+        };
+
+        // --- App State ---
+        let state = {
+            peaceCount: 0,
+            loveCoins: 100,
+            contractSigned: false,
+            partnerA: "",
+            partnerB: "",
+            historyLogs: []
+        };
+
+        // --- Web Audio Synth for Sounds ---
+        function playChimeSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
+                
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch(e) {
+                console.log("Audio play prevented");
+            }
+        }
+
+        // --- Helper: Local cache read ---
+        function safeGet(key, defVal = '') {
+            try {
+                const val = localStorage.getItem(key);
+                return val !== null ? val : defVal;
+            } catch(e) {
+                return defVal;
+            }
+        }
+
+        // --- Helper: Local cache write ---
+        function safeSet(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch(e) {}
+        }
+
+        // --- Initialization ---
+        document.addEventListener("DOMContentLoaded", () => {
+            loadState();
+            initTabs();
+            initGameRecommender();
+            initTiltBreaker();
+            initNVCTranslator();
+            initContract();
+        });
+
+        // --- State Sync (Local Storage + MongoDB Cloud) ---
+        function loadState() {
+            // First load from localStorage to prevent flash of zero
+            const localSaved = safeGet("sweetpact_state");
+            if (localSaved) {
+                try {
+                    state = { ...state, ...JSON.parse(localSaved) };
+                    renderState();
+                    initContractInputs();
+                } catch(e) {}
+            }
+
+            // Sync from MongoDB Cloud database
+            fetch('/api/config')
+                .then(res => res.json())
+                .then(cfg => {
+                    state.peaceCount = cfg.sweetpact_peace_count !== undefined ? parseInt(cfg.sweetpact_peace_count) : 0;
+                    state.loveCoins = cfg.sweetpact_love_coins !== undefined ? parseInt(cfg.sweetpact_love_coins) : 100;
+                    state.contractSigned = cfg.sweetpact_contract_signed === 'true' || cfg.sweetpact_contract_signed === true;
+                    state.partnerA = cfg.sweetpact_partner_a || "";
+                    state.partnerB = cfg.sweetpact_partner_b || "";
+                    
+                    try {
+                        state.historyLogs = cfg.sweetpact_history_logs ? JSON.parse(cfg.sweetpact_history_logs) : [];
+                    } catch(e) {
+                        state.historyLogs = [];
+                    }
+
+                    // Save local copy
+                    safeSet("sweetpact_state", JSON.stringify(state));
+                    renderState();
+                    initContractInputs();
+                })
+                .catch(err => {
+                    console.warn("SweetPact config fetch fallback to localStorage:", err);
+                });
+        }
+
+        function saveState() {
+            // 1. Save to local storage
+            safeSet("sweetpact_state", JSON.stringify(state));
+            renderState();
+
+            // 2. Save to MongoDB Cloud Database
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sweetpact_peace_count: String(state.peaceCount),
+                    sweetpact_love_coins: String(state.loveCoins),
+                    sweetpact_contract_signed: String(state.contractSigned),
+                    sweetpact_partner_a: state.partnerA,
+                    sweetpact_partner_b: state.partnerB,
+                    sweetpact_history_logs: JSON.stringify(state.historyLogs)
+                })
+            }).catch(e => console.error("Cloud SweetPact sync failed:", e));
+        }
+
+        function renderState() {
+            document.getElementById("peace-count").textContent = state.peaceCount;
+            document.getElementById("love-points").textContent = state.loveCoins;
+            document.getElementById("jar-coins-display").textContent = state.loveCoins;
+            
+            const signedEl = document.getElementById("pact-signed-status");
+            if (state.contractSigned) {
+                signedEl.textContent = "已生效 💖";
+                signedEl.style.color = "#06d6a0";
+            } else {
+                signedEl.textContent = "未签署";
+                signedEl.style.color = "#ef476f";
+            }
+
+            renderLogs();
+        }
+
+        function addCoinHistory(text, amount) {
+            const logItem = {
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                text: text,
+                amount: amount
+            };
+            state.historyLogs.unshift(logItem);
+            if (state.historyLogs.length > 20) state.historyLogs.pop();
+            saveState();
+        }
+
+        function renderLogs() {
+            const listEl = document.getElementById("coin-history-list");
+            if (!listEl) return;
+            listEl.innerHTML = "";
+
+            if (state.historyLogs.length === 0) {
+                listEl.innerHTML = `<li class="log-item"><span>暂无记录，快去赚取金币吧！</span></li>`;
+                return;
+            }
+
+            state.historyLogs.forEach(log => {
+                const li = document.createElement("li");
+                li.className = "log-item";
+                const sign = log.amount > 0 ? `+${log.amount}` : `${log.amount}`;
+                const cls = log.amount > 0 ? "log-gain" : "log-spend";
+                li.innerHTML = `
+                    <span>[${log.date}] ${log.text}</span>
+                    <span class="${cls}">${sign} 🪙</span>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // --- Tabs Management ---
+        function initTabs() {
+            const tabBtns = document.querySelectorAll(".tab-btn");
+            const tabPanes = document.querySelectorAll(".tab-pane");
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    tabBtns.forEach(b => b.classList.remove("active"));
+                    tabPanes.forEach(p => p.classList.remove("active"));
+
+                    btn.classList.add("active");
+                    const targetId = btn.getAttribute("data-tab");
+                    document.getElementById(targetId).classList.add("active");
+                });
+            });
+        }
+
+        // --- Game Peace Treaty & Tilt Breaker ---
+        let timerInterval = null;
+
+        function initTiltBreaker() {
+            const startPeaceBtn = document.getElementById("start-peace-game-btn");
+            if (startPeaceBtn) {
+                startPeaceBtn.addEventListener("click", () => {
+                    state.peaceCount += 1;
+                    state.loveCoins += 10;
+                    addCoinHistory("达成和平开黑局共识", 10);
+                    playChimeSound();
+                    alert("🎉 顺利开启“和平保护罩”！爱意金币 +10！加油享受游戏乐趣！");
+                });
+            }
+
+            const triggerBtn = document.getElementById("tilt-trigger-btn");
+            const cooldownBox = document.getElementById("cooldown-box");
+            const timerDisplay = document.getElementById("timer-display");
+            const taskDisplay = document.getElementById("cooldown-task");
+            const stopBtn = document.getElementById("stop-timer-btn");
+
+            if (triggerBtn) {
+                triggerBtn.addEventListener("click", () => {
+                    cooldownBox.classList.remove("hidden");
+                    triggerBtn.classList.add("hidden");
+                    
+                    // Random Task
+                    const randomTask = COOLDOWN_TASKS[Math.floor(Math.random() * COOLDOWN_TASKS.length)];
+                    taskDisplay.textContent = randomTask;
+
+                    // Start 3-minute Countdown (180s)
+                    let secondsLeft = 180;
+                    updateTimerDisplay(secondsLeft, timerDisplay);
+
+                    clearInterval(timerInterval);
+                    timerInterval = setInterval(() => {
+                        secondsLeft--;
+                        updateTimerDisplay(secondsLeft, timerDisplay);
+
+                        if (secondsLeft <= 0) {
+                            clearInterval(timerInterval);
+                            playChimeSound();
+                            alert("⏰ 3分钟冷却结束！请执行完小任务，给对方一个微笑再重新开始哦！");
+                            cooldownBox.classList.add("hidden");
+                            triggerBtn.classList.remove("hidden");
+                        }
+                    }, 1000);
+                });
+            }
+
+            if (stopBtn) {
+                stopBtn.addEventListener("click", () => {
+                    clearInterval(timerInterval);
+                    cooldownBox.classList.add("hidden");
+                    triggerBtn.classList.remove("hidden");
+                });
+            }
+        }
+
+        function updateTimerDisplay(totalSeconds, displayEl) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            displayEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // --- Game Recommender ---
+        function initGameRecommender() {
+            const grid = document.getElementById("game-list");
+            const filterBtns = document.querySelectorAll(".filter-pills .pill-btn");
+
+            function renderGames(filter = "all") {
+                grid.innerHTML = "";
+                const filtered = filter === "all" ? GAME_DATABASE : GAME_DATABASE.filter(g => g.tag === filter);
+
+                filtered.forEach(game => {
+                    const card = document.createElement("div");
+                    card.className = "game-item-card";
+                    card.innerHTML = `
+                        <div class="game-header">
+                            <span class="game-title">${game.name}</span>
+                            <span class="game-badge badge-${game.tag}">${game.badge}</span>
+                        </div>
+                        <p class="game-desc">${game.desc}</p>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    filterBtns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    renderGames(btn.getAttribute("data-filter"));
+                });
+            });
+
+            renderGames();
+        }
+
+        // --- NVC Script Reframer ---
+        function initNVCTranslator() {
+            const select = document.getElementById("preset-conflict-select");
+            const customBox = document.getElementById("custom-input-box");
+            const reframeBtn = document.getElementById("reframe-btn");
+            const resultsBox = document.getElementById("reframed-results-box");
+            const resultsList = document.getElementById("result-cards-list");
+
+            select.addEventListener("change", () => {
+                if (select.value === "custom") {
+                    customBox.classList.remove("hidden");
+                } else {
+                    customBox.classList.add("hidden");
+                }
+            });
+
+            reframeBtn.addEventListener("click", () => {
+                const val = select.value;
+                resultsList.innerHTML = "";
+                let items = [];
+
+                if (val === "custom") {
+                    const customText = document.getElementById("custom-angry-text").value.trim();
+                    if (!customText) {
+                        alert("请先输入你原本想脱口而出的话哦！");
+                        return;
+                    }
+                    items = [
+                        { type: "万能温柔表达公式", text: `“宝贝，当你说‘${customText}’的时候，我心里其实挺委屈的。我更希望能听到你温柔一点和我沟通，好不好呀？”` },
+                        { type: "倾听与关怀转化", text: `“我知道你现在有些情绪，但我也很在乎你的想法。我们先不赌气，你告诉我你真正需要我做什么，好吗？”` }
+                    ];
+                } else {
+                    items = NVC_DATABASE[val] || [];
+                }
+
+                items.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "nvc-result-card";
+                    card.innerHTML = `
+                        <button class="copy-btn" onclick="copyToClipboard('${escapeQuotes(item.text)}')">复制话术</button>
+                        <div class="nvc-tag">${item.type}</div>
+                        <div class="nvc-text">${item.text}</div>
+                    `;
+                    resultsList.appendChild(card);
+                });
+
+                resultsBox.classList.remove("hidden");
+            });
+        }
+
+        function escapeQuotes(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        window.copyToClipboard = function(text) {
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text.replace(/&quot;/g, '"');
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("📋 话术已复制！快去真诚地念给对方听或发送给他吧！");
+        }
+
+        // --- Cards Modal ---
+        const CARD_DETAILS = {
+            hug: { icon: "🤗", title: "抱抱卡生效！", text: "根据卡牌规定，请立刻给对方一个深深的拥抱，持续至少10秒钟，拥抱期间不准说话！" },
+            pause: { icon: "⏸️", title: "15分钟冷静卡生效！", text: "即刻中断所有非理性讨论！接下来的15分钟内，双方只能喝水、吃零食或各自听音乐发呆。" },
+            soft: { icon: "🥺", title: "语气软化卡生效！", text: "对方必须清清嗓子，用最软萌、温柔的声音，把刚才吵架的那句话重新说一遍。" },
+            praise: { icon: "🌟", title: "互夸卡生效！", text: "请双方看着对方的眼睛，轮流真诚地夸奖对方3个优点！" },
+            game_immune: { icon: "🛡️", title: "下饭豁免卡生效！", text: "本局游戏内，任何死掉、漏菜或失误操作均拥有免死权，禁止任何形式 of 追责与吐槽！" },
+            no_breakup: { icon: "🚫", title: "分手禁令生效！", text: "封印本次对话中的‘分手’词汇！任何提分手的念头立刻作废！" }
+        };
+
+        window.triggerCardModal = function(cardKey) {
+            const modal = document.getElementById("card-modal");
+            const data = CARD_DETAILS[cardKey];
+            if (!data) return;
+
+            document.getElementById("modal-card-icon").textContent = data.icon;
+            document.getElementById("modal-card-title").textContent = data.title;
+            document.getElementById("modal-card-text").textContent = data.text;
+
+            modal.classList.remove("hidden");
+            playChimeSound();
+        }
+
+        window.closeModal = function() {
+            document.getElementById("card-modal").classList.add("hidden");
+        }
+
+        // --- Breakup Ban Contract ---
+        function initContract() {
+            const signBtn = document.getElementById("sign-contract-btn");
+            if (!signBtn) return;
+
+            signBtn.addEventListener("click", () => {
+                const partnerA = document.getElementById("partner-a-name");
+                const partnerB = document.getElementById("partner-b-name");
+                const valA = partnerA.value.trim();
+                const valB = partnerB.value.trim();
+
+                if (!valA || !valB) {
+                    alert("请在契约下方写下你们双方的名字/昵称哦！");
+                    return;
+                }
+
+                state.contractSigned = true;
+                state.partnerA = valA;
+                state.partnerB = valB;
+                state.loveCoins += 50;
+
+                addCoinHistory("正式签署《绝不轻言分手契约》", 50);
+                initContractInputs();
+                playChimeSound();
+                alert(`💖 恭喜 ${valA} 与 ${valB} 正式盖章签署《绝不轻言分手契约》！爱意金币 +50！愿你们永结同心，不离不弃！`);
+                saveState();
+            });
+        }
+
+        function initContractInputs() {
+            const partnerA = document.getElementById("partner-a-name");
+            const partnerB = document.getElementById("partner-b-name");
+            const signBtn = document.getElementById("sign-contract-btn");
+            const stamp = document.getElementById("contract-stamp");
+
+            if (!partnerA || !partnerB || !signBtn || !stamp) return;
+
+            if (state.contractSigned) {
+                partnerA.value = state.partnerA || "";
+                partnerB.value = state.partnerB || "";
+                partnerA.disabled = true;
+                partnerB.disabled = true;
+                stamp.textContent = "已盖章";
+                stamp.classList.add("signed");
+                signBtn.textContent = "✅ 契约已生效并归档";
+                signBtn.disabled = true;
+            } else {
+                partnerA.value = "";
+                partnerB.value = "";
+                partnerA.disabled = false;
+                partnerB.disabled = false;
+                stamp.textContent = "未盖章";
+                stamp.classList.remove("signed");
+                signBtn.textContent = "🖋️ 双方确认并盖上【爱意印章】";
+                signBtn.disabled = false;
+            }
+        }
+
+        // --- Love Jar Rewards ---
+        window.redeemReward = function(name, cost) {
+            if (state.loveCoins < cost) {
+                alert(`🪙 爱意金币不足哦！当前只有 ${state.loveCoins} 🪙，还需要 ${cost - state.loveCoins} 🪙。多去完成和平开黑局吧！`);
+                return;
+            }
+
+            if (confirm(`确定花费 ${cost} 🪙 兑换【${name}】吗？`)) {
+                state.loveCoins -= cost;
+                addCoinHistory(`兑换特权：${name}`, -cost);
+                playChimeSound();
+                alert(`🎉 成功兑换【${name}】！凭证已记录在案，请凭此券要求对方履行特权服务哦！`);
+                saveState();
+            }
+        }
+    </script>
+</body>
+</html>

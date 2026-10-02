@@ -2503,10 +2503,24 @@
         }
     }
 
-    // 📱 PWA / 安卓 App Service Worker 自动注册
+    // 📱 PWA / 安卓 App Service Worker 自动注册与强制升级
+    if ('caches' in window) {
+        // 清理旧版本缓存
+        caches.keys().then((keys) => {
+            keys.forEach((key) => {
+                if (key === 'love-cabin-v1') {
+                    caches.delete(key);
+                }
+            });
+        });
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+            navigator.serviceWorker.register('/sw.js').then((reg) => {
+                // 每次访问主动检查 SW 更新
+                if (reg) reg.update().catch(() => {});
+            }).catch(() => {});
         });
     }
 

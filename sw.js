@@ -1,5 +1,5 @@
 // Service Worker for Love Cabin PWA / Android App
-const CACHE_NAME = 'love-cabin-v1';
+const CACHE_NAME = 'love-cabin-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -31,12 +31,28 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  // 对于 API 请求走网络优先，对于静态资源走缓存+网络
-  if (e.request.url.includes('/api/')) {
+
+  // API 请求与页面导航 (HTML) 走网络优先，离线时回退到缓存
+  const isApi = e.request.url.includes('/api/');
+  const isHtml = e.request.mode === 'navigate' ||
+                 (e.request.headers.get('accept') && e.request.headers.get('accept').includes('text/html')) ||
+                 e.request.url.endsWith('/') ||
+                 e.request.url.includes('.html');
+
+  if (isApi || isHtml) {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
+      fetch(e.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && isHtml) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(e.request))
     );
   } else {
+    // 静态资源（CSS, JS, 图片等）
     e.respondWith(
       caches.match(e.request).then((cachedResponse) => {
         return cachedResponse || fetch(e.request).then((networkResponse) => {

@@ -121,8 +121,8 @@ git push -u origin main -f
 if ($LASTEXITCODE -eq 0) {
     Write-Host "============================================="
     Write-Host " Success! Code pushed to GitHub successfully!"
-    Write-Host " Vercel will automatically redeploy at:"
-    Write-Host " https://love-zpp.vercel.app"
+    Write-Host " Render will automatically redeploy at:"
+    Write-Host " https://love-cabin.onrender.com/"
     Write-Host "============================================="
 } else {
     Write-Host "Push failed. Please check your network and account."

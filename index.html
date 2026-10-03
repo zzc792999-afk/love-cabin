@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <link rel="stylesheet" href="style.css?v=3.1">
 </head>
 <body>
 
@@ -33,15 +33,19 @@
     <div id="welcome-toast" class="toast-message">珊珊宝贝，欢迎来到属于我们的时光小屋！mua~ ❤️</div>
 
     <div class="container">
-        <!-- 头部标题 (带主题切换按钮) -->
-        <header>
-            <!-- 👩‍❤️‍👨 角色视角切换按钮 -->
-            <button id="role-toggle" class="role-toggle-btn" title="切换当前玩家视角 (祖哲 / 珊珊)" style="position: absolute; top: 20px; left: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); border: var(--border-glass); box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: all 0.3s; z-index: 100;">
+        <!-- 📱 手机端/全端专属顶栏：角色视角切换 + 居中灵动岛 + 主题切换 (彻底杜绝重叠冲突) -->
+        <div class="top-nav-bar">
+            <button id="role-toggle" class="nav-circle-btn role-toggle-btn" title="切换当前玩家视角 (祖哲 / 珊珊)">
                 <span id="role-indicator-icon">👩</span>
             </button>
-            <button id="theme-toggle" class="theme-toggle-btn" title="一键切换 梦幻樱粉 / 极光暗夜">
+            <div id="dynamic-island-slot" class="island-slot-container"></div>
+            <button id="theme-toggle" class="nav-circle-btn theme-toggle-btn" title="一键切换 梦幻樱粉 / 极光暗夜">
                 <i class="fas fa-moon"></i>
             </button>
+        </div>
+
+        <!-- 头部标题 -->
+        <header class="main-header">
             <h1 class="header-title"><i class="fas fa-heart"></i> 致<span id="header-girlfriend-name">珊珊</span>宝贝 <i class="fas fa-heart"></i></h1>
             <p class="subtitle">记录我们的相遇、重逢与未来的每一天</p>
         </header>
@@ -81,17 +85,17 @@
             </div>
 
             <!-- 📖 青春回忆录与毕业之约入口横幅 -->
-            <div class="glass-panel" style="background: linear-gradient(135deg, rgba(255, 117, 151, 0.22), rgba(161, 127, 224, 0.2), rgba(249, 168, 38, 0.15)); border: 1px solid rgba(255, 117, 151, 0.45); border-radius: 20px; padding: 18px 20px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 25px rgba(255, 117, 151, 0.2);" onclick="window.location.href='memory.html'">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 2.2rem; background: rgba(255, 255, 255, 0.15); border-radius: 16px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📖</div>
-                    <div>
-                        <h4 style="font-size: 1.08rem; color: #fff; margin-bottom: 4px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
-                            时光回忆录 · 青春与毕业之约 <span style="font-size: 0.72rem; background: var(--primary); padding: 2px 8px; border-radius: 10px; font-weight: bold;">NEW</span>
+            <div class="glass-panel memory-banner" onclick="window.location.href='memory.html'">
+                <div class="memory-banner-left">
+                    <div class="memory-banner-icon">📖</div>
+                    <div class="memory-banner-text">
+                        <h4>
+                            时光回忆录 · 青春与毕业之约 <span class="memory-banner-tag">NEW</span>
                         </h4>
-                        <p style="font-size: 0.82rem; color: #ffd3dc;">「暂别的日子里，我们在各自跑道上拼尽全力，顶峰相见！」</p>
+                        <p>「暂别的日子里，我们在各自跑道上拼尽全力，顶峰相见！」</p>
                     </div>
                 </div>
-                <button class="btn-primary" style="padding: 9px 18px; font-size: 0.85rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0;">翻开 <i class="fas fa-arrow-right"></i></button>
+                <button class="btn-primary memory-banner-btn">翻开 <i class="fas fa-arrow-right"></i></button>
             </div>
 
             <!-- 欢迎与寄语 -->
@@ -135,7 +139,7 @@
             <div class="glass-panel" style="margin-bottom: 25px;">
                 <div class="card-glare"></div>
                 <h3 style="color: var(--primary-dark); text-align: center; margin-bottom: 25px; font-size: 1.5rem;"><i class="fas fa-trophy"></i> 我们的心动勋章墙</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; justify-content: center;">
+                <div class="medals-grid">
                     <!-- Badge 1: 终身契约 -->
                     <div class="medal-badge" id="badge-contract" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px 10px; text-align: center; transition: all 0.3s ease; filter: grayscale(1); opacity: 0.4;" title="签署心动契约">
                         <div style="font-size: 2.2rem; margin-bottom: 8px;">🤝</div>
@@ -173,7 +177,7 @@
             <div class="glass-panel">
                 <div class="card-glare"></div>
                 <h3 style="color: var(--text-color); text-align: center; margin-bottom: 25px; font-size: 1.5rem;"><i class="far fa-clock"></i> 属于我们的重要日子</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="important-dates-grid">
                     <!-- 🎉 300天纪念日倒计时 (重点高亮) -->
                     <div style="background: linear-gradient(135deg, rgba(255,117,151,0.15), rgba(161,127,224,0.15)); border-radius: 16px; padding: 20px; text-align: center; border: 2px solid rgba(255,117,151,0.35); transition: background 0.8s, border 0.8s; grid-column: 1 / -1; position: relative; overflow: hidden;">
                         <div style="position: absolute; top: 10px; right: 15px; font-size: 0.75rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 4px 14px; border-radius: 20px; font-weight: 700;">🎯 里程碑</div>
@@ -455,12 +459,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=3.0"></script>
+    <script src="app.js?v=3.1"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=3.0"></script>
+    <script src="js/cabin3d.js?v=3.1"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=3.0"></script>
+    <script src="js/features3.js?v=3.1"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

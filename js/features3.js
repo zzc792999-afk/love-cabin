@@ -33,8 +33,9 @@
 
     // 1. 创建顶部灵动岛胶囊状态栏 (极简、轻盈)
     function createDynamicIsland() {
+        const slot = document.getElementById('dynamic-island-slot');
         const header = document.querySelector('header');
-        if (!header) return;
+        if (!slot && !header) return;
 
         const island = document.createElement('div');
         island.className = 'dynamic-island';
@@ -44,7 +45,7 @@
                 <!-- 在线状态 -->
                 <div class="island-section status-sec">
                     <span class="online-dot"></span>
-                    <span class="status-text">珊珊&臭臭 · 恋爱同频中</span>
+                    <span class="status-text"><span class="name-prefix">珊珊&臭臭 · </span>恋爱同频中</span>
                 </div>
 
                 <!-- 远程心跳戳一戳 -->
@@ -61,7 +62,11 @@
             </div>
         `;
 
-        header.insertBefore(island, header.firstChild);
+        if (slot) {
+            slot.appendChild(island);
+        } else {
+            header.insertBefore(island, header.firstChild);
+        }
     }
 
     // 3. 远程心跳戳一戳动效
@@ -146,6 +151,9 @@
         document.getElementById('vault-close-btn').addEventListener('click', () => {
             modal.classList.remove('active');
         });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
 
         // 兑换事件
         modal.querySelectorAll('.wish-buy-btn').forEach(btn => {
@@ -218,6 +226,9 @@
 
         document.getElementById('digest-close-btn').addEventListener('click', () => {
             modal.classList.remove('active');
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
         });
 
         // 暴露全局触发

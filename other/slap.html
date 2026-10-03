@@ -231,7 +231,7 @@
         .stage-wrapper {
             position: relative;
             width: 100%;
-            height: 400px;
+            height: min(400px, 115vw);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -241,8 +241,8 @@
 
         /* 击打区 */
         .character-card {
-            width: 300px;
-            height: 370px;
+            width: min(300px, 86vw);
+            height: min(370px, 106vw);
             border-radius: 36px;
             background: #fff;
             border: 4px solid rgba(255, 255, 255, 0.9);
@@ -534,6 +534,24 @@
 
         .btn-apology-view:active {
             transform: scale(0.95);
+        }
+
+        @media (max-width: 380px) {
+            .weapon-bar {
+                padding: 8px 6px;
+                gap: 4px;
+            }
+            .weapon-btn {
+                padding: 7px 4px 5px;
+                font-size: 0.65rem;
+            }
+            .weapon-btn span.icon {
+                font-size: 1.35rem;
+            }
+            .action-btn {
+                padding: 12px 6px;
+                font-size: 0.82rem;
+            }
         }
 
         /* 终极大认错弹窗 (跪地比心专属照片) */

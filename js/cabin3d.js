@@ -424,15 +424,39 @@
         dom.addEventListener('mousemove', onPointerMove);
         window.addEventListener('mouseup', onPointerUp);
 
+        let touchStartPos = { x: 0, y: 0 };
+        let isTouchScrolling = false;
+
         dom.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) onPointerDown(e.touches[0]);
-        }, { passive: false });
+            if (e.touches.length === 1) {
+                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                isTouchScrolling = false;
+                onPointerDown(e.touches[0]);
+            }
+        }, { passive: true });
 
         dom.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1) onPointerMove(e.touches[0]);
-        }, { passive: false });
+            if (e.touches.length === 1) {
+                if (touchStartPos && !isTouchScrolling) {
+                    const dx = Math.abs(e.touches[0].clientX - touchStartPos.x);
+                    const dy = Math.abs(e.touches[0].clientY - touchStartPos.y);
+                    // 纵向滑动大于横向滑动并超过微小阈值，判定为手机端常规滚动，放行原生滚动
+                    if (dy > dx && dy > 8) {
+                        isTouchScrolling = true;
+                        isDragging = false;
+                        return;
+                    }
+                }
+                if (!isTouchScrolling) {
+                    onPointerMove(e.touches[0]);
+                }
+            }
+        }, { passive: true });
 
-        window.addEventListener('touchend', onPointerUp);
+        window.addEventListener('touchend', (e) => {
+            isTouchScrolling = false;
+            onPointerUp(e);
+        });
 
         window.addEventListener('resize', () => {
             if (!renderer || !camera || !container) return;

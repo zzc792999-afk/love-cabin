@@ -790,9 +790,22 @@
                 <div class="setting-title" style="margin-bottom: 10px;">
                     <i class="fas fa-gift"></i> 珊珊卡券背包管理 (实时云数据库)
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
                     实时显示并调整珊珊在扭蛋机中抽得的所有奖品券数。您可以直接加减卡券的数量，点击确认后实时写入云端背包。
                 </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted);">
+                        <i class="fas fa-boxes-stacked"></i> 当前扭蛋背包卡片存量
+                    </span>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-helper" id="btn-clear-all-gashapon-cards" style="color: #ff4757; border-color: rgba(255,71,87,0.4); margin: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: bold;">
+                            <i class="fas fa-trash-can"></i> 一键清空扭蛋背包卡片 (归零)
+                        </button>
+                        <button class="btn-helper" id="btn-clear-entire-inventory-1" style="color: #ff4757; border-color: rgba(255,71,87,0.6); background: rgba(255,71,87,0.12); margin: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: bold;">
+                            <i class="fas fa-broom"></i> 🚨 清空全站所有卡片 (全部彻底归零)
+                        </button>
+                    </div>
+                </div>
                 <div id="backpack-list-element" style="display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                     <!-- 动态载入珊珊的背包卡片 -->
                 </div>
@@ -821,9 +834,9 @@
                         <label style="align-self: start; padding-top: 5px;">卡券描述:</label>
                         <textarea id="add-prize-desc" placeholder="例如: 凭此卡可向哲哲兑换超大啵啵一个，即刻生效！" rows="2" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 6px 10px; border-radius: 4px; resize: vertical; font-family: inherit;"></textarea>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn-submit" id="btn-add-custom-prize" style="flex: 1; margin: 0; font-size: 0.85rem;"><i class="fas fa-plus"></i> 确认添加奖品进入奖池</button>
-                        <button class="btn-submit" id="btn-reset-default-prizes" style="background:#ffa502; border-color:#ffa502; margin: 0; font-size: 0.85rem; max-width: 250px;"><i class="fas fa-rotate-left"></i> 一键还原为出厂默认卡券 (清空修改)</button>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <button class="btn-submit" id="btn-add-custom-prize" style="flex: 1; min-width: 200px; margin: 0; font-size: 0.85rem;"><i class="fas fa-plus"></i> 确认添加奖品进入奖池</button>
+                        <button class="btn-submit" id="btn-reset-default-prizes" style="background:#ffa502; border-color:#ffa502; margin: 0; font-size: 0.85rem; max-width: 320px;"><i class="fas fa-rotate-left"></i> 一键重置奖池为出厂模板 (清空自定义添加)</button>
                     </div>
                 </div>
             </div>
@@ -899,9 +912,22 @@
                 <div class="setting-title" style="margin-bottom: 10px;">
                     <i class="fas fa-gift"></i> 珊珊刮刮乐卡券背包管理 (实时云数据库)
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
                     实时显示并调整珊珊通过刮刮乐获得的卡券数量。您可以直接加减卡券的数量，点击确认后实时写入云端背包。
                 </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted);">
+                        <i class="fas fa-boxes-stacked"></i> 当前刮刮乐背包卡片存量
+                    </span>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-helper" id="btn-clear-all-scratch-cards" style="color: #ff4757; border-color: rgba(255,71,87,0.4); margin: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: bold;">
+                            <i class="fas fa-trash-can"></i> 一键清空刮刮乐背包卡片 (归零)
+                        </button>
+                        <button class="btn-helper" id="btn-clear-entire-inventory-2" style="color: #ff4757; border-color: rgba(255,71,87,0.6); background: rgba(255,71,87,0.12); margin: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: bold;">
+                            <i class="fas fa-broom"></i> 🚨 清空全站所有卡片 (全部彻底归零)
+                        </button>
+                    </div>
+                </div>
                 <div id="scratch-backpack-list-element" style="display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                     <!-- 动态载入珊珊的刮刮乐背包卡片 -->
                 </div>
@@ -932,9 +958,9 @@
                         <label style="align-self: start; padding-top: 5px;">卡券描述:</label>
                         <textarea id="add-scratch-prize-desc" placeholder="例如: 兑换爆米花一大桶，随时有效..." rows="2" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 6px 10px; border-radius: 4px; resize: vertical; font-family: inherit;"></textarea>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn-submit" id="btn-add-custom-scratch-prize" style="flex: 1; margin: 0; font-size: 0.85rem;"><i class="fas fa-plus"></i> 确认添加卡片进入刮刮乐</button>
-                        <button class="btn-submit" id="btn-reset-default-scratch-prizes" style="background:#ffa502; border-color:#ffa502; margin: 0; font-size: 0.85rem; max-width: 250px;"><i class="fas fa-rotate-left"></i> 还原为默认刮刮乐卡片 (清空修改)</button>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <button class="btn-submit" id="btn-add-custom-scratch-prize" style="flex: 1; min-width: 200px; margin: 0; font-size: 0.85rem;"><i class="fas fa-plus"></i> 确认添加卡片进入刮刮乐</button>
+                        <button class="btn-submit" id="btn-reset-default-scratch-prizes" style="background:#ffa502; border-color:#ffa502; margin: 0; font-size: 0.85rem; max-width: 320px;"><i class="fas fa-rotate-left"></i> 还原刮刮乐奖池为出厂模板 (清空自定义添加)</button>
                     </div>
                 </div>
             </div>
@@ -974,6 +1000,11 @@
                 <div class="form-group">
                     <label><i class="fas fa-tree"></i> 爱意树当前成长养分值 (treePoints)</label>
                     <input type="number" id="input-tree-points" min="0" placeholder="如: 15">
+                </div>
+                <!-- 纪念日暗号密码 -->
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> 纪念日密码 (Password)</label>
+                    <input type="text" id="input-anniversary-password" placeholder="如: 100417">
                 </div>
                 <button class="btn-submit" id="btn-save-dates">
                     <i class="fas fa-save"></i> 保存纪念日与恋爱统计设定
@@ -1537,32 +1568,38 @@
         }
 
         function applyConfigToInputs() {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = (val !== undefined && val !== null) ? val : '';
+            };
+
             // --- 1. 扭蛋机会次数 ---
-            const extraSpins = safeGet('gashapon_extra_spins', '0');
-            document.getElementById('spins-input').value = extraSpins;
+            setVal('spins-input', safeGet('gashapon_extra_spins', '0'));
 
             // --- 2. 扭蛋无限模式 ---
             const isInfinite = safeGet('gashapon_infinite_spins') === 'true';
             const toggle = document.getElementById('infinite-toggle');
             const infStatus = document.getElementById('inf-status');
-            toggle.checked = isInfinite;
-            infStatus.textContent = isInfinite ? '已开启' : '已关闭';
-            infStatus.style.color = isInfinite ? 'var(--secondary)' : 'var(--text-muted)';
+            if (toggle) toggle.checked = isInfinite;
+            if (infStatus) {
+                infStatus.textContent = isInfinite ? '已开启' : '已关闭';
+                infStatus.style.color = isInfinite ? 'var(--secondary)' : 'var(--text-muted)';
+            }
 
             // --- 3. 密钥兑换报表 ---
             renderKeys();
 
             // --- 4. 纪念日/里程碑日期载入 ---
-            document.getElementById('input-meet-date').value = safeGet('config_meet_date', '2024-05-03');
-            document.getElementById('input-reunion-date').value = safeGet('config_reunion_date', '2026-01-18');
-            document.getElementById('input-countdown-target').value = safeGet('config_countdown_target', '2026-08-05');
-            document.getElementById('input-countdown-title').value = safeGet('config_countdown_title', '在一起第 200 天');
+            setVal('input-meet-date', safeGet('config_meet_date', '2024-05-03'));
+            setVal('input-reunion-date', safeGet('config_reunion_date', '2026-01-18'));
+            setVal('input-countdown-target', safeGet('config_countdown_target', '2026-08-05'));
+            setVal('input-countdown-title', safeGet('config_countdown_title', '在一起第 200 天'));
 
             // --- 5. 公告内容载入 ---
-            document.getElementById('input-announcement').value = safeGet('config_custom_announcement');
+            setVal('input-announcement', safeGet('config_custom_announcement'));
 
             // --- 5.5 爱意树养分值载入 ---
-            document.getElementById('input-tree-points').value = safeGet('tree_points') || safeGet('treePoints') || '15';
+            setVal('input-tree-points', safeGet('tree_points') || safeGet('treePoints') || '15');
 
             // --- 5.6 答题与拼图游戏云端通关状态刷新 ---
             const quizCompleted = safeGet('quiz_completed') === 'true';
@@ -1582,19 +1619,18 @@
             }
 
             // --- 5.7 纪念日密码载入 ---
-            document.getElementById('input-anniversary-password').value = safeGet('config_anniversary_password', '100417');
+            setVal('input-anniversary-password', safeGet('config_anniversary_password', '100417'));
 
             // --- 5.8 甜蜜对话剧本载入 ---
-            document.getElementById('chat-reply-miss').value = safeGet('chat_reply_miss', '');
-            document.getElementById('chat-reply-hug').value = safeGet('chat_reply_hug', '');
-            document.getElementById('chat-reply-coax').value = safeGet('chat_reply_coax', '');
+            setVal('chat-reply-miss', safeGet('chat_reply_miss', ''));
+            setVal('chat-reply-hug', safeGet('chat_reply_hug', ''));
+            setVal('chat-reply-coax', safeGet('chat_reply_coax', ''));
 
             // --- 5.9 扭蛋机配置与背包载入 ---
             syncGashaponAdminData();
 
             // --- 5.9.1 刮刮乐次数与模式载入 ---
-            const scratchExtraSpins = safeGet('scratch_extra_spins', '0');
-            document.getElementById('scratch-spins-input').value = scratchExtraSpins;
+            setVal('scratch-spins-input', safeGet('scratch_extra_spins', '0'));
 
             const isScratchInfinite = safeGet('scratch_infinite_spins') === 'true';
             const scratchToggle = document.getElementById('scratch-infinite-toggle');
@@ -2113,6 +2149,7 @@
 
             renderBackpackAdmin();
             renderPrizePoolAdmin();
+            renderScratchPrizePoolAdmin();
         }
 
         function renderBackpackAdmin() {
@@ -2187,6 +2224,56 @@
                 gashapon_inventory: JSON.stringify(adminInventory)
             });
         };
+
+        // 🗑️ 一键清空扭蛋背包卡片 (归零)
+        function clearGashaponBackpack() {
+            if (!confirm('确定要清空珊珊扭蛋背包里的所有特权卡吗？\n\n清空后扭蛋抽得的所有卡片数量将全部归零！')) return;
+            adminPrizes.forEach(p => {
+                delete adminInventory[p.id];
+            });
+            renderBackpackAdmin();
+            safeSet('gashapon_inventory', JSON.stringify(adminInventory));
+            saveConfigToServer({
+                gashapon_inventory: JSON.stringify(adminInventory)
+            }, '🗑️ 扭蛋背包中的所有特权卡片已全部清空归零！');
+        }
+
+        // 🗑️ 一键清空刮刮乐背包卡片 (归零)
+        function clearScratchBackpack() {
+            if (!confirm('确定要清空珊珊刮刮乐背包里的所有特权卡吗？\n\n清空后刮出的所有卡片数量将全部归零！')) return;
+            scratchPrizes.forEach(p => {
+                delete adminInventory[p.id];
+            });
+            renderBackpackAdmin();
+            safeSet('gashapon_inventory', JSON.stringify(adminInventory));
+            saveConfigToServer({
+                gashapon_inventory: JSON.stringify(adminInventory)
+            }, '🗑️ 刮刮乐背包中的所有特权卡片已全部清空归零！');
+        }
+
+        // 🚨 一键清空全站所有卡片 (全部彻底归零)
+        function clearEntireInventory() {
+            if (!confirm('🚨 警告：确定要一键清空珊珊背包里的【全部所有特权卡片】吗？\n\n（扭蛋机 + 刮刮乐所有已抽取的卡券将彻底清空归零，不可撤销）')) return;
+            adminInventory = {};
+            renderBackpackAdmin();
+            safeSet('gashapon_inventory', JSON.stringify(adminInventory));
+            saveConfigToServer({
+                gashapon_inventory: JSON.stringify(adminInventory)
+            }, '🗑️ 全站背包中的所有特权卡片已彻底清空归零！');
+        }
+
+        // 绑定清空按钮事件
+        const btnClearGashapon = document.getElementById('btn-clear-all-gashapon-cards');
+        if (btnClearGashapon) btnClearGashapon.addEventListener('click', clearGashaponBackpack);
+
+        const btnClearScratch = document.getElementById('btn-clear-all-scratch-cards');
+        if (btnClearScratch) btnClearScratch.addEventListener('click', clearScratchBackpack);
+
+        const btnClearAll1 = document.getElementById('btn-clear-entire-inventory-1');
+        if (btnClearAll1) btnClearAll1.addEventListener('click', clearEntireInventory);
+
+        const btnClearAll2 = document.getElementById('btn-clear-entire-inventory-2');
+        if (btnClearAll2) btnClearAll2.addEventListener('click', clearEntireInventory);
 
         let editingPrizeId = null;
 
@@ -2318,15 +2405,18 @@
             }, '🎉 成功添加新自定义卡券至扭蛋奖池！');
         });
 
-        document.getElementById('btn-reset-default-prizes').addEventListener('click', () => {
-            if (!confirm('🚨 警告：此操作将清空您之前对卡池做的所有自定义修改，并强制恢复为系统最原始的 11 张卡券模板。如果您刚才在卡片上做了【编辑修改】，请不要点击此按钮！确定要清除所有修改并恢复出厂设置吗？')) return;
-            adminPrizes = [...DEFAULT_PRIZES];
-            renderPrizePoolAdmin();
-            renderBackpackAdmin();
-            saveConfigToServer({
-                gashapon_prizes: JSON.stringify(adminPrizes)
-            }, '🍕 奖池已成功还原为全新默认11张卡券模板并同步至云端！');
-        });
+        const btnResetPrizes = document.getElementById('btn-reset-default-prizes');
+        if (btnResetPrizes) {
+            btnResetPrizes.addEventListener('click', () => {
+                if (!confirm('🚨 此操作将重置扭蛋奖池为出厂默认的 11 张卡券模板（清空您自定义新增或编辑的卡券）。\n\n💡 提示：此操作仅重置奖池可抽取的卡片种类，不会清除珊珊背包中已经抽到的卡券！若要清空已获得的卡券，请点击上方红色的【一键清空扭蛋背包卡片】按钮。\n\n确定要恢复默认奖池模板吗？')) return;
+                adminPrizes = [...DEFAULT_PRIZES];
+                renderPrizePoolAdmin();
+                renderBackpackAdmin();
+                saveConfigToServer({
+                    gashapon_prizes: JSON.stringify(adminPrizes)
+                }, '🍕 扭蛋奖池已成功还原为全新默认11张卡券模板并同步至云端！');
+            });
+        }
 
         // ================================================================
         // 🎟️ 刮刮乐卡池的编辑与同步控制逻辑
@@ -2461,15 +2551,18 @@
             }, '🎉 成功添加新自定义卡券至刮刮乐奖池！');
         });
 
-        document.getElementById('btn-reset-default-scratch-prizes').addEventListener('click', () => {
-            if (!confirm('🚨 警告：此操作将清空您之前对刮刮乐奖池做的所有自定义修改，并恢复出厂默认配置。确定吗？')) return;
-            scratchPrizes = [...DEFAULT_SCRATCH_PRIZES];
-            renderScratchPrizePoolAdmin();
-            renderBackpackAdmin();
-            saveConfigToServer({
-                scratch_prizes: JSON.stringify(scratchPrizes)
-            }, '🍕 刮刮乐奖池已还原为默认模板并同步至云端！');
-        });
+        const btnResetScratchPrizes = document.getElementById('btn-reset-default-scratch-prizes');
+        if (btnResetScratchPrizes) {
+            btnResetScratchPrizes.addEventListener('click', () => {
+                if (!confirm('🚨 此操作将恢复刮刮乐奖池为出厂默认配置（清空您自定义新增或编辑的卡券）。\n\n💡 提示：此操作仅重置奖池可刮出的卡片种类，不会清除珊珊背包中已经获得的卡券！若要清空已获得的卡券，请点击上方红色的【一键清空刮刮乐背包卡片】按钮。\n\n确定要恢复默认刮刮乐奖池吗？')) return;
+                scratchPrizes = [...DEFAULT_SCRATCH_PRIZES];
+                renderScratchPrizePoolAdmin();
+                renderBackpackAdmin();
+                saveConfigToServer({
+                    scratch_prizes: JSON.stringify(scratchPrizes)
+                }, '🍕 刮刮乐奖池已还原为默认模板并同步至云端！');
+            });
+        }
 
         // ================================================================
         // 💖 恋爱心愿单管理模块 (API 桥接)

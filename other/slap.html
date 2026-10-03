@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💢 珊珊专属出气筒 · 暴揍臭臭</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #ff477e;
+            --primary-light: #ff758f;
+            --primary-bg: #fff0f3;
+            --accent: #7b2cbf;
+            --gold: #ffb703;
+            --glass-bg: rgba(255, 255, 255, 0.72);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 10px 30px rgba(255, 71, 126, 0.15);
+            --text-dark: #2b2d42;
+            --text-muted: #8d99ae;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background: linear-gradient(145deg, #ffd6e0 0%, #ffefef 45%, #ffccd5 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            width: 100%;
+            max-width: 520px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sound-toggle-btn {
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+
+        /* 主容器 */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 0 16px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            z-index: 5;
+        }
+
+        .title-box {
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 1.55rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #e63946, #ff477e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* 怒气进度条卡片 */
+        .gauge-card {
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 20px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .gauge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .anger-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #d90429;
+        }
+
+        .combo-badge {
+            background: linear-gradient(135deg, #ff0054, #ff5400);
+            color: white;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(255, 0, 84, 0.3);
+            animation: pulseCombo 1s infinite alternate;
+        }
+
+        @keyframes pulseCombo {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.06); }
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff4d6d, #d90429, #9d0208);
+            border-radius: 10px;
+            transition: width 0.25s ease-out, background 0.4s;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            animation: shineBar 2s infinite;
+        }
+
+        @keyframes shineBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 3D 舞台区域 */
+        .stage-wrapper {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+            margin: 5px 0;
+        }
+
+        /* 击打区 */
+        .character-card {
+            width: 280px;
+            height: 340px;
+            border-radius: 36px;
+            background: #fff;
+            border: 5px solid #fff;
+            box-shadow: 0 20px 45px rgba(255, 71, 126, 0.22), 0 0 0 1px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.08s cubic-bezier(0.1, 0.9, 0.2, 1);
+            will-change: transform;
+            touch-action: manipulation;
+        }
+
+        .character-card:active {
+            filter: brightness(1.03);
+        }
+
+        /* 搞怪视频/图像 */
+        .character-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            display: block;
+            border-radius: 30px;
+        }
+
+        /* 3D晕头小星星 */
+        .dizzy-stars {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 12px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .dizzy-stars.active {
+            display: flex;
+        }
+
+        .star-item {
+            font-size: 1.8rem;
+            animation: spinStar 1.2s infinite linear;
+            filter: drop-shadow(0 2px 5px rgba(255, 183, 3, 0.6));
+        }
+
+        .star-item:nth-child(2) {
+            animation-duration: 0.9s;
+            animation-delay: -0.3s;
+        }
+
+        .star-item:nth-child(3) {
+            animation-duration: 1.5s;
+            animation-delay: -0.6s;
+        }
+
+        @keyframes spinStar {
+            0% { transform: translateY(0) rotate(0deg) scale(0.9); }
+            50% { transform: translateY(-8px) rotate(180deg) scale(1.15); }
+            100% { transform: translateY(0) rotate(360deg) scale(0.9); }
+        }
+
+        /* 头顶求饶气泡 */
+        .speech-bubble {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: #ffffff;
+            color: #d90429;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 25px rgba(217, 4, 41, 0.25);
+            border: 2px solid #ff4d6d;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 30;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 9px 8px 0;
+            border-style: solid;
+            border-color: #ff4d6d transparent;
+            display: block;
+            width: 0;
+        }
+
+        .speech-bubble.show {
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 脸颊巴掌红印 */
+        .slap-mark-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .slap-hand-stamp {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.88;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 8px rgba(255, 0, 85, 0.5));
+            animation: stampPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 1.8s ease-out;
+        }
+
+        @keyframes stampPop {
+            0% { transform: scale(1.6) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0.88; }
+        }
+
+        /* 挥动的武器手掌/平底锅 */
+        .slap-weapon-anim {
+            position: absolute;
+            font-size: 5rem;
+            pointer-events: none;
+            z-index: 40;
+            opacity: 0;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+        }
+
+        .slap-from-right {
+            animation: hitFromRight 0.22s ease-out forwards;
+        }
+
+        .slap-from-left {
+            animation: hitFromLeft 0.22s ease-out forwards;
+        }
+
+        @keyframes hitFromRight {
+            0% {
+                opacity: 0;
+                transform: translate(140px, -20px) rotate(45deg) scale(1.4);
+            }
+            45% {
+                opacity: 1;
+                transform: translate(0px, 0px) rotate(-15deg) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-30px, 10px) rotate(-35deg) scale(0.9);
+            }
+        }
+
+        @keyframes hitFromLeft {
+            0% {
+                opacity: 0;
+                transform: translate(-140px, -20px) rotate(-45deg) scale(1.4);
+            }
+            45% {
+                opacity: 1;
+                transform: translate(0px, 0px) rotate(15deg) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(30px, 10px) rotate(35deg) scale(0.9);
+            }
+        }
+
+        /* 击打漫画特效文本 */
+        .hit-comic-text {
+            position: absolute;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ff0054;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0 4px 10px rgba(0,0,0,0.2);
+            pointer-events: none;
+            z-index: 50;
+            animation: popComic 0.45s ease-out forwards;
+        }
+
+        @keyframes popComic {
+            0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1.1) translateY(-25px); opacity: 0; }
+        }
+
+        /* 武器选择栏 */
+        .weapon-bar {
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 24px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 8px;
+        }
+
+        .weapon-btn {
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
+            border-radius: 18px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .weapon-btn span.icon {
+            font-size: 1.55rem;
+        }
+
+        .weapon-btn.active {
+            background: #ffffff;
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(255, 71, 126, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .weapon-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 底部互动操作栏 */
+        .action-bar {
+            width: 100%;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        .btn-slap-auto {
+            background: linear-gradient(135deg, #ff477e, #e63946);
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.35);
+        }
+
+        .btn-apology-view {
+            background: #ffffff;
+            color: #7b2cbf;
+            border: 2px solid #e2d9f3;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 终极大认错弹窗 (跪地比心专属照片) */
+        .apology-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .apology-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .apology-card {
+            background: #ffffff;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 380px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            transform: scale(0.85) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            text-align: center;
+        }
+
+        .apology-modal-overlay.active .apology-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 跪地比心专属照片展示区 */
+        .kneel-photo-wrapper {
+            width: 100%;
+            height: 270px;
+            position: relative;
+            background: #111;
+            overflow: hidden;
+        }
+
+        .kneel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            animation: slowZoom 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.06); }
+        }
+
+        .kneel-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 71, 126, 0.9);
+            color: #fff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .modal-content-box {
+            padding: 20px 22px 24px;
+        }
+
+        .modal-main-title {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #d90429;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .modal-desc {
+            font-size: 0.9rem;
+            color: #4a4e69;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-forgive {
+            background: linear-gradient(135deg, #ff477e, #ff758f);
+            color: white;
+            box-shadow: 0 6px 18px rgba(255, 71, 126, 0.35);
+        }
+
+        .btn-keep-slap {
+            background: #f1f3f5;
+            color: #495057;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 屏幕震颤效果 */
+        .screen-shake {
+            animation: shakeScreen 0.15s ease-in-out;
+        }
+
+        @keyframes shakeScreen {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-6px, 4px) rotate(-1deg); }
+            50% { transform: translate(6px, -4px) rotate(1deg); }
+            75% { transform: translate(-3px, 2px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* 摸摸头宠溺模式 */
+        .pet-heart {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff477e;
+            pointer-events: none;
+            animation: flyHeart 1s ease-out forwards;
+            z-index: 60;
+        }
+
+        @keyframes flyHeart {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), -100px) scale(1.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <header class="top-nav">
+        <a href="../index.html" class="back-btn">
+            <i class="fas fa-chevron-left"></i> 回时光小屋
+        </a>
+        <button id="sound-btn" class="sound-toggle-btn" title="开关音效">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </header>
+
+    <div class="container" id="main-container">
+        
+        <!-- 标题 -->
+        <div class="title-box">
+            <h1 class="main-title"><i class="fas fa-hand-sparkles"></i> 珊珊专属出气筒</h1>
+            <p class="subtitle">惹仙女生气了？立刻暴揍臭臭！打到气消为止~ mua❤️</p>
+        </div>
+
+        <!-- 怒气槽卡片 -->
+        <div class="gauge-card">
+            <div class="gauge-header">
+                <div class="anger-status">
+                    <span id="anger-emoji">😡</span>
+                    <span id="anger-label">当前怒气值：</span>
+                    <span id="anger-percent" style="font-weight: 900;">100%</span>
+                </div>
+                <div class="combo-badge" id="combo-badge">连击 x0</div>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <!-- 3D 核心舞台 -->
+        <div class="stage-wrapper">
+            
+            <!-- 头顶旋转眩晕星星 -->
+            <div class="dizzy-stars" id="dizzy-stars">
+                <div class="star-item">💫</div>
+                <div class="star-item">⭐</div>
+                <div class="star-item">💫</div>
+            </div>
+
+            <!-- 头顶求饶对话气泡 -->
+            <div class="speech-bubble" id="speech-bubble">
+                臭臭：珊珊 我错了 😭
+            </div>
+
+            <!-- 动态角色 3D 卡片 -->
+            <div class="character-card" id="character-card">
+                <!-- 搞怪视频 (带 1.mp4 视频和 1.jpg 降级) -->
+                <video id="avatar-video" class="character-media" src="../images/cx/1.mp4" poster="../images/cx/1.jpg" playsinline webkit-playsinline loop muted autoplay></video>
+
+                <!-- 脸颊掌印覆盖层 -->
+                <div class="slap-mark-layer" id="slap-mark-layer"></div>
+            </div>
+        </div>
+
+        <!-- 武器切换栏 -->
+        <div class="weapon-bar">
+            <button class="weapon-btn active" data-weapon="hand" title="清脆大巴掌">
+                <span class="icon">🖐️</span>
+                <span>大巴掌</span>
+            </button>
+            <button class="weapon-btn" data-weapon="pan" title="暴躁平底锅">
+                <span class="icon">🍳</span>
+                <span>平底锅</span>
+            </button>
+            <button class="weapon-btn" data-weapon="slipper" title="粉色大拖鞋">
+                <span class="icon">👡</span>
+                <span>大拖鞋</span>
+            </button>
+            <button class="weapon-btn" data-weapon="paw" title="软萌猫爪爪">
+                <span class="icon">🐾</span>
+                <span>猫爪爪</span>
+            </button>
+            <button class="weapon-btn" data-weapon="heart" title="摸摸头贴贴">
+                <span class="icon">🥰</span>
+                <span>摸摸头</span>
+            </button>
+        </div>
+
+        <!-- 底部快捷操作 -->
+        <div class="action-bar">
+            <button class="action-btn btn-slap-auto" id="btn-slap-burst">
+                <i class="fas fa-bolt"></i> 暴风雨连环掌
+            </button>
+            <button class="action-btn btn-apology-view" id="btn-view-apology">
+                <i class="fas fa-heart-crack"></i> 跪地认错姿态
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 终极大认错弹窗 (展示跪地比心专属照片) -->
+    <div class="apology-modal-overlay" id="apology-modal">
+        <div class="apology-card">
+            <button class="modal-close-btn" id="modal-close-btn"><i class="fas fa-times"></i></button>
+            
+            <div class="kneel-photo-wrapper">
+                <img src="../images/cx/kneel.png" alt="跪地比心求原谅" class="kneel-img">
+                <div class="kneel-badge">跪地双手比心姿态 · 诚意拉满</div>
+            </div>
+
+            <div class="modal-content-box">
+                <h3 class="modal-main-title">😭 臭臭：珊珊 我错了！</h3>
+                <p class="modal-desc">
+                    “惹宝贝珊珊生气是臭臭的最大过错！已经深刻反省，地板/键盘都跪好啦~ 罚我明天带你去吃大餐、无条件听宝贝话好不好？求求珊珊大人消消气原谅我吧！🥺❤️”
+                </p>
+
+                <div class="modal-btn-group">
+                    <button class="modal-btn btn-forgive" id="btn-modal-forgive">
+                        🥰 哼，看你态度诚恳，原谅你啦！
+                    </button>
+                    <button class="modal-btn btn-keep-slap" id="btn-modal-keep-slap">
+                        😈 还没消气！换平底锅再打一顿！
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入炫彩纸屑库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // ================= 全局状态与配置 =================
+        let angerValue = 100;
+        let comboCount = 0;
+        let lastHitTime = 0;
+        let currentWeapon = 'hand';
+        let soundEnabled = true;
+        let isForgiven = false;
+        let comboTimer = null;
+        let speechTimer = null;
+
+        // 搞怪认错经典求饶台词池
+        const APOLOGY_LINES = [
+            "臭臭：珊珊 我错了 😭",
+            "臭臭：珊珊 我错了，再打脸就破相啦！",
+            "臭臭：珊珊 我错了，轻点扇宝贝手疼~",
+            "臭臭：珊珊 我错了，明天带你去吃火锅！",
+            "臭臭：珊珊 我错了，金币+100，买包包！",
+            "臭臭：珊珊 我错了，全听媳妇的！",
+            "打在夫身，痛在妻心呀宝贝！",
+            "珊珊大人饶命！臭臭知错啦！"
+        ];
+
+        // 漫画打击词
+        const COMIC_WORDS = ["啪！", "POW!", "嗷！", "DUANG!", "SLAP!", "💥", "啪啪！", "CRACK!"];
+
+        // DOM 元素引用
+        const card = document.getElementById('character-card');
+        const video = document.getElementById('avatar-video');
+        const progressBar = document.getElementById('progress-bar-fill');
+        const angerPercent = document.getElementById('anger-percent');
+        const angerEmoji = document.getElementById('anger-emoji');
+        const comboBadge = document.getElementById('combo-badge');
+        const speechBubble = document.getElementById('speech-bubble');
+        const slapMarkLayer = document.getElementById('slap-mark-layer');
+        const dizzyStars = document.getElementById('dizzy-stars');
+        const apologyModal = document.getElementById('apology-modal');
+        const soundBtn = document.getElementById('sound-btn');
+        const weaponBtns = document.querySelectorAll('.weapon-btn');
+
+        // 尝试自动播放背景视频
+        window.addEventListener('load', () => {
+            if (video) {
+                video.play().catch(() => {});
+            }
+        });
+
+        // ================= 高保真 Web Audio 音效引擎 (无需下载，零延迟) =================
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // 播放合成音效
+        function playSlapSound(type) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'hand') {
+                    // 清脆大巴掌：噪音脉冲 + 带通滤波器
+                    const bufferSize = ctx.sampleRate * 0.08;
+                    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.setValueAtTime(1400, now);
+                    filter.Q.setValueAtTime(3, now);
+
+                    const gain = ctx.createGain();
+                    gain.gain.setValueAtTime(1.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                    // 低音打击感
+                    const osc = ctx.createOscillator();
+                    const oscGain = ctx.createGain();
+                    osc.frequency.setValueAtTime(130, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.07);
+                    oscGain.gain.setValueAtTime(0.8, now);
+                    oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.connect(oscGain);
+                    oscGain.connect(ctx.destination);
+
+                    noise.start(now);
+                    osc.start(now);
+                } else if (type === 'pan') {
+                    // 平底锅金属轰鸣音效 (DUANG)
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc1.type = 'square';
+                    osc1.frequency.setValueAtTime(420, now);
+                    osc1.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(840, now);
+                    osc2.frequency.exponentialRampToValueAtTime(220, now + 0.35);
+
+                    gain.gain.setValueAtTime(0.9, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.36);
+                    osc2.stop(now + 0.36);
+                } else if (type === 'slipper') {
+                    // 大拖鞋厚实抽打声
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.12);
+                    gain.gain.setValueAtTime(1.0, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.13);
+                } else if (type === 'paw') {
+                    // 萌系软击
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.11);
+                } else if (type === 'heart') {
+                    // 摸摸头温柔音
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.21);
+                } else if (type === 'forgive') {
+                    // 庆祝胜利琴音
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                        gain.gain.setValueAtTime(0.4, now + i * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + i * 0.1);
+                        osc.stop(now + i * 0.1 + 0.45);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        // ================= 3D 巴掌与打击交互逻辑 =================
+        function triggerSlap(event, fromSide) {
+            getAudioContext();
+
+            // 如果是摸摸头模式
+            if (currentWeapon === 'heart') {
+                triggerPetHead(event);
+                return;
+            }
+
+            // 计算打击方向
+            const rect = card.getBoundingClientRect();
+            let clickX = rect.width / 2;
+            let clickY = rect.height / 2;
+
+            if (event && event.clientX) {
+                clickX = event.clientX - rect.left;
+                clickY = event.clientY - rect.top;
+            }
+
+            // 根据点击位置判断是从左还是从右扇
+            const isLeftHit = fromSide ? (fromSide === 'left') : (clickX < rect.width / 2);
+
+            // 1. 播放音效
+            playSlapSound(currentWeapon);
+
+            // 2. 3D 头部晃荡与弹簧受力回弹
+            const rotateY = isLeftHit ? 36 : -36;
+            const rotateZ = isLeftHit ? -12 : 12;
+            const translateX = isLeftHit ? 18 : -18;
+
+            card.style.transform = `perspective(1000px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) translateX(${translateX}px) scale(0.92)`;
+
+            setTimeout(() => {
+                // 第一下弹性回摆
+                card.style.transform = `perspective(1000px) rotateY(${-rotateY * 0.4}deg) rotateZ(${-rotateZ * 0.4}deg) scale(1.02)`;
+                setTimeout(() => {
+                    // 第二下微弱回摆
+                    card.style.transform = `perspective(1000px) rotateY(${rotateY * 0.15}deg) scale(0.99)`;
+                    setTimeout(() => {
+                        // 恢复平稳
+                        card.style.transform = `perspective(1000px) rotateY(0deg) rotateZ(0deg) translateX(0) scale(1)`;
+                    }, 80);
+                }, 90);
+            }, 100);
+
+            // 3. 屏幕轻微震颤
+            document.body.classList.add('screen-shake');
+            setTimeout(() => document.body.classList.remove('screen-shake'), 160);
+
+            // 4. 浮现武器动画
+            createWeaponAnimation(isLeftHit ? 'left' : 'right');
+
+            // 5. 脸颊留下红红的巴掌印
+            createSlapMark(clickX, clickY, isLeftHit);
+
+            // 6. 弹出漫画爆裂文字
+            createComicHitText(clickX, clickY);
+
+            // 7. 更新连击与怒气值
+            comboCount++;
+            comboBadge.innerText = `连击 x${comboCount}`;
+            comboBadge.style.display = 'block';
+
+            clearTimeout(comboTimer);
+            comboTimer = setTimeout(() => {
+                comboCount = 0;
+                comboBadge.innerText = `连击 x0`;
+            }, 3000);
+
+            // 怒气值递减 (每次打击减少 5% ~ 8%)
+            const decrement = currentWeapon === 'pan' ? 10 : 6;
+            angerValue = Math.max(0, angerValue - decrement);
+            updateAngerDisplay();
+
+            // 8. 实时弹出求饶气泡: "臭臭：珊珊 我错了"
+            showApologySpeech();
+
+            // 9. 晕头小星星激活
+            dizzyStars.classList.add('active');
+            clearTimeout(window.starTimer);
+            window.starTimer = setTimeout(() => {
+                dizzyStars.classList.remove('active');
+            }, 2500);
+
+            // 10. 当怒气值被打到 0，或者打满 15 连击，找机会触发终极跪地求和照片弹窗！
+            if (angerValue === 0 || comboCount === 15) {
+                setTimeout(() => {
+                    openApologyModal();
+                }, 500);
+            }
+        }
+
+        // 实时求饶气泡
+        function showApologySpeech() {
+            // 优先展示主打语，或者随机调侃
+            const line = (comboCount <= 2 || Math.random() > 0.4) 
+                ? "臭臭：珊珊 我错了 😭" 
+                : APOLOGY_LINES[Math.floor(Math.random() * APOLOGY_LINES.length)];
+
+            speechBubble.innerText = line;
+            speechBubble.classList.add('show');
+
+            clearTimeout(speechTimer);
+            speechTimer = setTimeout(() => {
+                speechBubble.classList.remove('show');
+            }, 1800);
+        }
+
+        // 创建武器呼啸挥击动画
+        function createWeaponAnimation(direction) {
+            const weaponIcon = {
+                'hand': '🖐️',
+                'pan': '🍳',
+                'slipper': '👡',
+                'paw': '🐾'
+            }[currentWeapon] || '🖐️';
+
+            const animEl = document.createElement('div');
+            animEl.className = `slap-weapon-anim slap-from-${direction}`;
+            animEl.innerText = weaponIcon;
+            card.parentElement.appendChild(animEl);
+
+            setTimeout(() => {
+                animEl.remove();
+            }, 240);
+        }
+
+        // 脸颊生成红色掌印
+        function createSlapMark(x, y, isLeft) {
+            const stamp = document.createElement('div');
+            stamp.className = 'slap-hand-stamp';
+
+            // SVG 红色小巴掌
+            stamp.innerHTML = `
+                <svg viewBox="0 0 100 100" fill="rgba(255, 30, 80, 0.72)">
+                    <path d="M50 15 C52 10, 58 10, 60 15 L62 42 C62 43, 65 43, 65 42 L68 22 C70 17, 76 18, 77 23 L76 46 C76 47, 79 47, 79 46 L82 32 C84 27, 90 28, 91 33 L88 56 C88 75, 75 90, 52 90 C32 90, 22 75, 22 60 L22 45 C22 40, 28 38, 30 44 L32 55 C33 56, 35 55, 35 54 L36 28 C37 23, 43 23, 44 28 L45 42 C45 43, 48 43, 48 42 Z"/>
+                </svg>
+            `;
+
+            // 限制在面部区域
+            const clampX = Math.max(20, Math.min(x - 36, 180));
+            const clampY = Math.max(30, Math.min(y - 36, 230));
+
+            stamp.style.left = `${clampX}px`;
+            stamp.style.top = `${clampY}px`;
+            stamp.style.transform = `rotate(${(Math.random() - 0.5) * 40}deg)`;
+
+            slapMarkLayer.appendChild(stamp);
+
+            // 自动渐隐消失，避免堆积过多
+            setTimeout(() => {
+                stamp.style.opacity = '0';
+                setTimeout(() => stamp.remove(), 1800);
+            }, 2000);
+        }
+
+        // 漫画击打爆裂特效
+        function createComicHitText(x, y) {
+            const textEl = document.createElement('div');
+            textEl.className = 'hit-comic-text';
+            textEl.innerText = COMIC_WORDS[Math.floor(Math.random() * COMIC_WORDS.length)];
+            textEl.style.left = `${Math.max(10, Math.min(x - 20, 200))}px`;
+            textEl.style.top = `${Math.max(10, Math.min(y - 20, 240))}px`;
+            card.appendChild(textEl);
+
+            setTimeout(() => {
+                textEl.remove();
+            }, 450);
+        }
+
+        // 摸摸头贴贴模式
+        function triggerPetHead(e) {
+            playSlapSound('heart');
+            card.style.transform = 'perspective(1000px) scale(0.97) translateY(6px)';
+            setTimeout(() => {
+                card.style.transform = 'perspective(1000px) scale(1) translateY(0)';
+            }, 150);
+
+            // 飘落小心心
+            for (let i = 0; i < 4; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'pet-heart';
+                heart.innerText = ['💖', '💕', '🥰', '✨'][Math.floor(Math.random() * 4)];
+                heart.style.left = `${Math.random() * 200 + 40}px`;
+                heart.style.top = `${Math.random() * 150 + 80}px`;
+                heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 80}px`);
+                card.appendChild(heart);
+                setTimeout(() => heart.remove(), 1000);
+            }
+
+            speechBubble.innerText = "臭臭：最爱珊珊宝贝了！mua~ ❤️";
+            speechBubble.classList.add('show');
+            clearTimeout(speechTimer);
+            speechTimer = setTimeout(() => speechBubble.classList.remove('show'), 2000);
+        }
+
+        // 更新怒气值显示
+        function updateAngerDisplay() {
+            progressBar.style.width = `${angerValue}%`;
+            angerPercent.innerText = `${angerValue}%`;
+
+            if (angerValue > 70) {
+                angerEmoji.innerText = '😡';
+                progressBar.style.background = 'linear-gradient(90deg, #ff4d6d, #d90429, #9d0208)';
+            } else if (angerValue > 35) {
+                angerEmoji.innerText = '😤';
+                progressBar.style.background = 'linear-gradient(90deg, #ff758f, #ff4d6d, #d90429)';
+            } else if (angerValue > 0) {
+                angerEmoji.innerText = '😒';
+                progressBar.style.background = 'linear-gradient(90deg, #ffb3c1, #ff758f)';
+            } else {
+                angerEmoji.innerText = '🥰';
+                progressBar.style.background = 'linear-gradient(90deg, #52b788, #74c69d)';
+                angerPercent.innerText = `0% (已消气啦)`;
+            }
+        }
+
+        // ================= 弹窗控制：展示跪地比心专属照片 =================
+        function openApologyModal() {
+            apologyModal.classList.add('active');
+        }
+
+        function closeApologyModal() {
+            apologyModal.classList.remove('active');
+        }
+
+        // 点击原谅臭臭：触发漫天礼花和爱心
+        document.getElementById('btn-modal-forgive').addEventListener('click', () => {
+            closeApologyModal();
+            playSlapSound('forgive');
+
+            // 漫天爱心礼花纸屑
+            if (window.confetti) {
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#ff477e', '#ff758f', '#ffccd5', '#ffd166', '#a17fe0']
+                });
+            }
+
+            // 切换为摸摸头武器
+            weaponBtns.forEach(b => b.classList.remove('active'));
+            const heartBtn = document.querySelector('[data-weapon="heart"]');
+            if (heartBtn) heartBtn.classList.add('active');
+            currentWeapon = 'heart';
+
+            speechBubble.innerText = "耶！珊珊原谅我啦！臭臭最爱你！ mua~ 💖";
+            speechBubble.classList.add('show');
+            angerValue = 0;
+            updateAngerDisplay();
+        });
+
+        // 点击还没消气：关掉照片，换平底锅继续打
+        document.getElementById('btn-modal-keep-slap').addEventListener('click', () => {
+            closeApologyModal();
+
+            // 切换为平底锅
+            weaponBtns.forEach(b => b.classList.remove('active'));
+            const panBtn = document.querySelector('[data-weapon="pan"]');
+            if (panBtn) panBtn.classList.add('active');
+            currentWeapon = 'pan';
+
+            // 恢复一部分怒气继续出气
+            angerValue = 60;
+            updateAngerDisplay();
+
+            // 连扇两下
+            triggerSlap(null, 'left');
+            setTimeout(() => triggerSlap(null, 'right'), 200);
+        });
+
+        // 点击右上角叉叉关闭弹窗
+        document.getElementById('modal-close-btn').addEventListener('click', closeApologyModal);
+
+        // 底部快捷按钮
+        document.getElementById('btn-view-apology').addEventListener('click', openApologyModal);
+
+        // 暴风雨连环掌
+        document.getElementById('btn-slap-burst').addEventListener('click', () => {
+            let count = 0;
+            const timer = setInterval(() => {
+                triggerSlap(null, count % 2 === 0 ? 'left' : 'right');
+                count++;
+                if (count >= 5) clearInterval(timer);
+            }, 120);
+        });
+
+        // 点击角色卡片扇巴掌
+        card.addEventListener('click', (e) => {
+            triggerSlap(e);
+        });
+
+        // 切换武器
+        weaponBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                weaponBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentWeapon = btn.dataset.weapon;
+                getAudioContext();
+                playSlapSound(currentWeapon);
+            });
+        });
+
+        // 音效开关
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.innerHTML = soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            soundBtn.style.color = soundEnabled ? 'var(--primary)' : 'var(--text-muted)';
+        });
+    </script>
+</body>
+</html>

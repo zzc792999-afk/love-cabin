@@ -285,14 +285,16 @@ h1.header-title {
     bottom: 25px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 40px;
-    padding: 10px 20px;
+    padding: 8px 18px;
     display: flex;
-    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(255, 117, 151, 0.1);
     z-index: 999;
     max-width: 90%;
@@ -312,7 +314,7 @@ h1.header-title {
 }
 
 .nav-item {
-    padding: 10px 18px;
+    padding: 9px 18px;
     border-radius: 30px;
     cursor: pointer;
     font-size: 0.95rem;
@@ -321,6 +323,7 @@ h1.header-title {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     white-space: nowrap;
 }
@@ -1639,15 +1642,28 @@ footer .heart {
 
     .nav-bar {
         width: calc(100% - 24px);
+        max-width: 440px;
         bottom: max(12px, env(safe-area-inset-bottom, 12px));
         gap: 6px;
-        padding: 8px 10px;
+        padding: 6px 8px;
         border-radius: 30px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        box-sizing: border-box;
     }
     
     .nav-item {
-        padding: 8px 12px;
-        font-size: 0.82rem;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 6px;
+        font-size: 0.85rem;
+        text-align: center;
+        border-radius: 24px;
+        white-space: nowrap;
+        min-width: 0;
     }
     
     h1.header-title {
@@ -1985,23 +2001,40 @@ footer .heart {
         grid-template-columns: 1fr;
     }
 
-    /* 底部导航栏适配全面屏安全区 */
+    /* 底部导航栏适配全面屏安全区 (居中等宽均分布局，彻底杜绝偏左) */
     .nav-bar {
-        bottom: max(8px, env(safe-area-inset-bottom, 8px));
-        width: calc(100% - 16px);
-        padding: 5px 4px;
-        gap: 2px;
-        border-radius: 26px;
+        bottom: max(10px, env(safe-area-inset-bottom, 10px));
+        width: calc(100% - 20px);
+        max-width: 420px;
+        padding: 5px 6px;
+        gap: 4px;
+        border-radius: 28px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        box-sizing: border-box;
     }
     
     .nav-item {
-        padding: 7px 4px;
-        font-size: 0.74rem;
-        gap: 2px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 4px;
+        font-size: 0.78rem;
+        gap: 4px;
+        text-align: center;
+        border-radius: 22px;
+        white-space: nowrap;
+        min-width: 0;
     }
     
     .nav-item i {
         font-size: 0.95rem;
+    }
+
+    .nav-item.active {
+        transform: none;
     }
 
     /* 弹窗手机端大小自适应 */
@@ -2055,9 +2088,20 @@ footer .heart {
         display: none;
     }
 
+    .nav-bar {
+        width: calc(100% - 16px);
+        padding: 5px 3px;
+        gap: 2px;
+    }
+
     .nav-item {
-        padding: 6px 2px;
-        font-size: 0.7rem;
+        padding: 7px 2px;
+        font-size: 0.72rem;
+        gap: 3px;
+    }
+
+    .nav-item i {
+        font-size: 0.85rem;
     }
 }
 

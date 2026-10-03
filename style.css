@@ -2162,3 +2162,536 @@ details[open] .drawer-arrow {
     border-color: transparent;
 }
 
+
+/* ==========================================================================
+   🏡 LOVE CABIN 3.0 - 终极全能升级模块样式 (3D小窝 · 灵动岛 · 心愿金库 · 恋爱月报)
+   ========================================================================== */
+
+/* 1. 顶部灵动岛胶囊状态栏 */
+.dynamic-island {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+    z-index: 100;
+}
+
+.island-capsule {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 117, 151, 0.4);
+    box-shadow: 0 8px 30px rgba(255, 117, 151, 0.18);
+    border-radius: 30px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 95%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.island-capsule::-webkit-scrollbar {
+    display: none;
+}
+
+[data-theme="dark"] .island-capsule {
+    background: rgba(30, 22, 42, 0.75);
+    border-color: rgba(255, 117, 151, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.island-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.island-section:hover {
+    background: rgba(255, 117, 151, 0.12);
+}
+
+.island-section:active {
+    transform: scale(0.95);
+}
+
+.status-sec {
+    cursor: default;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background: #06d6a0;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #06d6a0;
+    animation: blinkOnline 1.8s infinite alternate;
+}
+
+@keyframes blinkOnline {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.15); }
+}
+
+.heartbeat-btn {
+    background: linear-gradient(135deg, rgba(255, 71, 126, 0.15), rgba(255, 117, 151, 0.25));
+    color: #ff0054;
+}
+
+.heartbeat-btn .heart-icon {
+    animation: pulseIcon 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+}
+
+.vault-btn {
+    background: rgba(255, 183, 3, 0.15);
+    color: #d48b00;
+}
+
+[data-theme="dark"] .vault-btn {
+    color: #ffd166;
+}
+
+/* 2. 极简 3D 虚拟恋爱小窝 */
+.cabin-3d-section {
+    width: 100%;
+    margin-bottom: 25px;
+    transition: all 0.4s ease;
+}
+
+.cabin-3d-card {
+    background: var(--card-bg);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    border-radius: 28px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.cabin-3d-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px 12px;
+}
+
+.cabin-3d-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cabin-3d-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: rgba(255, 117, 151, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+#cabin-3d-viewport {
+    width: 100%;
+    height: 400px;
+    border-radius: 22px;
+    position: relative;
+    cursor: grab;
+    touch-action: none;
+    background: radial-gradient(circle at center, rgba(255, 230, 238, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+[data-theme="dark"] #cabin-3d-viewport {
+    background: radial-gradient(circle at center, rgba(80, 40, 100, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+#cabin-3d-viewport:active {
+    cursor: grabbing;
+}
+
+.cabin-quick-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.quick-pill {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 117, 151, 0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+[data-theme="dark"] .quick-pill {
+    background: rgba(30, 20, 45, 0.65);
+}
+
+.quick-pill:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* 3. 远程心跳全屏涟漪 */
+.heartbeat-fullscreen-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 71, 126, 0.25);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.heartbeat-pulse-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid #ff0054;
+    animation: ringExpand 1.4s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.pulse-ring.ring-2 {
+    animation-delay: 0.4s;
+}
+
+@keyframes ringExpand {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+.pulse-heart {
+    font-size: 5rem;
+    animation: heartBeatZoom 0.7s infinite alternate ease-in-out;
+    filter: drop-shadow(0 10px 25px rgba(255, 0, 84, 0.5));
+}
+
+@keyframes heartBeatZoom {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1.2); }
+}
+
+.pulse-msg {
+    margin-top: 30px;
+    background: #ffffff;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #d90429;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* 4. 爱意小金库 & 心愿特权商城 Modal */
+.vault-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.vault-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vault-modal-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vault-modal-overlay.active .vault-modal-card {
+    transform: scale(1);
+}
+
+.vault-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.vault-badge {
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.vault-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-color);
+    margin: 8px 0 14px;
+}
+
+.vault-balance-box {
+    background: linear-gradient(135deg, rgba(255, 183, 3, 0.15), rgba(251, 133, 0, 0.1));
+    border: 1px solid rgba(255, 183, 3, 0.4);
+    border-radius: 20px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.vault-amount {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #d48b00;
+}
+
+.wish-store-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wish-item-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 117, 151, 0.25);
+    border-radius: 18px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+[data-theme="dark"] .wish-item-card {
+    background: rgba(30, 20, 45, 0.5);
+}
+
+.wish-item-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.wish-item-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.wish-item-action {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.wish-item-price {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #ffb703;
+}
+
+.wish-buy-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 117, 151, 0.3);
+}
+
+.wish-buy-btn:active {
+    transform: scale(0.95);
+}
+
+/* 5. 智能恋爱月报 Modal */
+.digest-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.digest-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.digest-card {
+    background: #ffffff;
+    border-radius: 26px;
+    width: 100%;
+    max-width: 380px;
+    padding: 28px 24px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    position: relative;
+    text-align: center;
+    color: #2b2d42;
+    transform: scale(0.9);
+    transition: transform 0.3s;
+}
+
+.digest-modal-overlay.active .digest-card {
+    transform: scale(1);
+}
+
+.digest-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #f1f3f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.digest-badge {
+    background: #ff477e;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.digest-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #ff477e;
+    margin-bottom: 2px;
+}
+
+.digest-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.digest-stat-box {
+    background: #fff0f3;
+    border-radius: 16px;
+    padding: 12px 10px;
+}
+
+.d-num {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #d90429;
+}
+
+.d-label {
+    font-size: 0.75rem;
+    color: #8d99ae;
+    font-weight: 600;
+}
+
+.digest-summary-box {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 0.82rem;
+    color: #495057;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 18px;
+    border-left: 4px solid #ff477e;
+}
+
+.digest-save-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff477e, #ff758f);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(255, 71, 126, 0.35);
+}

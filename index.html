@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
 
@@ -54,6 +54,32 @@
              Tab 1: 🏠 时光小屋 (首页)
              ================================================================ -->
         <section id="tab-home" class="tab-content active">
+            <!-- 🏡 极简 3D 虚拟恋爱小窝 (Three.js 交互引擎) -->
+            <div id="cabin-3d-section" class="cabin-3d-section">
+                <div class="cabin-3d-card">
+                    <div class="cabin-3d-header">
+                        <div class="cabin-3d-title">
+                            <i class="fas fa-home"></i> 我们的 3D 专属小窝
+                        </div>
+                        <div class="cabin-3d-hint">
+                            <i class="fas fa-hand-pointer"></i> 拖拽旋转视角 · 点击家具互动
+                        </div>
+                    </div>
+
+                    <!-- 3D 视口画布 -->
+                    <div id="cabin-3d-viewport"></div>
+
+                    <!-- 快捷家具快速交互药丸 -->
+                    <div class="cabin-quick-pills">
+                        <button class="quick-pill" onclick="window.location.href='other/takeout.html'"><i class="fas fa-utensils" style="color:#ff758c;"></i> 🧊 打开小冰箱</button>
+                        <button class="quick-pill" onclick="window.location.href='other/slap.html'"><i class="fas fa-hand-sparkles" style="color:#ff477e;"></i> 🥊 暴揍臭臭</button>
+                        <button class="quick-pill" onclick="document.querySelectorAll('.nav-item')[1].click()"><i class="fas fa-camera-retro" style="color:#a17fe0;"></i> 📺 回忆放映机</button>
+                        <button class="quick-pill" onclick="document.querySelectorAll('.nav-item')[2].click()"><i class="fas fa-envelope-open-text" style="color:#52b788;"></i> 💌 床头信箱</button>
+                        <button class="quick-pill" onclick="window.openLoveDigest && window.openLoveDigest()"><i class="fas fa-chart-pie" style="color:#ffb703;"></i> 📊 查看恋爱月报</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- 📖 青春回忆录与毕业之约入口横幅 -->
             <div class="glass-panel" style="background: linear-gradient(135deg, rgba(255, 117, 151, 0.22), rgba(161, 127, 224, 0.2), rgba(249, 168, 38, 0.15)); border: 1px solid rgba(255, 117, 151, 0.45); border-radius: 20px; padding: 18px 20px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 25px rgba(255, 117, 151, 0.2);" onclick="window.location.href='memory.html'">
                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -429,7 +455,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=2.0"></script>
+    <script src="app.js?v=3.0"></script>
+    <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
+    <script src="js/three.min.js"></script>
+    <script src="js/cabin3d.js?v=3.0"></script>
+    <!-- 💖 简约灵动岛与情侣特权商城 -->
+    <script src="js/features3.js?v=3.0"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

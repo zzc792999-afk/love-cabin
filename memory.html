@@ -1952,10 +1952,20 @@
             '去属于我们的下一个城市，开启人生新篇章 🎓'
         ];
 
+        function getSafeMemoryWishes() {
+            try {
+                const res = JSON.parse(localStorage.getItem('cabin_memory_wishes') || '[]');
+                return Array.isArray(res) ? res : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
         function initWishlist() {
             const container = document.getElementById('wishlist-container');
+            if (!container) return;
             container.innerHTML = '';
-            let saved = JSON.parse(localStorage.getItem('cabin_memory_wishes') || '[]');
+            let saved = getSafeMemoryWishes();
 
             wishes.forEach((w, index) => {
                 const isDone = saved.includes(index);
@@ -1972,7 +1982,7 @@
         }
 
         function toggleWish(index) {
-            let saved = JSON.parse(localStorage.getItem('cabin_memory_wishes') || '[]');
+            let saved = getSafeMemoryWishes();
             if (saved.includes(index)) {
                 saved = saved.filter(i => i !== index);
                 playDingDong(0.9);

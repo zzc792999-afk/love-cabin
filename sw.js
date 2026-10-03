@@ -12,7 +12,9 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return Promise.allSettled(
+        ASSETS_TO_CACHE.map((url) => cache.add(url).catch((err) => console.warn('SW pre-cache skip:', url, err)))
+      );
     })
   );
 });
@@ -52,12 +54,18 @@ self.addEventListener('fetch', (e) => {
         .catch(() => caches.match(e.request))
     );
   } else {
-    // 静态资源（CSS, JS, 图片等）
+    // 静态资源（CSS, JS, 图片等）：缓存优先，网络回退
     e.respondWith(
       caches.match(e.request).then((cachedResponse) => {
-        return cachedResponse || fetch(e.request).then((networkResponse) => {
-          return networkResponse;
-        });
+        return cachedResponse || fetch(e.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+            }
+            return networkResponse;
+          })
+          .catch(() => new Response('', { status: 408, statusText: 'Offline' }));
       })
     );
   }

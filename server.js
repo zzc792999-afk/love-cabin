@@ -1,7 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { MongoClient } = require('mongodb');
+let MongoClient = null;
+try {
+    MongoClient = require('mongodb').MongoClient;
+} catch (e) {
+    // 本地运行未安装 mongodb 模块时自动降级为本地 JSON 存储
+}
 
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'other', 'messages.json');
@@ -25,7 +30,7 @@ const POLAROIDS_FILE = path.join(__dirname, 'other', 'polaroids.json');
 const FOOD_MENU_FILE = path.join(__dirname, 'other', 'food_menu.json');
 const FOOD_ORDERS_FILE = path.join(__dirname, 'other', 'food_orders.json');
 
-if (mongoURI) {
+if (mongoURI && MongoClient) {
     console.log("检测到 MONGODB_URI，正在建立云数据库连接...");
     MongoClient.connect(mongoURI)
         .then(client => {
@@ -275,11 +280,17 @@ function getMimeType(filePath) {
         '.png': 'image/png',
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
+        '.webp': 'image/webp',
         '.gif': 'image/gif',
         '.ico': 'image/x-icon',
         '.svg': 'image/svg+xml',
         '.mp3': 'audio/mpeg',
         '.wav': 'audio/wav',
+        '.mp4': 'video/mp4',
+        '.pdf': 'application/pdf',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.ttf': 'font/ttf',
         '.zip': 'application/zip'
     };
     return mimeTypes[ext] || 'application/octet-stream';
@@ -292,7 +303,7 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // 自动清除网页、API 数据及样式脚本的浏览器缓存，保证每次打开都是从云端拉取最新的控制数据
-    const isStaticMedia = req.url.match(/\.(mp3|wav|png|jpg|jpeg|gif|ico|svg|zip)$/i);
+    const isStaticMedia = req.url.match(/\.(mp3|wav|mp4|png|jpg|jpeg|webp|gif|ico|svg|pdf|woff|woff2|ttf|zip)$/i);
     if (!isStaticMedia) {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         res.setHeader('Pragma', 'no-cache');

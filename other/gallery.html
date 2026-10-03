@@ -193,6 +193,15 @@
             });
         }
 
+        function safeJsonParse(str, defaultVal = []) {
+            try {
+                const res = JSON.parse(str);
+                return Array.isArray(res) ? res : defaultVal;
+            } catch (e) {
+                return defaultVal;
+            }
+        }
+
         function loadPolaroids() {
             fetch('/api/polaroids')
                 .then(res => res.json())
@@ -202,12 +211,12 @@
                         renderCards(merged);
                         localStorage.setItem('300days_polaroids', JSON.stringify(cloudList));
                     } else {
-                        const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+                        const localList = safeJsonParse(localStorage.getItem('300days_polaroids'), []);
                         renderCards([...localList, ...DEFAULT_CARDS]);
                     }
                 })
                 .catch(() => {
-                    const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+                    const localList = safeJsonParse(localStorage.getItem('300days_polaroids'), []);
                     renderCards([...localList, ...DEFAULT_CARDS]);
                 });
         }
@@ -273,6 +282,7 @@
             const date = document.getElementById('input-date').value.trim();
 
             if (!title) { alert('请输入回忆主题哦！'); return; }
+            if (!selectedBase64Img) { alert('请先点击上方按钮选择一张相册照片哦！📷'); return; }
 
             const btn = document.getElementById('btn-save-photo');
             btn.innerText = '☁️ 云端同步上传中...';
@@ -288,7 +298,7 @@
             };
 
             // 先更新本地
-            const localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            const localList = safeJsonParse(localStorage.getItem('300days_polaroids'), []);
             localList.unshift(newItem);
             localStorage.setItem('300days_polaroids', JSON.stringify(localList));
 
@@ -319,7 +329,7 @@
             if (!confirm('确定要删除这张拍立得相片吗？')) return;
 
             // 删除本地
-            let localList = JSON.parse(localStorage.getItem('300days_polaroids') || '[]');
+            let localList = safeJsonParse(localStorage.getItem('300days_polaroids'), []);
             localList = localList.filter(item => item.id !== id);
             localStorage.setItem('300days_polaroids', JSON.stringify(localList));
 

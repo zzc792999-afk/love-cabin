@@ -693,7 +693,12 @@
             height = canvas.height = window.innerHeight;
         });
 
-        function animate() {
+        let lastStarTime = 0;
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+            if (timestamp - lastStarTime < 50) return; // 限制在 20fps，大幅降低显卡开销
+            lastStarTime = timestamp;
+
             ctx.clearRect(0, 0, width, height);
 
             stars.forEach(star => {
@@ -714,8 +719,6 @@
                     star.x = Math.random() * width;
                 }
             });
-
-            requestAnimationFrame(animate);
         }
 
         animate();
@@ -1074,8 +1077,8 @@
             status = "距离抽枝还差 " + (30 - state.treePoints) + " 养分";
         }
 
-        levelEl.textContent = level;
-        nextLevelEl.textContent = status;
+        if (levelEl) levelEl.textContent = level;
+        if (nextLevelEl) nextLevelEl.textContent = status;
     }
 
     function drawTree() {
@@ -1379,7 +1382,8 @@
                 saveWishlistToServer();
                 input.value = '';
 
-                const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+                const activeBtn = document.querySelector('.filter-btn.active');
+                const activeFilter = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
                 renderWishlist(activeFilter);
                 showToastMessage('🎉 新增自定义心愿成功！');
             });
@@ -2045,56 +2049,62 @@
 
         missCounter.textContent = state.missCount;
 
-        missButton.addEventListener('click', function() {
-            state.missCount++;
-            localStorage.setItem('missCount', state.missCount);
-            missCounter.textContent = state.missCount;
+        if (missButton) {
+            missButton.addEventListener('click', function() {
+                state.missCount++;
+                localStorage.setItem('missCount', state.missCount);
+                if (missCounter) missCounter.textContent = state.missCount;
 
-            missCounter.style.transform = 'scale(1.3)';
-            setTimeout(() => missCounter.style.transform = 'scale(1)', 150);
+                if (missCounter) {
+                    missCounter.style.transform = 'scale(1.3)';
+                    setTimeout(() => missCounter.style.transform = 'scale(1)', 150);
+                }
 
-            updateMissMessageTip();
-            checkSpecialMissReaction(state.missCount);
-            
-            state.treePoints += 1;
-            safeSet('treePoints', String(state.treePoints));
-            safeSet('tree_points', String(state.treePoints));
-            updateTreeDashboard();
+                updateMissMessageTip();
+                checkSpecialMissReaction(state.missCount);
+                
+                state.treePoints += 1;
+                safeSet('treePoints', String(state.treePoints));
+                safeSet('tree_points', String(state.treePoints));
+                updateTreeDashboard();
 
-            // 实时上传想念次数、想念触发时间戳与爱意树到云端
-            const postData = {
-                miss_count: String(state.missCount),
-                miss_last_date: state.missLastDate,
-                tree_points: String(state.treePoints)
-            };
-            const triggerKey = state.myRole === 'shanshan' ? 'sweetpact_miss_trigger_shanshan' : 'sweetpact_miss_trigger_zuzhe';
-            postData[triggerKey] = String(Date.now());
-
-            fetch('/api/config', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(postData)
-            }).catch(e => console.error("Cloud miss count sync failed:", e));
-        });
-
-        missReset.addEventListener('click', function() {
-            if (confirm('确定要重置今天的想念次数吗？')) {
-                state.missCount = 0;
-                localStorage.setItem('missCount', 0);
-                missCounter.textContent = 0;
-                document.getElementById('miss-message').textContent = '点击下面的按钮，记录每次想我的瞬间';
-                showToastMessage('💦 重置成功，让我们今天重新开始想念！');
+                // 实时上传想念次数、想念触发时间戳与爱意树到云端
+                const postData = {
+                    miss_count: String(state.missCount),
+                    miss_last_date: state.missLastDate,
+                    tree_points: String(state.treePoints)
+                };
+                const triggerKey = state.myRole === 'shanshan' ? 'sweetpact_miss_trigger_shanshan' : 'sweetpact_miss_trigger_zuzhe';
+                postData[triggerKey] = String(Date.now());
 
                 fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        miss_count: '0',
-                        miss_last_date: state.missLastDate
-                    })
-                }).catch(e => console.error("Cloud miss count reset failed:", e));
-            }
-        });
+                    body: JSON.stringify(postData)
+                }).catch(e => console.error("Cloud miss count sync failed:", e));
+            });
+        }
+
+        if (missReset) {
+            missReset.addEventListener('click', function() {
+                if (confirm('确定要重置今天的想念次数吗？')) {
+                    state.missCount = 0;
+                    localStorage.setItem('missCount', 0);
+                    if (missCounter) missCounter.textContent = 0;
+                    updateMissMessageTip();
+                    showToastMessage('💦 重置成功，让我们今天重新开始想念！');
+
+                    fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            miss_count: '0',
+                            miss_last_date: state.missLastDate
+                        })
+                    }).catch(e => console.error("Cloud miss count reset failed:", e));
+                }
+            });
+        }
     }
 
     function updateMissMessageTip() {
@@ -2416,13 +2426,24 @@
             // 降低生成频次，避免粒子过多导致卡顿
             if (Math.random() < 0.35) {
                 particles.push(new TrailHeart(x, y));
+                if (!isHeartRunning) {
+                    isHeartRunning = true;
+                    requestAnimationFrame(animate);
+                }
             }
         }
 
+        let isHeartRunning = false;
         window.addEventListener('mousemove', addParticles);
         window.addEventListener('touchmove', addParticles, { passive: true });
 
         function animate() {
+            if (particles.length === 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                isHeartRunning = false;
+                return;
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             for (let i = particles.length - 1; i >= 0; i--) {
@@ -2435,7 +2456,6 @@
             }
             requestAnimationFrame(animate);
         }
-        animate();
     }
 
     // 3. 实时心跳状态卡片数据模拟与波动
@@ -2508,7 +2528,7 @@
         // 清理旧版本缓存
         caches.keys().then((keys) => {
             keys.forEach((key) => {
-                if (key === 'love-cabin-v1') {
+                if (key !== 'love-cabin-v3') {
                     caches.delete(key);
                 }
             });

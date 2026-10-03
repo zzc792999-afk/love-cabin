@@ -1409,6 +1409,15 @@
         /* ================================================================
          * 11. 🌟 许愿瓶
          * ================================================================ */
+        function getSafeCustomWishes() {
+            try {
+                const res = JSON.parse(localStorage.getItem('300days_custom_wishes') || '[]');
+                return Array.isArray(res) ? res : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
         function addWishToBottle() {
             const input = document.getElementById('wish-input');
             const val = input.value.trim();
@@ -1417,7 +1426,7 @@
                 return;
             }
             playMusicBoxNote(700, '愿望', 6);
-            const wishes = JSON.parse(localStorage.getItem('300days_custom_wishes') || '[]');
+            const wishes = getSafeCustomWishes();
             wishes.unshift({ text: val, date: new Date().toLocaleDateString() });
             localStorage.setItem('300days_custom_wishes', JSON.stringify(wishes));
             input.value = '';
@@ -1427,7 +1436,7 @@
 
         function loadWishes() {
             const list = document.getElementById('wish-display-list');
-            const wishes = JSON.parse(localStorage.getItem('300days_custom_wishes') || '[]');
+            const wishes = getSafeCustomWishes();
             if (wishes.length === 0) {
                 list.innerHTML = '<div style="font-size:0.8rem; color:var(--text-sub);">尚无封存愿望，许下你们的第一个愿望吧～</div>';
                 return;

@@ -1251,14 +1251,11 @@
             const availableSpins = (hasFreeScratch ? 1 : 0) + extraSpins;
 
             if (!isInfinite && availableSpins < 20) {
-                const proceed = confirm(`💖 珊珊宝贝当前拥有 ${availableSpins} 次刮刮乐机会，不足20次。\n\n哲哲特别启动【宠溺免单特权】，确定开启豪华 20 连刮吗？mua~ ❤️`);
-                if (!proceed) return;
-                // 扣除已有次数
-                if (hasFreeScratch) {
-                    safeSet('scratch_last_free_date', todayStr);
-                }
-                safeSet('scratch_extra_spins', '0');
-            } else if (!isInfinite) {
+                alert(`❌ 珊珊宝贝当前仅有 ${availableSpins} 次刮刮乐机会，不足 20 次，无法开启 20 连刮哦！\n\n请通过输入特权暗号获取更多机会~`);
+                return;
+            }
+
+            if (!isInfinite) {
                 let toDeduct = 20;
                 if (hasFreeScratch) {
                     safeSet('scratch_last_free_date', todayStr);

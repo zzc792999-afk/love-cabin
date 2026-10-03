@@ -1787,15 +1787,15 @@
             const availableSpins = (hasFreeSpin ? 1 : 0) + extraSpins;
 
             if (!isInfinite && availableSpins < 20) {
-                const proceed = confirm(`💖 珊珊宝贝当前拥有 ${availableSpins} 次特权，不足20次。\n\n哲哲特别开启【宠溺免单特权】，确定启动豪华 20 连扭吗？mua~ ❤️`);
-                if (!proceed) return;
-                // 扣除已有次数（扣到0，其余免单赠送）
-                if (hasFreeSpin) {
-                    safeSet('gashapon_last_free_date', todayStr);
-                }
-                safeSet('gashapon_extra_spins', '0');
-            } else if (!isInfinite) {
-                // 次数充足，正常扣减 20 次
+                showToast(`❌ 当前特权次数仅有 ${availableSpins} 次，不足 20 次，无法开启 20 连扭哦！`);
+                setTimeout(() => {
+                    openKeyRedeem();
+                }, 1200);
+                return;
+            }
+
+            if (!isInfinite) {
+                // 正常扣减 20 次
                 let toDeduct = 20;
                 if (hasFreeSpin) {
                     safeSet('gashapon_last_free_date', todayStr);

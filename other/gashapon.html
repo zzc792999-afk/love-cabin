@@ -562,6 +562,252 @@
             40%, 80% { transform: translateX(6px); }
         }
 
+        /* 🎰 豪华20连扭专属按钮与弹窗卡片网格样式 */
+        .btn-spin-action {
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255, 117, 151, 0.4);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--primary-dark);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(255, 117, 151, 0.15);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-spin-action:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 18px rgba(255, 117, 151, 0.25);
+        }
+
+        .btn-spin-action:active {
+            transform: scale(0.96);
+        }
+
+        .btn-20-pull {
+            background: linear-gradient(135deg, #ff758c, #a17fe0) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 6px 20px rgba(255, 117, 140, 0.35) !important;
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255, 117, 151, 0.3); }
+            50% { box-shadow: 0 6px 25px rgba(161, 127, 224, 0.55); transform: translateY(-1px); }
+        }
+
+        .multi-pull-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(255, 117, 151, 0.5);
+            border-radius: 28px;
+            padding: 24px 20px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 117, 151, 0.3);
+            animation: zoomInModal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            color: #2c3e50;
+        }
+
+        [data-theme="dark"] .multi-pull-card {
+            background: rgba(28, 22, 40, 0.96);
+            border-color: rgba(161, 127, 224, 0.4);
+            color: #ecf0f1;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(161, 127, 224, 0.25);
+        }
+
+        @keyframes zoomInModal {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .multi-pull-header {
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .multi-pull-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff758c, #a17fe0);
+            color: white;
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
+        }
+
+        .multi-pull-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .multi-pull-sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .multi-pull-summary-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 14px;
+            max-width: 100%;
+        }
+
+        .multi-summary-tag {
+            background: rgba(255, 117, 151, 0.12);
+            border: 1px solid rgba(255, 117, 151, 0.25);
+            border-radius: 14px;
+            padding: 3px 9px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .multi-pull-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-height: 52vh;
+            overflow-y: auto;
+            padding: 8px 4px;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+        }
+
+        @media (max-width: 540px) {
+            .multi-pull-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .multi-pull-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+        }
+
+        .multi-item-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 14px;
+            padding: 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            border: 2px solid rgba(255, 117, 151, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s;
+            animation: cardFlipIn 0.4s ease backwards;
+        }
+
+        [data-theme="dark"] .multi-item-card {
+            background: rgba(45, 35, 65, 0.85);
+            border-color: rgba(255, 117, 151, 0.2);
+        }
+
+        .multi-item-card.is-rare {
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.45);
+            background: linear-gradient(135deg, rgba(255, 248, 225, 0.95), rgba(255, 236, 179, 0.9)) !important;
+        }
+
+        [data-theme="dark"] .multi-item-card.is-rare {
+            background: linear-gradient(135deg, rgba(60, 45, 25, 0.95), rgba(80, 60, 30, 0.9)) !important;
+        }
+
+        @keyframes cardFlipIn {
+            from { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+            to { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+
+        .multi-item-emoji {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .multi-item-name {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .multi-item-tag {
+            font-size: 0.62rem;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 8px;
+            margin-top: 4px;
+            background: rgba(255, 117, 151, 0.2);
+            color: var(--primary-dark);
+        }
+
+        .multi-item-card.is-rare .multi-item-tag {
+            background: #ffd700;
+            color: #5c3b00;
+        }
+
+        .multi-pull-confirm-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 117, 140, 0.4);
+            transition: all 0.25s;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .multi-pull-confirm-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(255, 117, 140, 0.55);
+        }
+
+        .balloon-fragment {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+            animation: fragmentFly 0.8s ease-out forwards;
+        }
+
+        @keyframes fragmentFly {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.2); opacity: 0; }
+        }
+
         /* 移动端响应式适配 */
         @media (max-width: 600px) {
             .gashapon-machine {
@@ -620,6 +866,17 @@
                         <span style="opacity: 0.3; margin: 0 4px;">|</span>
                         <span>💎 额外特权：<span id="extra-spins-count">0</span> 次</span>
                     </div>
+
+                    <!-- 操作按钮组 (单抽 + 20连抽) -->
+                    <div style="display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 6px; flex-wrap: wrap;">
+                        <button id="btn-spin-once" class="btn-spin-action" onclick="document.getElementById('knob-btn').click()">
+                            <i class="fas fa-play"></i> 拧动单抽
+                        </button>
+                        <button id="btn-multi-spin" class="btn-spin-action btn-20-pull" onclick="doTwentySpins()">
+                            <i class="fas fa-bolt"></i> 🎰 豪华20连扭
+                        </button>
+                    </div>
+
                     <button onclick="openKeyRedeem()" style="background: transparent; border: none; color: var(--secondary); text-decoration: underline; font-weight: 700; cursor: pointer; font-size: 0.85rem; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; transition: opacity 0.2s;"><i class="fas fa-key"></i> 输入特权暗号兑换次数</button>
                 </div>
             </div>
@@ -657,6 +914,28 @@
 
             <!-- 操作按钮 -->
             <button class="btn-close-overlay" id="btn-close-overlay" style="display: none;">收入钱包</button>
+    </div>
+
+    <!-- 🎰 豪华20连扭结算弹窗 -->
+    <div id="multi-pull-modal" class="capsule-open-overlay" style="display: none; z-index: 10000; padding: 15px;">
+        <div class="multi-pull-card">
+            <div class="multi-pull-header">
+                <span class="multi-pull-badge">🎰 豪华20连扭 · 欧气大爆发</span>
+                <h3 class="multi-pull-title">恭喜珊珊宝贝！斩获 20 枚专属特权 🎉</h3>
+                <p class="multi-pull-sub">全部特权卡已存入专属钱包，哲哲随时待命无条件兑现！</p>
+            </div>
+            
+            <div class="multi-pull-summary-tags" id="multi-pull-tags">
+                <!-- 动态汇总 -->
+            </div>
+
+            <div class="multi-pull-grid" id="multi-pull-grid">
+                <!-- 20 张卡片 -->
+            </div>
+
+            <button class="multi-pull-confirm-btn" onclick="closeMultiPullModal()">
+                🎒 一键全收 · 存入特权钱包
+            </button>
         </div>
     </div>
 
@@ -1493,6 +1772,150 @@
                     };
                 }, 600);
             }, 800);
+        }
+
+        // 🎰 豪华 20 连扭核心逻辑
+        function doTwentySpins() {
+            initAudio();
+            if (isSpinning) return;
+
+            const isInfinite = safeGet('gashapon_infinite_spins') === 'true';
+            const todayStr = new Date().toDateString();
+            const lastFreeDate = safeGet('gashapon_last_free_date');
+            const hasFreeSpin = lastFreeDate !== todayStr;
+            let extraSpins = parseInt(safeGet('gashapon_extra_spins', '0')) || 0;
+            const availableSpins = (hasFreeSpin ? 1 : 0) + extraSpins;
+
+            if (!isInfinite && availableSpins < 20) {
+                const proceed = confirm(`💖 珊珊宝贝当前拥有 ${availableSpins} 次特权，不足20次。\n\n哲哲特别开启【宠溺免单特权】，确定启动豪华 20 连扭吗？mua~ ❤️`);
+                if (!proceed) return;
+                // 扣除已有次数（扣到0，其余免单赠送）
+                if (hasFreeSpin) {
+                    safeSet('gashapon_last_free_date', todayStr);
+                }
+                safeSet('gashapon_extra_spins', '0');
+            } else if (!isInfinite) {
+                // 次数充足，正常扣减 20 次
+                let toDeduct = 20;
+                if (hasFreeSpin) {
+                    safeSet('gashapon_last_free_date', todayStr);
+                    toDeduct -= 1;
+                }
+                const newExtra = Math.max(0, extraSpins - toDeduct);
+                safeSet('gashapon_extra_spins', String(newExtra));
+            }
+
+            updateSpinsDisplay();
+            // 云端同步扣除
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    gashapon_last_free_date: todayStr,
+                    gashapon_extra_spins: safeGet('gashapon_extra_spins', '0')
+                })
+            }).catch(e => console.error("Sync spins after 20-pull failed:", e));
+
+            // 清理出蛋口历史留存球
+            const oldBall = document.querySelector('.dropped-ball');
+            if (oldBall) oldBall.remove();
+
+            isSpinning = true;
+
+            // 旋扭疯狂旋转 4 圈
+            knobRotation += 1440;
+            knobElem.style.transform = `rotate(${knobRotation}deg)`;
+
+            // 连击声波
+            for (let i = 0; i < 12; i++) {
+                setTimeout(playKnobClickSound, i * 100);
+            }
+
+            // 扭蛋舱疯狂沸腾
+            balls.forEach(ball => {
+                ball.vx = (Math.random() - 0.5) * 45;
+                ball.vy = -Math.random() * 35 - 15;
+            });
+
+            const turboInterval = setInterval(() => {
+                balls.forEach(ball => {
+                    ball.vx += (Math.random() - 0.5) * 15;
+                    ball.vy -= Math.random() * 8 + 3;
+                });
+            }, 60);
+
+            // 抽取 20 张卡片
+            const rolledCards = [];
+            for (let i = 0; i < 20; i++) {
+                const p = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+                rolledCards.push(p);
+                inventory[p.id] = (inventory[p.id] || 0) + 1;
+            }
+
+            // 存入背包与同步
+            saveInventory();
+            renderWallet();
+
+            // 1.5 秒后展示 20 连抽大奖弹窗
+            setTimeout(() => {
+                clearInterval(turboInterval);
+                isSpinning = false;
+                showMultiPullModal(rolledCards);
+            }, 1500);
+        }
+
+        function showMultiPullModal(cards) {
+            const modal = document.getElementById('multi-pull-modal');
+            const grid = document.getElementById('multi-pull-grid');
+            const tags = document.getElementById('multi-pull-tags');
+            if (!modal || !grid) return;
+
+            grid.innerHTML = '';
+            tags.innerHTML = '';
+
+            // 统计各卡出现频次
+            const counts = {};
+            cards.forEach(c => {
+                counts[c.id] = (counts[c.id] || 0) + 1;
+            });
+
+            // 渲染汇总标签
+            Object.keys(counts).forEach(id => {
+                const prize = PRIZES.find(p => p.id === id);
+                if (prize) {
+                    const tag = document.createElement('span');
+                    tag.className = 'multi-summary-tag';
+                    tag.innerHTML = `${prize.emoji} ${prize.name} <b style="color:#e65275; margin-left:2px;">x${counts[id]}</b>`;
+                    tags.appendChild(tag);
+                }
+            });
+
+            // 渲染 20 张卡片
+            cards.forEach((c, index) => {
+                const isSupreme = c.id === 'supreme' || c.id === 'queen';
+                const div = document.createElement('div');
+                div.className = `multi-item-card ${isSupreme ? 'is-rare' : ''}`;
+                div.style.animationDelay = `${index * 0.04}s`;
+                div.innerHTML = `
+                    <div class="multi-item-emoji">${c.emoji}</div>
+                    <div class="multi-item-name">${c.name}</div>
+                    <span class="multi-item-tag">${isSupreme ? '✨ 欧气SSR' : '🍬 特权'}</span>
+                `;
+                grid.appendChild(div);
+            });
+
+            modal.style.display = 'flex';
+            playChimeSound();
+            triggerMiniHeartConfetti();
+            setTimeout(triggerMiniHeartConfetti, 400);
+        }
+
+        function closeMultiPullModal() {
+            const modal = document.getElementById('multi-pull-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            playPopSound();
         }
 
         // 🏆 小范围心形礼花爆破

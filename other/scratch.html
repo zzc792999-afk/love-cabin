@@ -478,6 +478,226 @@
             color: #121012;
         }
 
+        /* ⚡ 豪华20连刮专属按钮与弹窗卡片网格样式 */
+        .btn-20-pull {
+            background: linear-gradient(135deg, #ff758c, #a17fe0) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 6px 20px rgba(255, 117, 140, 0.35) !important;
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255, 117, 151, 0.3); }
+            50% { box-shadow: 0 6px 25px rgba(161, 127, 224, 0.55); transform: translateY(-1px); }
+        }
+
+        .multi-pull-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(255, 117, 151, 0.5);
+            border-radius: 28px;
+            padding: 24px 20px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 117, 151, 0.3);
+            animation: zoomInModal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            color: #2c3e50;
+        }
+
+        [data-theme="dark"] .multi-pull-card {
+            background: rgba(28, 22, 40, 0.96);
+            border-color: rgba(161, 127, 224, 0.4);
+            color: #ecf0f1;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(161, 127, 224, 0.25);
+        }
+
+        @keyframes zoomInModal {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .multi-pull-header {
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .multi-pull-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff758c, #a17fe0);
+            color: white;
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
+        }
+
+        .multi-pull-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .multi-pull-sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .multi-pull-summary-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 14px;
+            max-width: 100%;
+        }
+
+        .multi-summary-tag {
+            background: rgba(255, 117, 151, 0.12);
+            border: 1px solid rgba(255, 117, 151, 0.25);
+            border-radius: 14px;
+            padding: 3px 9px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .multi-pull-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-height: 52vh;
+            overflow-y: auto;
+            padding: 8px 4px;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+        }
+
+        @media (max-width: 540px) {
+            .multi-pull-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .multi-pull-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+        }
+
+        .multi-item-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 14px;
+            padding: 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            border: 2px solid rgba(255, 117, 151, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s;
+            animation: cardFlipIn 0.4s ease backwards;
+        }
+
+        [data-theme="dark"] .multi-item-card {
+            background: rgba(45, 35, 65, 0.85);
+            border-color: rgba(255, 117, 151, 0.2);
+        }
+
+        .multi-item-card.is-rare {
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.45);
+            background: linear-gradient(135deg, rgba(255, 248, 225, 0.95), rgba(255, 236, 179, 0.9)) !important;
+        }
+
+        [data-theme="dark"] .multi-item-card.is-rare {
+            background: linear-gradient(135deg, rgba(60, 45, 25, 0.95), rgba(80, 60, 30, 0.9)) !important;
+        }
+
+        @keyframes cardFlipIn {
+            from { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+            to { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+
+        .multi-item-emoji {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .multi-item-name {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .multi-item-tag {
+            font-size: 0.62rem;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 8px;
+            margin-top: 4px;
+            background: rgba(255, 117, 151, 0.2);
+            color: var(--primary-dark);
+        }
+
+        .multi-item-card.is-rare .multi-item-tag {
+            background: #ffd700;
+            color: #5c3b00;
+        }
+
+        .multi-pull-confirm-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 117, 140, 0.4);
+            transition: all 0.25s;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .multi-pull-confirm-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(255, 117, 140, 0.55);
+        }
+
+        .balloon-fragment {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+            animation: fragmentFly 0.8s ease-out forwards;
+        }
+
+        @keyframes fragmentFly {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.2); opacity: 0; }
+        }
+
         /* 移动端适配 */
         @media (max-width: 600px) {
             .scratch-card-box {
@@ -540,9 +760,10 @@
                 <span>🎁 额外机会：<span id="extra-scratches-count">0</span> 次</span>
             </div>
 
-            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                <button class="btn-action" id="btn-action" onclick="buyNewCard()" style="margin: 0; flex: 1; min-width: 200px;">🎁 解锁今日免费刮刮乐</button>
-                <button class="btn-action" id="btn-redeem" onclick="redeemScratchKey()" style="margin: 0; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); font-size: 0.85rem; max-width: 150px; flex: 1;"><i class="fas fa-key"></i> 兑换特权暗号</button>
+            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button class="btn-action" id="btn-action" onclick="buyNewCard()" style="margin: 0; flex: 1; min-width: 150px;">🎁 解锁单张刮刮乐</button>
+                <button class="btn-action btn-20-pull" id="btn-20-scratch" onclick="doTwentyScratch()" style="margin: 0; flex: 1; min-width: 150px;"><i class="fas fa-bolt"></i> ⚡ 豪华20连刮</button>
+                <button class="btn-action" id="btn-redeem" onclick="redeemScratchKey()" style="margin: 0; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); font-size: 0.85rem; max-width: 130px; flex: 1;"><i class="fas fa-key"></i> 兑换暗号</button>
             </div>
         </div>
 
@@ -568,7 +789,29 @@
             </div>
         </div>
         <button class="btn-use-prize" id="btn-use-prize">确定核销一张</button>
-        <button class="btn-close-modal" onclick="closeModal()">关闭</button>
+    </div>
+
+    <!-- 🎟️ 豪华20连刮结算弹窗 -->
+    <div id="multi-scratch-modal" class="modal-overlay" style="display: none; z-index: 10000; padding: 15px;">
+        <div class="multi-pull-card">
+            <div class="multi-pull-header">
+                <span class="multi-pull-badge">🎟️ 豪华20连刮 · 恋爱特权大丰收</span>
+                <h3 class="multi-pull-title">恭喜珊珊宝贝！20张特权卡全部解封 🎉</h3>
+                <p class="multi-pull-sub">指尖划破银河！所有刮出的心动特权已存入钱包，哲哲随时待命无条件兑现！</p>
+            </div>
+            
+            <div class="multi-pull-summary-tags" id="multi-scratch-tags">
+                <!-- 动态汇总 -->
+            </div>
+
+            <div class="multi-pull-grid" id="multi-scratch-grid">
+                <!-- 20 张卡片 -->
+            </div>
+
+            <button class="multi-pull-confirm-btn" onclick="closeMultiScratchModal()">
+                🎒 一键全收 · 存入特权钱包
+            </button>
+        </div>
     </div>
 
     <script>
@@ -994,6 +1237,169 @@
                 updateCountsDisplay();
             } else {
                 alert('🙋 今日的免费和额外刮刮乐机会都已用完啦！请通过特权暗号获取更多机会，或者等明天再来噢~');
+            }
+        }
+
+        // ⚡ 豪华 20 连刮核心逻辑
+        function doTwentyScratch() {
+            initAudio();
+            const todayStr = new Date().toDateString();
+            const lastFreeDate = safeGet('scratch_last_free_date');
+            const hasFreeScratch = lastFreeDate !== todayStr;
+            const isInfinite = safeGet('scratch_infinite_spins') === 'true';
+            let extraSpins = parseInt(safeGet('scratch_extra_spins', '0')) || 0;
+            const availableSpins = (hasFreeScratch ? 1 : 0) + extraSpins;
+
+            if (!isInfinite && availableSpins < 20) {
+                const proceed = confirm(`💖 珊珊宝贝当前拥有 ${availableSpins} 次刮刮乐机会，不足20次。\n\n哲哲特别启动【宠溺免单特权】，确定开启豪华 20 连刮吗？mua~ ❤️`);
+                if (!proceed) return;
+                // 扣除已有次数
+                if (hasFreeScratch) {
+                    safeSet('scratch_last_free_date', todayStr);
+                }
+                safeSet('scratch_extra_spins', '0');
+            } else if (!isInfinite) {
+                let toDeduct = 20;
+                if (hasFreeScratch) {
+                    safeSet('scratch_last_free_date', todayStr);
+                    toDeduct -= 1;
+                }
+                const newExtra = Math.max(0, extraSpins - toDeduct);
+                safeSet('scratch_extra_spins', String(newExtra));
+            }
+
+            updateCountsDisplay();
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    scratch_last_free_date: todayStr,
+                    scratch_extra_spins: safeGet('scratch_extra_spins', '0'),
+                    scratch_pending_prize_id: "",
+                    scratch_pending_deck: ""
+                })
+            }).catch(e => console.error("Sync scratch spins after 20-pull failed:", e));
+
+            // 播放刮卡音效组合
+            for (let i = 0; i < 8; i++) {
+                setTimeout(playScratchSound, i * 120);
+            }
+
+            // 刮卡区域动态金光摇晃
+            const containerBox = document.getElementById('scratch-card-container');
+            if (containerBox) {
+                containerBox.style.transform = 'scale(1.04) rotate(-1deg)';
+                setTimeout(() => { containerBox.style.transform = 'scale(1.04) rotate(1deg)'; }, 200);
+                setTimeout(() => { containerBox.style.transform = 'none'; }, 600);
+            }
+
+            // 抽取 20 张卡券 (以当前卡组为主，兼顾趣味搭配)
+            const rolledCards = [];
+            const primaryPool = ALL_PRIZES.filter(p => p.type === currentDeck);
+            const secondaryPool = ALL_PRIZES;
+
+            for (let i = 0; i < 20; i++) {
+                // 70% 概率抽当前卡组，30% 概率出全卡池惊喜
+                const pool = (Math.random() < 0.7 && primaryPool.length > 0) ? primaryPool : secondaryPool;
+                const p = pool[Math.floor(Math.random() * pool.length)];
+                rolledCards.push(p);
+                inventory[p.id] = (inventory[p.id] || 0) + 1;
+            }
+
+            // 存入背包并渲染
+            saveInventory();
+            renderWallet();
+
+            // 0.8秒后展开20连刮华丽结算弹窗
+            setTimeout(() => {
+                showMultiScratchModal(rolledCards);
+            }, 800);
+        }
+
+        function showMultiScratchModal(cards) {
+            const modal = document.getElementById('multi-scratch-modal');
+            const grid = document.getElementById('multi-scratch-grid');
+            const tags = document.getElementById('multi-scratch-tags');
+            if (!modal || !grid) return;
+
+            grid.innerHTML = '';
+            tags.innerHTML = '';
+
+            // 统计各类型与各卡出现频次
+            const typeCounts = { privilege: 0, penalty: 0, wish: 0 };
+            const counts = {};
+            cards.forEach(c => {
+                counts[c.id] = (counts[c.id] || 0) + 1;
+                if (c.type && typeCounts[c.type] !== undefined) {
+                    typeCounts[c.type]++;
+                }
+            });
+
+            // 渲染汇总标签
+            const typeLabels = {
+                privilege: '🍬 甜蜜特权',
+                penalty: '🧸 搞怪惩罚',
+                wish: '✨ 至尊心愿'
+            };
+            Object.keys(typeCounts).forEach(type => {
+                if (typeCounts[type] > 0) {
+                    const tag = document.createElement('span');
+                    tag.className = 'multi-summary-tag';
+                    tag.innerHTML = `${typeLabels[type]} <b style="color:#e65275; margin-left:2px;">x${typeCounts[type]}</b>`;
+                    tags.appendChild(tag);
+                }
+            });
+
+            // 渲染 20 张刮刮乐卡片
+            cards.forEach((c, index) => {
+                const isWish = c.type === 'wish';
+                const div = document.createElement('div');
+                div.className = `multi-item-card ${isWish ? 'is-rare' : ''}`;
+                div.style.animationDelay = `${index * 0.04}s`;
+                div.innerHTML = `
+                    <div class="multi-item-emoji">${c.emoji}</div>
+                    <div class="multi-item-name">${c.name}</div>
+                    <span class="multi-item-tag">${isWish ? '✨ 至尊心愿' : (c.type === 'penalty' ? '🧸 惩罚' : '🍬 特权')}</span>
+                `;
+                grid.appendChild(div);
+            });
+
+            modal.style.display = 'flex';
+            triggerMiniHeartConfetti();
+            setTimeout(triggerMiniHeartConfetti, 400);
+        }
+
+        function closeMultiScratchModal() {
+            const modal = document.getElementById('multi-scratch-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // 🏆 小范围心形礼花爆破
+        function triggerMiniHeartConfetti() {
+            const emojis = ['💖', '💕', '✨', '🌸', '❤️', '🎟️'];
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            
+            for (let i = 0; i < 25; i++) {
+                const frag = document.createElement('div');
+                frag.className = 'balloon-fragment';
+                frag.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                frag.style.left = (screenW / 2) + 'px';
+                frag.style.top = (screenH / 2 - 100) + 'px';
+                frag.style.fontSize = Math.random() * 15 + 15 + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 150 + 60;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                
+                frag.style.setProperty('--tx', tx + 'px');
+                frag.style.setProperty('--ty', ty + 'px');
+                
+                document.body.appendChild(frag);
+                setTimeout(() => frag.remove(), 800);
             }
         }
 

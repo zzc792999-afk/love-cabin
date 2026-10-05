@@ -2898,6 +2898,69 @@ details[open] .drawer-arrow {
     color: #fff;
 }
 
+/* 🎥 3D 特写运镜聚焦栏 */
+.cabin-camera-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+}
+.cabin-camera-bar::-webkit-scrollbar {
+    display: none;
+}
+.camera-bar-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #a17fe0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.camera-view-btn {
+    flex-shrink: 0;
+    padding: 4px 11px;
+    border-radius: 16px;
+    border: 1px solid rgba(161, 127, 224, 0.35);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #4a4e69;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(161, 127, 224, 0.08);
+    user-select: none;
+    white-space: nowrap;
+}
+.camera-view-btn:hover {
+    transform: translateY(-2px);
+    border-color: #a17fe0;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(161, 127, 224, 0.22);
+}
+.camera-view-btn.active {
+    background: linear-gradient(135deg, #a17fe0 0%, #7209b7 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(114, 9, 183, 0.35);
+    transform: scale(1.04);
+}
+[data-theme="dark"] .camera-view-btn {
+    background: rgba(35, 25, 48, 0.88);
+    color: #e2d9f3;
+    border-color: rgba(161, 127, 224, 0.3);
+}
+[data-theme="dark"] .camera-view-btn.active {
+    background: linear-gradient(135deg, #a17fe0 0%, #560bad 100%);
+    color: #fff;
+}
+
 .cabin-weather-badge {
     display: inline-flex;
     align-items: center;
@@ -3342,4 +3405,203 @@ details[open] .drawer-arrow {
     font-size: 0.95rem;
     cursor: pointer;
     box-shadow: 0 6px 18px rgba(255, 71, 126, 0.35);
+}
+
+/* ==========================================
+   💌 每日专属恋爱明信片 (平阳专属) Modal
+   ========================================== */
+.postcard-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.postcard-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.postcard-card {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    position: relative;
+    color: #2b2d42;
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: linear-gradient(145deg, #fffafb 0%, #ffffff 100%);
+    border: 2px solid #ffe3ea;
+}
+
+[data-theme="dark"] .postcard-card {
+    background: linear-gradient(145deg, #241d33 0%, #1e192c 100%);
+    border-color: rgba(255, 117, 151, 0.3);
+    color: #f7cad0;
+}
+
+.postcard-modal-overlay.active .postcard-card {
+    transform: scale(1);
+}
+
+.postcard-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.postcard-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    border-bottom: 2px dashed #ffd1dc;
+    padding-bottom: 14px;
+}
+
+.postcard-meta-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #ff477e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.postcard-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.postcard-stamp {
+    width: 76px;
+    height: 64px;
+    border: 2px dashed #ff758c;
+    border-radius: 8px;
+    background: #fff0f3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(255, 117, 151, 0.15);
+}
+
+.postcard-stamp:active {
+    transform: scale(0.92);
+}
+
+.postcard-stamp .stamp-icon {
+    font-size: 1.5rem;
+}
+
+.postcard-stamp .stamp-text {
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #ff477e;
+    letter-spacing: 0.5px;
+}
+
+.postcard-weather-pill {
+    background: rgba(255, 117, 151, 0.1);
+    border-radius: 14px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ff477e;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.postcard-quote-box {
+    background: #fff5f7;
+    border-left: 4px solid #ff477e;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #4a4e69;
+    font-style: italic;
+    min-height: 60px;
+}
+
+[data-theme="dark"] .postcard-quote-box {
+    background: rgba(255, 255, 255, 0.04);
+    color: #f7cad0;
+}
+
+.postcard-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.postcard-btn-sub {
+    flex: 1;
+    background: rgba(255, 117, 151, 0.12);
+    color: #ff477e;
+    border: 1px solid rgba(255, 117, 151, 0.3);
+    padding: 10px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.postcard-btn-sub:hover {
+    background: #ff477e;
+    color: #fff;
+}
+
+.postcard-btn-main {
+    flex: 1.3;
+    background: linear-gradient(135deg, #ff477e, #ff758f);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 71, 126, 0.35);
+}
+
+.postcard-btn-main:active {
+    transform: scale(0.96);
+}
+
+/* 移动端安全区域适配优化 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .nav-bar {
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
 }

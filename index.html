@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=3.5">
+    <link rel="stylesheet" href="style.css?v=3.6">
 </head>
 <body>
 
@@ -76,7 +76,7 @@
                     </div>
                     <div class="cabin-3d-subbar">
                         <div class="cabin-3d-hint">
-                            <i class="fas fa-paw"></i> 摸摸地毯上的小猫咪 · 随平阳实时天气变化
+                            <i class="fas fa-heart" style="color:#ff477e;"></i> 点击哲哲与珊珊贴贴抱抱 · 摸摸小猫咪 · 平阳实时天气
                         </div>
                     </div>
 
@@ -85,6 +85,7 @@
 
                     <!-- 快捷家具快速交互药丸 -->
                     <div class="cabin-quick-pills">
+                        <button class="quick-pill" onclick="window.Cabin3D && window.Cabin3D.interactCouple()"><i class="fas fa-heart" style="color:#ff477e;"></i> 💑 哲哲与珊珊 (贴贴/抱抱)</button>
                         <button class="quick-pill" onclick="window.Cabin3D && window.Cabin3D.interactCat()"><i class="fas fa-paw" style="color:#ff9f1c;"></i> 🐱 逗逗小猫咪 (伸懒腰/打呼噜)</button>
                         <button class="quick-pill" onclick="window.location.href='other/takeout.html'"><i class="fas fa-utensils" style="color:#ff758c;"></i> 🧊 打开小冰箱</button>
                         <button class="quick-pill" onclick="window.location.href='other/slap.html'"><i class="fas fa-hand-sparkles" style="color:#ff477e;"></i> 🥊 暴揍臭臭</button>
@@ -470,12 +471,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=3.5"></script>
+    <script src="app.js?v=3.6"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=3.5"></script>
+    <script src="js/cabin3d.js?v=3.6"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=3.5"></script>
+    <script src="js/features3.js?v=3.6"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

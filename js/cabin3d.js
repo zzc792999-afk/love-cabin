@@ -26,6 +26,11 @@
     let isStretching = false;
     let stretchStartTime = 0;
 
+    // 哲哲与珊珊情侣人物与互动状态变量
+    let coupleGroup = null;
+    let isCuddling = false;
+    let cuddleStartTime = 0;
+
     // 按需高效渲染控制
     let renderFramesLeft = 60;
     function requestRender(frames = 30) {
@@ -34,6 +39,11 @@
 
     // 家具定义与对应互动事件
     const FURNITURE_DEFS = {
+        couple: {
+            title: "💑 哲哲与珊珊",
+            desc: "我们的时光小窝！点击甜蜜贴贴抱抱~ ❤️",
+            action: () => triggerCoupleCuddle()
+        },
         cat: {
             title: "🐱 暖心陪伴小咪",
             desc: "点一下小猫咪会伸懒腰、打呼噜！随平阳天气变化互动",
@@ -122,6 +132,7 @@
         buildGramophone();
         buildDecorations();
         buildCat();
+        buildCoupleFigures();
 
         // 6. 交互射线投射
         raycaster = new THREE.Raycaster();
@@ -625,6 +636,290 @@
         registerInteractive(catGroup, 'cat');
     }
 
+    // 💑 哲哲 & 珊珊 专属 3D Q版情侣形象 (依偎在双人暖萌床前，甜蜜贴贴)
+    function buildCoupleFigures() {
+        coupleGroup = new THREE.Group();
+        coupleGroup.name = "couple";
+
+        // 共享材质
+        const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdfba, roughness: 0.5 });
+        const blushMat = new THREE.MeshBasicMaterial({ color: 0xff8fa3, transparent: true, opacity: 0.75 });
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1d2d44 });
+        const eyeShineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+        // ==========================================
+        // 👦 1. 臭臭 (陈祖哲) - 帅气暖男卫衣，宠溺揽肩
+        // ==========================================
+        const zhezhe = new THREE.Group();
+        zhezhe.name = "zhezhe";
+        zhezhe.position.set(-0.32, 0, 0);
+        coupleGroup.add(zhezhe);
+        coupleGroup.userData.zhezhe = zhezhe;
+
+        // 身体/卫衣 (深邃雅致藏青蓝)
+        const boyHoodieMat = new THREE.MeshStandardMaterial({ color: 0x3d5a80, roughness: 0.6 });
+        const boyBody = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.44, 16), boyHoodieMat);
+        boyBody.position.set(0, 0.22, 0);
+        zhezhe.add(boyBody);
+
+        // 卫衣帽子圈与拉链装饰
+        const boyHoodMat = new THREE.MeshStandardMaterial({ color: 0x2b3a4a });
+        const boyHood = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.045, 8, 16), boyHoodMat);
+        boyHood.rotation.x = Math.PI / 2.2;
+        boyHood.position.set(0, 0.42, -0.06);
+        zhezhe.add(boyHood);
+
+        // 哲哲头部
+        const boyHeadGroup = new THREE.Group();
+        boyHeadGroup.position.set(0, 0.65, 0);
+        zhezhe.add(boyHeadGroup);
+        coupleGroup.userData.boyHead = boyHeadGroup;
+
+        const boyHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinMat);
+        boyHeadGroup.add(boyHead);
+
+        // 哲哲帅气短发
+        const boyHairMat = new THREE.MeshStandardMaterial({ color: 0x22222b, roughness: 0.7 });
+        const boyHairTop = new THREE.Mesh(new THREE.SphereGeometry(0.235, 14, 14), boyHairMat);
+        boyHairTop.scale.set(1.02, 1.05, 1.02);
+        boyHairTop.position.set(0, 0.04, -0.03);
+        boyHeadGroup.add(boyHairTop);
+
+        // 额前刘海碎发
+        for (let i = -2; i <= 2; i++) {
+            const bang = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.12, 4), boyHairMat);
+            bang.position.set(i * 0.05, 0.12, 0.18);
+            bang.rotation.x = Math.PI / 1.3;
+            bang.rotation.z = i * 0.1;
+            boyHeadGroup.add(bang);
+        }
+
+        // 哲哲五官
+        const boyEyeL = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), eyeMat);
+        boyEyeL.position.set(-0.08, -0.01, 0.19);
+        boyHeadGroup.add(boyEyeL);
+        const boyEyeR = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), eyeMat);
+        boyEyeR.position.set(0.08, -0.01, 0.19);
+        boyHeadGroup.add(boyEyeR);
+
+        const boyShineL = new THREE.Mesh(new THREE.SphereGeometry(0.01, 6, 6), eyeShineMat);
+        boyShineL.position.set(-0.085, 0.005, 0.21);
+        boyHeadGroup.add(boyShineL);
+        const boyShineR = new THREE.Mesh(new THREE.SphereGeometry(0.01, 6, 6), eyeShineMat);
+        boyShineR.position.set(0.075, 0.005, 0.21);
+        boyHeadGroup.add(boyShineR);
+
+        // 哲哲微腮红与宠溺微笑
+        const boyBlushL = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.03), blushMat);
+        boyBlushL.position.set(-0.11, -0.06, 0.2);
+        boyHeadGroup.add(boyBlushL);
+        const boyBlushR = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.03), blushMat);
+        boyBlushR.position.set(0.11, -0.06, 0.2);
+        boyHeadGroup.add(boyBlushR);
+
+        // 哲哲手臂 (右臂自然环绕抱向珊珊)
+        const boyArmL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.32, 8), boyHoodieMat);
+        boyArmL.position.set(-0.25, 0.2, 0.05);
+        boyArmL.rotation.z = 0.2;
+        zhezhe.add(boyArmL);
+
+        const boyArmR = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.35, 8), boyHoodieMat);
+        boyArmR.position.set(0.24, 0.24, 0.06);
+        boyArmR.rotation.z = -1.1; // 宠溺搭向珊珊肩膀
+        boyArmR.rotation.x = -0.3;
+        zhezhe.add(boyArmR);
+
+        // 哲哲悬空晃荡小腿与球鞋
+        const pantsMat = new THREE.MeshStandardMaterial({ color: 0x293241 });
+        const shoeMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+
+        const boyLegGroupL = new THREE.Group();
+        boyLegGroupL.position.set(-0.1, 0.02, 0.12);
+        const boyLegL = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.38, 8), pantsMat);
+        boyLegL.position.set(0, -0.19, 0);
+        boyLegGroupL.add(boyLegL);
+        const boyShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.07, 0.16), shoeMat);
+        boyShoeL.position.set(0, -0.38, 0.05);
+        boyLegGroupL.add(boyShoeL);
+        zhezhe.add(boyLegGroupL);
+        coupleGroup.userData.boyLegL = boyLegGroupL;
+
+        const boyLegGroupR = new THREE.Group();
+        boyLegGroupR.position.set(0.1, 0.02, 0.12);
+        const boyLegR = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.38, 8), pantsMat);
+        boyLegR.position.set(0, -0.19, 0);
+        boyLegGroupR.add(boyLegR);
+        const boyShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.07, 0.16), shoeMat);
+        boyShoeR.position.set(0, -0.38, 0.05);
+        boyLegGroupR.add(boyShoeR);
+        zhezhe.add(boyLegGroupR);
+        coupleGroup.userData.boyLegR = boyLegGroupR;
+
+        // ==========================================
+        // 👧 2. 珊珊宝贝 (白珊珊) - 樱花粉毛衣裙，甜美依偎
+        // ==========================================
+        const shanshan = new THREE.Group();
+        shanshan.name = "shanshan";
+        shanshan.position.set(0.24, 0, 0);
+        coupleGroup.add(shanshan);
+        coupleGroup.userData.shanshan = shanshan;
+
+        // 身体/裙装 (温柔樱花粉)
+        const girlDressMat = new THREE.MeshStandardMaterial({ color: 0xffb3c1, roughness: 0.5 });
+        const girlBody = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 0.42, 16), girlDressMat);
+        girlBody.position.set(0, 0.21, 0);
+        shanshan.add(girlBody);
+
+        // 珍珠白领口结
+        const collarMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const girlCollar = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 8, 16), collarMat);
+        girlCollar.rotation.x = Math.PI / 2;
+        girlCollar.position.set(0, 0.41, 0.02);
+        shanshan.add(girlCollar);
+
+        // 珊珊头部 (略带倾斜依偎向哲哲肩膀)
+        const girlHeadGroup = new THREE.Group();
+        girlHeadGroup.position.set(0, 0.63, 0);
+        girlHeadGroup.rotation.z = -0.18; // 甜蜜倚靠角度
+        shanshan.add(girlHeadGroup);
+        coupleGroup.userData.girlHead = girlHeadGroup;
+
+        const girlHead = new THREE.Mesh(new THREE.SphereGeometry(0.21, 16, 16), skinMat);
+        girlHeadGroup.add(girlHead);
+
+        // 珊珊温婉栗色长发
+        const girlHairMat = new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.7 });
+        const girlHairTop = new THREE.Mesh(new THREE.SphereGeometry(0.23, 16, 16), girlHairMat);
+        girlHairTop.scale.set(1.03, 1.05, 1.04);
+        girlHairTop.position.set(0, 0.03, -0.03);
+        girlHeadGroup.add(girlHairTop);
+
+        // 垂落肩头的两缕软萌长发
+        const hairStrandL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.03, 0.45, 8), girlHairMat);
+        hairStrandL.position.set(-0.16, -0.22, 0.1);
+        hairStrandL.rotation.z = 0.15;
+        girlHeadGroup.add(hairStrandL);
+
+        const hairStrandR = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.03, 0.45, 8), girlHairMat);
+        hairStrandR.position.set(0.16, -0.22, 0.08);
+        hairStrandR.rotation.z = -0.15;
+        girlHeadGroup.add(hairStrandR);
+
+        // 珊珊头上的粉红宝石蝴蝶结发夹
+        const bowMat = new THREE.MeshStandardMaterial({ color: 0xff4d6d, roughness: 0.4 });
+        const bowCenter = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), bowMat);
+        bowCenter.position.set(-0.15, 0.22, 0.12);
+        girlHeadGroup.add(bowCenter);
+        const bowWingL = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.08, 4), bowMat);
+        bowWingL.rotation.z = Math.PI / 2;
+        bowWingL.position.set(-0.2, 0.22, 0.12);
+        girlHeadGroup.add(bowWingL);
+        const bowWingR = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.08, 4), bowMat);
+        bowWingR.rotation.z = -Math.PI / 2;
+        bowWingR.position.set(-0.1, 0.22, 0.12);
+        girlHeadGroup.add(bowWingR);
+
+        // 珊珊萌萌大眼与娇羞腮红
+        const girlEyeL = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 8), eyeMat);
+        girlEyeL.position.set(-0.075, -0.01, 0.185);
+        girlHeadGroup.add(girlEyeL);
+        const girlEyeR = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 8), eyeMat);
+        girlEyeR.position.set(0.075, -0.01, 0.185);
+        girlHeadGroup.add(girlEyeR);
+
+        const girlShineL = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 6), eyeShineMat);
+        girlShineL.position.set(-0.08, 0.005, 0.205);
+        girlHeadGroup.add(girlShineL);
+        const girlShineR = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 6), eyeShineMat);
+        girlShineR.position.set(0.07, 0.005, 0.205);
+        girlHeadGroup.add(girlShineR);
+
+        const girlBlushL = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.035), blushMat);
+        girlBlushL.position.set(-0.11, -0.065, 0.19);
+        girlHeadGroup.add(girlBlushL);
+        const girlBlushR = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.035), blushMat);
+        girlBlushR.position.set(0.11, -0.065, 0.19);
+        girlHeadGroup.add(girlBlushR);
+
+        // 珊珊小手 (双手乖巧环抱胸前，捧着一颗小红心)
+        const girlArmL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.28, 8), girlDressMat);
+        girlArmL.position.set(-0.16, 0.18, 0.12);
+        girlArmL.rotation.x = -0.8;
+        girlArmL.rotation.z = -0.4;
+        shanshan.add(girlArmL);
+
+        const girlArmR = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.28, 8), girlDressMat);
+        girlArmR.position.set(0.16, 0.18, 0.12);
+        girlArmR.rotation.x = -0.8;
+        girlArmR.rotation.z = 0.4;
+        shanshan.add(girlArmR);
+
+        // 珊珊捧着的水晶爱心
+        const miniHeartGeo = new THREE.SphereGeometry(0.05, 12, 12);
+        miniHeartGeo.scale(1, 1.2, 0.6);
+        const miniHeart = new THREE.Mesh(miniHeartGeo, new THREE.MeshStandardMaterial({ color: 0xff477e, emissive: 0xff477e, emissiveIntensity: 0.3 }));
+        miniHeart.position.set(0, 0.14, 0.24);
+        shanshan.add(miniHeart);
+
+        // 珊珊悬空小细腿与小粉鞋
+        const girlLegMat = new THREE.MeshStandardMaterial({ color: 0xffffff }); // 软白袜
+        const girlShoeMat = new THREE.MeshStandardMaterial({ color: 0xff758c }); // 甜粉鞋
+
+        const girlLegGroupL = new THREE.Group();
+        girlLegGroupL.position.set(-0.08, 0.02, 0.12);
+        const girlLegL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.36, 8), girlLegMat);
+        girlLegL.position.set(0, -0.18, 0);
+        girlLegGroupL.add(girlLegL);
+        const girlShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.14), girlShoeMat);
+        girlShoeL.position.set(0, -0.36, 0.04);
+        girlLegGroupL.add(girlShoeL);
+        shanshan.add(girlLegGroupL);
+        coupleGroup.userData.girlLegL = girlLegGroupL;
+
+        const girlLegGroupR = new THREE.Group();
+        girlLegGroupR.position.set(0.08, 0.02, 0.12);
+        const girlLegR = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.36, 8), girlLegMat);
+        girlLegR.position.set(0, -0.18, 0);
+        girlLegGroupR.add(girlLegR);
+        const girlShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.14), girlShoeMat);
+        girlShoeR.position.set(0, -0.36, 0.04);
+        girlLegGroupR.add(girlShoeR);
+        shanshan.add(girlLegGroupR);
+        coupleGroup.userData.girlLegR = girlLegGroupR;
+
+        // ==========================================
+        // 💖 3. 头顶悬浮闪耀浪漫爱心
+        // ==========================================
+        const loveHeartMat = new THREE.MeshStandardMaterial({
+            color: 0xff477e,
+            emissive: 0xff477e,
+            emissiveIntensity: 0.5,
+            roughness: 0.3
+        });
+        const heartGroup = new THREE.Group();
+        heartGroup.position.set(-0.04, 1.05, 0);
+        coupleGroup.add(heartGroup);
+        coupleGroup.userData.heartGroup = heartGroup;
+
+        const sphereL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), loveHeartMat);
+        sphereL.position.set(-0.04, 0.04, 0);
+        heartGroup.add(sphereL);
+        const sphereR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), loveHeartMat);
+        sphereR.position.set(0.04, 0.04, 0);
+        heartGroup.add(sphereR);
+        const bottomCone = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.12, 16), loveHeartMat);
+        bottomCone.rotation.z = Math.PI;
+        bottomCone.position.set(0, -0.02, 0);
+        heartGroup.add(bottomCone);
+
+        // 放置在双人暖萌床床沿，面对镜头与小猫咪
+        coupleGroup.position.set(-1.45, 0.88, -0.22);
+        coupleGroup.rotation.y = 0.22;
+        roomGroup.add(coupleGroup);
+
+        registerInteractive(coupleGroup, 'couple');
+    }
+
     // 辅助心形函数
     function createHeartShape() {
         const shape = new THREE.Shape();
@@ -948,6 +1243,69 @@
             bubbleEl.style.transform = 'translate(-50%, -130px) scale(0.9)';
             setTimeout(() => bubbleEl.remove(), 400);
         }, 900);
+    }
+
+    // 💖 浪漫清脆爱心配乐合成 (八音盒灵动琶音 C5-E5-G5-B5-C6)
+    function playCoupleLoveSound() {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            if (!window.__catAudioCtx) window.__catAudioCtx = new AudioCtx();
+            const ctx = window.__catAudioCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const notes = [523.25, 659.25, 783.99, 987.77, 1046.50];
+            const start = ctx.currentTime;
+
+            notes.forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, start + idx * 0.08);
+
+                gain.gain.setValueAtTime(0.001, start + idx * 0.08);
+                gain.gain.linearRampToValueAtTime(0.08, start + idx * 0.08 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + idx * 0.08 + 0.45);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(start + idx * 0.08);
+                osc.stop(start + idx * 0.08 + 0.5);
+            });
+        } catch (e) {
+            console.warn("Couple love sound synthesis failed:", e);
+        }
+    }
+
+    // 💑 哲哲与珊珊甜蜜贴贴抱抱核心交互
+    function triggerCoupleCuddle() {
+        if (isCuddling) return;
+        isCuddling = true;
+        cuddleStartTime = performance.now();
+
+        // 播放专属八音盒甜蜜音效
+        playCoupleLoveSound();
+
+        // 触发绚丽彩色爱心纸屑烟花
+        if (typeof window.confetti === 'function') {
+            window.confetti({
+                particleCount: 50,
+                spread: 75,
+                origin: { y: 0.62 },
+                colors: ['#ff477e', '#ff758c', '#ffccd5', '#ffd166', '#a17fe0']
+            });
+        }
+
+        const quotes = [
+            "「臭臭轻轻抱住珊珊：有宝贝在身边，小窝才是全世界最温暖的地方~ mua❤️」",
+            "「珊珊甜甜依偎在臭臭怀里：今天也要一直一直抱着不撒手哦~ 💕」",
+            "「臭臭温柔揉了揉珊珊头发：不管窗外晴天雨天，哲哲永远都是珊珊最坚固的依靠！✨」",
+            "「珊珊蹭蹭臭臭肩膀：小窝真舒服，我们要一直一直在一起！🌸」"
+        ];
+        const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+        showFloatingNotice("💑 哲哲与珊珊甜蜜贴贴抱抱~", quote);
+        requestRender(160);
     }
 
     // 🐱 伸懒腰与打呼噜核心互动
@@ -1326,6 +1684,79 @@
             }
         }
 
+        // 1.5 哲哲与珊珊情侣贴贴/悠闲晃荡小腿动画
+        if (coupleGroup) {
+            const time = performance.now() * 0.002;
+            const boyLegL = coupleGroup.userData.boyLegL;
+            const boyLegR = coupleGroup.userData.boyLegR;
+            const girlLegL = coupleGroup.userData.girlLegL;
+            const girlLegR = coupleGroup.userData.girlLegR;
+            const heart = coupleGroup.userData.heartGroup;
+            const zhezhe = coupleGroup.userData.zhezhe;
+            const shanshan = coupleGroup.userData.shanshan;
+
+            if (isCuddling) {
+                const elapsed = (performance.now() - cuddleStartTime) / 1000;
+                if (elapsed < 0.4) {
+                    const p = Math.sin((elapsed / 0.4) * Math.PI / 2);
+                    if (zhezhe) {
+                        zhezhe.position.x = -0.32 + 0.1 * p;
+                        zhezhe.rotation.y = 0.35 * p;
+                    }
+                    if (shanshan) {
+                        shanshan.position.x = 0.24 - 0.1 * p;
+                        shanshan.rotation.z = -0.18 - 0.2 * p;
+                    }
+                    if (heart) {
+                        heart.scale.set(1 + 0.6 * p, 1 + 0.6 * p, 1 + 0.6 * p);
+                    }
+                } else if (elapsed < 1.4) {
+                    const sway = Math.sin(elapsed * 8) * 0.04;
+                    if (zhezhe) zhezhe.position.x = -0.22 + sway;
+                    if (shanshan) shanshan.position.x = 0.14 + sway;
+                    if (heart) {
+                        heart.position.y = 1.05 + Math.sin(elapsed * 12) * 0.08;
+                        heart.rotation.y = elapsed * 4;
+                    }
+                } else if (elapsed < 1.9) {
+                    const p = (elapsed - 1.4) / 0.5;
+                    const settleP = 1 - p;
+                    if (zhezhe) {
+                        zhezhe.position.x = -0.32 + 0.1 * settleP;
+                        zhezhe.rotation.y = 0.35 * settleP;
+                    }
+                    if (shanshan) {
+                        shanshan.position.x = 0.24 - 0.1 * settleP;
+                        shanshan.rotation.z = -0.18 - 0.2 * settleP;
+                    }
+                    if (heart) {
+                        heart.scale.set(1 + 0.6 * settleP, 1 + 0.6 * settleP, 1 + 0.6 * settleP);
+                    }
+                } else {
+                    isCuddling = false;
+                    if (zhezhe) {
+                        zhezhe.position.x = -0.32;
+                        zhezhe.rotation.y = 0;
+                    }
+                    if (shanshan) {
+                        shanshan.position.x = 0.24;
+                        shanshan.rotation.z = -0.18;
+                    }
+                    if (heart) heart.scale.set(1, 1, 1);
+                }
+            } else {
+                // 待机悠闲晃荡双腿与心跳起伏
+                if (boyLegL) boyLegL.rotation.x = Math.sin(time * 2.2) * 0.18;
+                if (boyLegR) boyLegR.rotation.x = Math.sin(time * 2.2 + 0.8) * 0.18;
+                if (girlLegL) girlLegL.rotation.x = Math.sin(time * 2.4 + 0.4) * 0.22;
+                if (girlLegR) girlLegR.rotation.x = Math.sin(time * 2.4 + 1.2) * 0.22;
+                if (heart) {
+                    heart.position.y = 1.05 + Math.sin(time * 2.8) * 0.035;
+                    heart.rotation.y = time * 1.5;
+                }
+            }
+        }
+
         // 2. 雨天平阳雨丝粒子向下流动
         if (rainGroup && rainGroup.visible) {
             const drops = rainGroup.children;
@@ -1339,7 +1770,7 @@
         }
 
         // 3. 动态渲染控制 (有雨、有拉伸或有拖拽时连续渲染，其余静止省电)
-        const shouldContinuousRender = isDragging || isStretching || (rainGroup && rainGroup.visible) || renderFramesLeft > 0;
+        const shouldContinuousRender = isDragging || isStretching || isCuddling || (rainGroup && rainGroup.visible) || renderFramesLeft > 0;
 
         if (shouldContinuousRender) {
             currentRotationY += (targetRotationY - currentRotationY) * 0.1;
@@ -1352,7 +1783,7 @@
 
             renderer.render(scene, camera);
 
-            if (!isDragging && !isStretching && (!rainGroup || !rainGroup.visible)) {
+            if (!isDragging && !isStretching && !isCuddling && (!rainGroup || !rainGroup.visible)) {
                 renderFramesLeft--;
             }
         }
@@ -1360,6 +1791,7 @@
 
     window.Cabin3D = {
         init: init3DStage,
+        interactCouple: triggerCoupleCuddle,
         interactCat: triggerCatStretch,
         showWeather: () => currentWeather && showWeatherCard(currentWeather),
         refreshWeather: fetchPingyangWeather,

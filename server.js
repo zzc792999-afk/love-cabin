@@ -6,30 +6,60 @@ const path = require('path');
 // 🌤️ 平阳天气服务端代理缓存 (让国内手机客户端免受海外 API 波动影响)
 let serverPingyangWeatherCache = null;
 let serverPingyangWeatherTime = 0;
+
+function getFallbackPingyangWeather() {
+    const chinaHour = (new Date().getUTCHours() + 8) % 24;
+    const isDay = (chinaHour >= 6 && chinaHour < 18) ? 1 : 0;
+    return {
+        current: {
+            temperature_2m: 21.0,
+            relative_humidity_2m: 82,
+            is_day: isDay,
+            weather_code: isDay ? 1 : 80,
+            rain: 0,
+            precipitation: 0
+        }
+    };
+}
+
 function getLivePingyangWeather(cb) {
     if (serverPingyangWeatherCache && (Date.now() - serverPingyangWeatherTime < 10 * 60 * 1000)) {
         return cb(null, serverPingyangWeatherCache);
     }
     const apiUrl = 'https://api.open-meteo.com/v1/forecast?latitude=27.666&longitude=120.57&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,weather_code&timezone=Asia%2FShanghai';
-    https.get(apiUrl, (resp) => {
+    const req = https.get(apiUrl, {
+        headers: {
+            'User-Agent': 'LoveCabinServer/3.0 (https://love-cabin.onrender.com)',
+            'Accept': 'application/json'
+        },
+        timeout: 6000
+    }, (resp) => {
         let buffer = '';
         resp.on('data', chunk => buffer += chunk);
         resp.on('end', () => {
             try {
-                const parsed = JSON.parse(buffer);
-                if (parsed && parsed.current) {
-                    serverPingyangWeatherCache = parsed;
-                    serverPingyangWeatherTime = Date.now();
-                    cb(null, parsed);
-                } else {
-                    cb(new Error('Invalid Open-Meteo payload'));
+                if (resp.statusCode >= 200 && resp.statusCode < 300) {
+                    const parsed = JSON.parse(buffer);
+                    if (parsed && parsed.current) {
+                        serverPingyangWeatherCache = parsed;
+                        serverPingyangWeatherTime = Date.now();
+                        return cb(null, parsed);
+                    }
                 }
+                cb(null, getFallbackPingyangWeather());
             } catch (e) {
-                cb(e);
+                cb(null, getFallbackPingyangWeather());
             }
         });
-    }).on('error', (err) => {
-        cb(err);
+    });
+
+    req.on('timeout', () => {
+        req.destroy();
+        cb(null, getFallbackPingyangWeather());
+    });
+
+    req.on('error', (err) => {
+        cb(null, getFallbackPingyangWeather());
     });
 }
 let MongoClient = null;

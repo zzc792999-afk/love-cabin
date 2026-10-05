@@ -1,6 +1,37 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
+
+// 🌤️ 平阳天气服务端代理缓存 (让国内手机客户端免受海外 API 波动影响)
+let serverPingyangWeatherCache = null;
+let serverPingyangWeatherTime = 0;
+function getLivePingyangWeather(cb) {
+    if (serverPingyangWeatherCache && (Date.now() - serverPingyangWeatherTime < 10 * 60 * 1000)) {
+        return cb(null, serverPingyangWeatherCache);
+    }
+    const apiUrl = 'https://api.open-meteo.com/v1/forecast?latitude=27.666&longitude=120.57&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,weather_code&timezone=Asia%2FShanghai';
+    https.get(apiUrl, (resp) => {
+        let buffer = '';
+        resp.on('data', chunk => buffer += chunk);
+        resp.on('end', () => {
+            try {
+                const parsed = JSON.parse(buffer);
+                if (parsed && parsed.current) {
+                    serverPingyangWeatherCache = parsed;
+                    serverPingyangWeatherTime = Date.now();
+                    cb(null, parsed);
+                } else {
+                    cb(new Error('Invalid Open-Meteo payload'));
+                }
+            } catch (e) {
+                cb(e);
+            }
+        });
+    }).on('error', (err) => {
+        cb(err);
+    });
+}
 let MongoClient = null;
 try {
     MongoClient = require('mongodb').MongoClient;
@@ -330,6 +361,20 @@ const server = http.createServer((req, res) => {
         // ==========================================
         // API 路由
         // ==========================================
+
+        // 0. 平阳实时天气代理接口
+        if (pathname === '/api/weather/pingyang' && req.method === 'GET') {
+            getLivePingyangWeather((err, weather) => {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: '获取天气失败', fallback: true }));
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(weather));
+                }
+            });
+            return;
+        }
 
     // 1. 获取留言列表
     if (pathname === '/api/messages' && req.method === 'GET') {

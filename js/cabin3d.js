@@ -1001,12 +1001,12 @@
     }
 
     function fetchPingyangWeather() {
-        // 先检查本地缓存 (15 分钟内有效)
+        // 先检查本地缓存 (10 分钟内有效)
         const cachedStr = localStorage.getItem(WEATHER_CACHE_KEY);
         if (cachedStr) {
             try {
                 const cached = JSON.parse(cachedStr);
-                if (Date.now() - cached.timestamp < 15 * 60 * 1000) {
+                if (Date.now() - cached.timestamp < 10 * 60 * 1000) {
                     currentWeather = cached.data;
                     updateWeatherBadge(currentWeather);
                     applyWeatherToRoom(currentWeather);
@@ -1015,52 +1015,95 @@
             } catch (e) {}
         }
 
-        fetch(PINGYANG_WEATHER_API)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.current) {
-                    const c = data.current;
-                    const info = getWeatherInfo(c.weather_code, c.is_day);
-                    const weatherData = {
-                        temp: Math.round(c.temperature_2m),
-                        humidity: c.relative_humidity_2m,
-                        isDay: c.is_day === 1,
-                        code: c.weather_code,
-                        rain: c.rain || c.precipitation || 0,
-                        desc: info.desc,
-                        icon: info.icon,
-                        type: info.type
-                    };
-
-                    currentWeather = weatherData;
-                    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
-                        data: weatherData,
-                        timestamp: Date.now()
-                    }));
-
-                    updateWeatherBadge(weatherData);
-                    applyWeatherToRoom(weatherData);
-                }
-            })
-            .catch(err => {
-                console.warn("Pingyang weather fetch fallback:", err);
-                // 离线时间感知智能兜底 (UTC+8)
-                const chinaHour = (new Date().getUTCHours() + 8) % 24;
-                const isDay = chinaHour >= 6 && chinaHour < 18;
-                const fallbackData = {
-                    temp: 21,
-                    humidity: 85,
-                    isDay: isDay,
-                    code: isDay ? 1 : 80,
-                    rain: isDay ? 0 : 0.4,
-                    desc: isDay ? '晴间多云' : '小阵雨',
-                    icon: isDay ? '🌤️' : '🌧️',
-                    type: isDay ? 'cloudy' : 'rain'
+        const handleRawData = (data) => {
+            if (data && data.current) {
+                const c = data.current;
+                const info = getWeatherInfo(c.weather_code, c.is_day);
+                const weatherData = {
+                    temp: Math.round(c.temperature_2m),
+                    humidity: c.relative_humidity_2m,
+                    isDay: c.is_day === 1,
+                    code: c.weather_code,
+                    rain: c.rain || c.precipitation || 0,
+                    desc: info.desc,
+                    icon: info.icon,
+                    type: info.type
                 };
-                currentWeather = fallbackData;
-                updateWeatherBadge(fallbackData);
-                applyWeatherToRoom(fallbackData);
-            });
+
+                currentWeather = weatherData;
+                localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
+                    data: weatherData,
+                    timestamp: Date.now()
+                }));
+
+                updateWeatherBadge(weatherData);
+                applyWeatherToRoom(weatherData);
+                return true;
+            }
+            return false;
+        };
+
+        const applyFallback = () => {
+            const chinaHour = (new Date().getUTCHours() + 8) % 24;
+            const isDay = chinaHour >= 6 && chinaHour < 18;
+            const fallbackData = {
+                temp: 21,
+                humidity: 85,
+                isDay: isDay,
+                code: isDay ? 1 : 80,
+                rain: isDay ? 0 : 0.4,
+                desc: isDay ? '晴间多云' : '小阵雨',
+                icon: isDay ? '🌤️' : '🌧️',
+                type: isDay ? 'cloudy' : 'rain'
+            };
+            currentWeather = fallbackData;
+            updateWeatherBadge(fallbackData);
+            applyWeatherToRoom(fallbackData);
+        };
+
+        // 优先通过小屋自身后端 API 获取（速度极快、无境外网络限制），超时则降级直连
+        let isHandled = false;
+        const fetchBackend = () => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 3500);
+
+            fetch('/api/weather/pingyang', { signal: controller.signal })
+                .then(res => res.json())
+                .then(data => {
+                    clearTimeout(timer);
+                    if (!isHandled && handleRawData(data)) {
+                        isHandled = true;
+                    } else if (!isHandled) {
+                        fetchDirect();
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timer);
+                    if (!isHandled) fetchDirect();
+                });
+        };
+
+        const fetchDirect = () => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 4000);
+
+            fetch(PINGYANG_WEATHER_API, { signal: controller.signal })
+                .then(res => res.json())
+                .then(data => {
+                    clearTimeout(timer);
+                    if (!isHandled && handleRawData(data)) {
+                        isHandled = true;
+                    } else if (!isHandled) {
+                        applyFallback();
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timer);
+                    if (!isHandled) applyFallback();
+                });
+        };
+
+        fetchBackend();
     }
 
     // 更新界面天气挂件

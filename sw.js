@@ -1,10 +1,8 @@
 // Service Worker for Love Cabin PWA / Android App
-const CACHE_NAME = 'love-cabin-v3';
+const CACHE_NAME = 'love-cabin-v3.5';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/style.css',
-  '/app.js',
   '/manifest.json'
 ];
 
@@ -34,18 +32,19 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
-  // API 请求与页面导航 (HTML) 走网络优先，离线时回退到缓存
+  // API 请求、页面导航 (HTML) 与核心脚本样式 (.js, .css) 走网络优先，确保代码热更新即刻生效
   const isApi = e.request.url.includes('/api/');
   const isHtml = e.request.mode === 'navigate' ||
                  (e.request.headers.get('accept') && e.request.headers.get('accept').includes('text/html')) ||
                  e.request.url.endsWith('/') ||
                  e.request.url.includes('.html');
+  const isCode = e.request.url.includes('.js') || e.request.url.includes('.css');
 
-  if (isApi || isHtml) {
+  if (isApi || isHtml || isCode) {
     e.respondWith(
       fetch(e.request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && isHtml) {
+          if (networkResponse && networkResponse.status === 200) {
             const clone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
           }
@@ -54,7 +53,7 @@ self.addEventListener('fetch', (e) => {
         .catch(() => caches.match(e.request))
     );
   } else {
-    // 静态资源（CSS, JS, 图片等）：缓存优先，网络回退
+    // 静态多媒体资源（图片、字体、音频等）：缓存优先，网络回退
     e.respondWith(
       caches.match(e.request).then((cachedResponse) => {
         return cachedResponse || fetch(e.request)

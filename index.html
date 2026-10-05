@@ -65,8 +65,18 @@
                         <div class="cabin-3d-title">
                             <i class="fas fa-home"></i> 我们的 3D 专属小窝
                         </div>
+                        <!-- 📍 温州平阳实时天气联动挂件 -->
+                        <div id="cabin-weather-badge" class="cabin-weather-badge" title="点击查看平阳天气寄语">
+                            <span class="weather-dot"></span>
+                            <span class="weather-loc"><i class="fas fa-location-dot"></i> 平阳</span>
+                            <span id="cabin-weather-icon" class="weather-icon">🌧️</span>
+                            <span id="cabin-weather-temp" class="weather-temp">--°C</span>
+                            <span id="cabin-weather-text" class="weather-desc">获取中</span>
+                        </div>
+                    </div>
+                    <div class="cabin-3d-subbar">
                         <div class="cabin-3d-hint">
-                            <i class="fas fa-hand-pointer"></i> 拖拽旋转视角 · 点击家具互动
+                            <i class="fas fa-paw"></i> 摸摸地毯上的小猫咪 · 随平阳实时天气变化
                         </div>
                     </div>
 
@@ -75,6 +85,7 @@
 
                     <!-- 快捷家具快速交互药丸 -->
                     <div class="cabin-quick-pills">
+                        <button class="quick-pill" onclick="window.Cabin3D && window.Cabin3D.interactCat()"><i class="fas fa-paw" style="color:#ff9f1c;"></i> 🐱 逗逗小猫咪 (伸懒腰/打呼噜)</button>
                         <button class="quick-pill" onclick="window.location.href='other/takeout.html'"><i class="fas fa-utensils" style="color:#ff758c;"></i> 🧊 打开小冰箱</button>
                         <button class="quick-pill" onclick="window.location.href='other/slap.html'"><i class="fas fa-hand-sparkles" style="color:#ff477e;"></i> 🥊 暴揍臭臭</button>
                         <button class="quick-pill" onclick="document.querySelectorAll('.nav-item')[1].click()"><i class="fas fa-camera-retro" style="color:#a17fe0;"></i> 📺 回忆放映机</button>

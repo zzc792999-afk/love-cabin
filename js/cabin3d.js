@@ -16,7 +16,17 @@
     let currentRotationX = 0.2;
     let isInitialized = false;
 
-    // 按需高效渲染控制：仅在拖动或视角变化时渲染，静止时 0% GPU 消耗，极速丝滑
+    // 天气与光影系统模块变量
+    let ambientLight, sunLight, pinkPointLight;
+    let skyMesh, skyMat, starsGroup, moonMesh, sunbeamMesh, rainGroup;
+    let currentWeather = null;
+
+    // 虚拟互动猫咪与动画状态变量
+    let catGroup = null;
+    let isStretching = false;
+    let stretchStartTime = 0;
+
+    // 按需高效渲染控制
     let renderFramesLeft = 60;
     function requestRender(frames = 30) {
         renderFramesLeft = Math.max(renderFramesLeft, frames);
@@ -24,6 +34,11 @@
 
     // 家具定义与对应互动事件
     const FURNITURE_DEFS = {
+        cat: {
+            title: "🐱 暖心陪伴小咪",
+            desc: "点一下小猫咪会伸懒腰、打呼噜！随平阳天气变化互动",
+            action: () => triggerCatStretch()
+        },
         bed: {
             title: "🛏️ 双人暖萌床",
             desc: "臭臭已为珊珊暖好被窝啦~ 点击贴贴抱抱！",
@@ -83,14 +98,14 @@
         container.appendChild(renderer.domElement);
 
         // 4. 温馨柔和光影系统
-        const ambientLight = new THREE.AmbientLight(0xfff0f3, 0.95);
+        ambientLight = new THREE.AmbientLight(0xfff0f3, 0.95);
         scene.add(ambientLight);
 
-        const sunLight = new THREE.DirectionalLight(0xfff5eb, 1.15);
+        sunLight = new THREE.DirectionalLight(0xfff5eb, 1.15);
         sunLight.position.set(8, 14, 6);
         scene.add(sunLight);
 
-        const pinkPointLight = new THREE.PointLight(0xff758c, 1.2, 16);
+        pinkPointLight = new THREE.PointLight(0xff758c, 1.2, 16);
         pinkPointLight.position.set(0, 3.5, 0);
         scene.add(pinkPointLight);
 
@@ -106,6 +121,7 @@
         buildMailbox();
         buildGramophone();
         buildDecorations();
+        buildCat();
 
         // 6. 交互射线投射
         raycaster = new THREE.Raycaster();
@@ -117,6 +133,10 @@
         isInitialized = true;
         requestRender(60);
         animate();
+
+        // 7. 启动平阳天气联动系统
+        fetchPingyangWeather();
+        setInterval(fetchPingyangWeather, 10 * 60 * 1000);
     }
 
     // 构建简约房间基础结构 (地板与两面墙壁)
@@ -149,18 +169,77 @@
         wallBack.position.set(0, 2.3, -3.85);
         roomGroup.add(wallBack);
 
-        // 窗户 (左墙带星空光效)
+        // 窗户 (左墙带星空/天气光效)
         const windowFrameMat = new THREE.MeshStandardMaterial({ color: 0xffb3c1 });
         const windowFrame = new THREE.Mesh(new THREE.BoxGeometry(0.35, 2.2, 2.8), windowFrameMat);
         windowFrame.position.set(-3.85, 3.2, 0.5);
         roomGroup.add(windowFrame);
 
-        // 窗外星空深邃蓝
-        const skyMat = new THREE.MeshBasicMaterial({ color: 0x1a1235 });
-        const skyMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.0), skyMat);
+        // 窗外天空底板 (受平阳实时天气影响)
+        skyMat = new THREE.MeshBasicMaterial({ color: 0x1a1235 });
+        skyMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.0), skyMat);
         skyMesh.rotation.y = Math.PI / 2;
         skyMesh.position.set(-3.65, 3.2, 0.5);
         roomGroup.add(skyMesh);
+
+        // 窗外夜空繁星系统 (夜晚或晴夜显现)
+        starsGroup = new THREE.Group();
+        const starMat = new THREE.MeshBasicMaterial({ color: 0xfff9db });
+        for (let i = 0; i < 28; i++) {
+            const star = new THREE.Mesh(new THREE.SphereGeometry(0.018, 4, 4), starMat);
+            star.position.set(
+                -3.62,
+                2.35 + Math.random() * 1.7,
+                -0.6 + Math.random() * 2.2
+            );
+            starsGroup.add(star);
+        }
+        starsGroup.visible = false;
+        roomGroup.add(starsGroup);
+
+        // 窗外月亮 (弯月/暖黄色)
+        moonMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.18, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0xffe066 })
+        );
+        moonMesh.scale.set(0.2, 1, 1);
+        moonMesh.position.set(-3.62, 3.85, 1.3);
+        moonMesh.visible = false;
+        roomGroup.add(moonMesh);
+
+        // 窗前丁达尔暖阳晨光 (晴天显现)
+        const sunbeamGeo = new THREE.CylinderGeometry(0.35, 1.4, 4.8, 16, 1, true);
+        const sunbeamColor = new THREE.MeshBasicMaterial({
+            color: 0xffe8a1,
+            transparent: true,
+            opacity: 0.14,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        });
+        sunbeamMesh = new THREE.Mesh(sunbeamGeo, sunbeamColor);
+        sunbeamMesh.position.set(-1.8, 1.8, 0.8);
+        sunbeamMesh.rotation.z = Math.PI / 3.2;
+        sunbeamMesh.visible = false;
+        roomGroup.add(sunbeamMesh);
+
+        // 窗外平阳雨滴雨丝粒子系统 (雨天显现)
+        rainGroup = new THREE.Group();
+        const dropMat = new THREE.MeshBasicMaterial({
+            color: 0x9be8ff,
+            transparent: true,
+            opacity: 0.75
+        });
+        for (let i = 0; i < 45; i++) {
+            const drop = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.32, 4), dropMat);
+            drop.position.set(
+                -3.63,
+                2.2 + Math.random() * 2.0,
+                -0.7 + Math.random() * 2.4
+            );
+            rainGroup.add(drop);
+        }
+        rainGroup.visible = false;
+        roomGroup.add(rainGroup);
     }
 
     // 🛏️ 双人暖萌床
@@ -391,6 +470,161 @@
         roomGroup.add(plantGroup);
     }
 
+    // 🐱 虚拟互动萌宠小猫咪 (暖心小橘白，安睡在地毯小软垫上)
+    function buildCat() {
+        catGroup = new THREE.Group();
+        catGroup.name = "cat";
+
+        // 1. 猫咪软萌坐垫 (甜甜圈造型小窝)
+        const cushionMat = new THREE.MeshStandardMaterial({ color: 0xffccd5, roughness: 0.8 });
+        const cushion = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.78, 0.12, 24), cushionMat);
+        cushion.position.set(0, 0.06, 0);
+        catGroup.add(cushion);
+
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0xffb4a2, roughness: 0.9 });
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.08, 12, 24), rimMat);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.set(0, 0.14, 0);
+        catGroup.add(rim);
+
+        // 2. 猫咪动态动画骨架根节点
+        const catAnim = new THREE.Group();
+        catAnim.name = "catAnim";
+        catAnim.position.set(0, 0.12, 0);
+        catGroup.add(catAnim);
+        catGroup.userData.catAnim = catAnim;
+
+        // 材质定义
+        const catFurMat = new THREE.MeshStandardMaterial({ color: 0xfcb07e, roughness: 0.6 }); // 温暖奶油橘
+        const catWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }); // 白手白胸
+        const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff8fa3, roughness: 0.4 }); // 耳窝与肉垫粉
+
+        // 躯干 (球形拉伸)
+        const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 16), catFurMat);
+        body.scale.set(0.85, 0.8, 1.15);
+        body.position.set(0, 0.35, 0);
+        catAnim.add(body);
+        catGroup.userData.body = body;
+
+        // 软糯白肚皮
+        const belly = new THREE.Mesh(new THREE.SphereGeometry(0.35, 14, 14), catWhiteMat);
+        belly.scale.set(0.75, 0.7, 0.95);
+        belly.position.set(0, 0.32, 0.18);
+        catAnim.add(belly);
+
+        // 圆圆猫猫头
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, 0.6, 0.42);
+        catAnim.add(headGroup);
+        catGroup.userData.headGroup = headGroup;
+
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 16), catFurMat);
+        head.scale.set(1.05, 0.95, 0.95);
+        headGroup.add(head);
+
+        // 白白腮帮子与嘴套
+        const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), catWhiteMat);
+        muzzle.scale.set(1.2, 0.75, 0.85);
+        muzzle.position.set(0, -0.07, 0.22);
+        headGroup.add(muzzle);
+
+        // 小粉鼻
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.04, 4), pinkMat);
+        nose.rotation.x = Math.PI;
+        nose.position.set(0, -0.04, 0.34);
+        headGroup.add(nose);
+
+        // 萌萌大眼睛
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), eyeMat);
+        eyeL.position.set(-0.12, 0.04, 0.27);
+        headGroup.add(eyeL);
+
+        const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), eyeMat);
+        eyeR.position.set(0.12, 0.04, 0.27);
+        headGroup.add(eyeR);
+
+        // 星星高光
+        const shineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const shineL = new THREE.Mesh(new THREE.SphereGeometry(0.015, 6, 6), shineMat);
+        shineL.position.set(-0.13, 0.06, 0.3);
+        headGroup.add(shineL);
+        const shineR = new THREE.Mesh(new THREE.SphereGeometry(0.015, 6, 6), shineMat);
+        shineR.position.set(0.11, 0.06, 0.3);
+        headGroup.add(shineR);
+
+        // 灵动立体尖耳朵
+        const earL = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.18, 4), catFurMat);
+        earL.position.set(-0.18, 0.28, 0.02);
+        earL.rotation.z = 0.35;
+        earL.rotation.x = -0.15;
+        headGroup.add(earL);
+
+        const earLInner = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.12, 4), pinkMat);
+        earLInner.position.set(-0.17, 0.27, 0.05);
+        earLInner.rotation.z = 0.35;
+        earLInner.rotation.x = -0.15;
+        headGroup.add(earLInner);
+
+        const earR = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.18, 4), catFurMat);
+        earR.position.set(0.18, 0.28, 0.02);
+        earR.rotation.z = -0.35;
+        earR.rotation.x = -0.15;
+        headGroup.add(earR);
+
+        const earRInner = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.12, 4), pinkMat);
+        earRInner.position.set(0.17, 0.27, 0.05);
+        earRInner.rotation.z = -0.35;
+        earRInner.rotation.x = -0.15;
+        headGroup.add(earRInner);
+
+        // 红色项圈与小金铃铛
+        const collarMat = new THREE.MeshStandardMaterial({ color: 0xe63946 });
+        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.025, 8, 16), collarMat);
+        collar.rotation.x = Math.PI / 2.3;
+        collar.position.set(0, -0.2, 0.08);
+        headGroup.add(collar);
+
+        const bell = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshStandardMaterial({ color: 0xffd166, metalness: 0.8, roughness: 0.2 }));
+        bell.position.set(0, -0.27, 0.28);
+        headGroup.add(bell);
+
+        // 软糯前爪爪 (拉伸关键部位)
+        const pawL = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 10), catWhiteMat);
+        pawL.scale.set(0.85, 0.6, 1.25);
+        pawL.position.set(-0.16, 0.12, 0.42);
+        catAnim.add(pawL);
+        catGroup.userData.pawL = pawL;
+
+        const pawR = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 10), catWhiteMat);
+        pawR.scale.set(0.85, 0.6, 1.25);
+        pawR.position.set(0.16, 0.12, 0.42);
+        catAnim.add(pawR);
+        catGroup.userData.pawR = pawR;
+
+        // 灵动长尾巴 (带白尾尖)
+        const tailGroup = new THREE.Group();
+        tailGroup.position.set(0, 0.32, -0.45);
+        catAnim.add(tailGroup);
+        catGroup.userData.tailGroup = tailGroup;
+
+        const tailPart1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.35, 8), catFurMat);
+        tailPart1.position.set(0, 0.15, -0.08);
+        tailPart1.rotation.x = -Math.PI / 3.5;
+        tailGroup.add(tailPart1);
+
+        const tailPart2 = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, 0.35, 8), catWhiteMat);
+        tailPart2.position.set(0, 0.38, -0.02);
+        tailPart2.rotation.x = -Math.PI / 8;
+        tailGroup.add(tailPart2);
+
+        // 放置在房间粉红地毯前方，面向镜头
+        catGroup.position.set(0.9, 0, 0.8);
+        catGroup.rotation.y = -Math.PI / 4;
+        roomGroup.add(catGroup);
+        registerInteractive(catGroup, 'cat');
+    }
+
     // 辅助心形函数
     function createHeartShape() {
         const shape = new THREE.Shape();
@@ -594,11 +828,477 @@
         }
     }
 
+    // 🎵 Web Audio API 原生合成逼真猫咪呼噜声与软萌轻喵
+    function playCatPurrSound() {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            if (!window.__catAudioCtx) {
+                window.__catAudioCtx = new AudioCtx();
+            }
+            const ctx = window.__catAudioCtx;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+
+            const now = ctx.currentTime;
+
+            // 1. 软萌开场奶猫轻叫 (560Hz -> 780Hz -> 460Hz)
+            const meowOsc = ctx.createOscillator();
+            const meowGain = ctx.createGain();
+            meowOsc.type = 'sine';
+            meowOsc.frequency.setValueAtTime(560, now);
+            meowOsc.frequency.exponentialRampToValueAtTime(780, now + 0.15);
+            meowOsc.frequency.exponentialRampToValueAtTime(460, now + 0.35);
+
+            meowGain.gain.setValueAtTime(0.06, now);
+            meowGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+            meowOsc.connect(meowGain);
+            meowGain.connect(ctx.destination);
+            meowOsc.start(now);
+            meowOsc.stop(now + 0.4);
+
+            // 2. 猫咪喉腔共振节律呼噜声 (24Hz 振幅调制在 68Hz 载波，典型猫咪惬意呼噜音频)
+            const carrier = ctx.createOscillator();
+            carrier.type = 'triangle';
+            carrier.frequency.setValueAtTime(68, now + 0.2);
+
+            const lfo = ctx.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(24, now + 0.2);
+
+            const lfoGain = ctx.createGain();
+            lfoGain.gain.setValueAtTime(0.08, now + 0.2);
+
+            const mainGain = ctx.createGain();
+            mainGain.gain.setValueAtTime(0.001, now + 0.2);
+            mainGain.gain.linearRampToValueAtTime(0.12, now + 0.5);
+            mainGain.gain.setValueAtTime(0.12, now + 1.6);
+            mainGain.gain.exponentialRampToValueAtTime(0.001, now + 2.3);
+
+            lfo.connect(mainGain.gain);
+            carrier.connect(mainGain);
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(150, now);
+
+            mainGain.connect(filter);
+            filter.connect(ctx.destination);
+
+            carrier.start(now + 0.2);
+            lfo.start(now + 0.2);
+            carrier.stop(now + 2.35);
+            lfo.stop(now + 2.35);
+        } catch (e) {
+            console.warn("Purr sound synthesis failed:", e);
+        }
+    }
+
+    // 💭 猫咪头顶升起呼噜爱心气泡
+    function spawnPurrFloatingBubble() {
+        const container = document.getElementById('cabin-3d-viewport');
+        if (!container || !catGroup || !camera) return;
+
+        const catWorldPos = new THREE.Vector3();
+        catGroup.getWorldPosition(catWorldPos);
+        catWorldPos.y += 0.85;
+
+        const screenPos = catWorldPos.clone().project(camera);
+        const rect = container.getBoundingClientRect();
+        const x = ((screenPos.x + 1) / 2) * rect.width;
+        const y = ((-screenPos.y + 1) / 2) * rect.height;
+
+        const bubbles = ['💭 咕噜噜~', '💖', '✨ 呼噜呼噜...', '🐾 舒服~', '🌸 蹭蹭宝贝~'];
+        const text = bubbles[Math.floor(Math.random() * bubbles.length)];
+
+        const bubbleEl = document.createElement('div');
+        bubbleEl.className = 'cat-purr-bubble';
+        bubbleEl.textContent = text;
+        bubbleEl.style.cssText = `
+            position: absolute;
+            left: ${x + (Math.random() - 0.5) * 35}px;
+            top: ${y}px;
+            transform: translate(-50%, -50%) scale(0.6);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 117, 151, 0.45);
+            color: #ff477e;
+            font-weight: 800;
+            font-size: 0.82rem;
+            padding: 4px 10px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(255, 71, 126, 0.25);
+            pointer-events: none;
+            z-index: 90;
+            transition: all 1.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+            opacity: 0;
+            user-select: none;
+            white-space: nowrap;
+        `;
+        container.appendChild(bubbleEl);
+
+        requestAnimationFrame(() => {
+            bubbleEl.style.opacity = '1';
+            bubbleEl.style.transform = 'translate(-50%, -90px) scale(1.05)';
+        });
+
+        setTimeout(() => {
+            bubbleEl.style.opacity = '0';
+            bubbleEl.style.transform = 'translate(-50%, -130px) scale(0.9)';
+            setTimeout(() => bubbleEl.remove(), 400);
+        }, 900);
+    }
+
+    // 🐱 伸懒腰与打呼噜核心互动
+    function triggerCatStretch() {
+        if (isStretching) return;
+        isStretching = true;
+        stretchStartTime = performance.now();
+
+        // 播放合成呼噜声
+        playCatPurrSound();
+
+        // 伴随升起爱心呼噜气泡
+        spawnPurrFloatingBubble();
+        setTimeout(spawnPurrFloatingBubble, 400);
+        setTimeout(spawnPurrFloatingBubble, 850);
+
+        // 根据平阳实时天气定制猫咪暖心对白
+        let weatherCatMsg = "「咕噜噜~ 呼噜呼噜... 珊珊摸得好舒服呀！小咪最喜欢宝贝啦~」";
+        if (currentWeather && currentWeather.type === 'rain') {
+            weatherCatMsg = "「平阳下着细雨呢，小咪在暖被窝边陪着珊珊，咕噜噜... 舒服到翻肚皮~」";
+        } else if (currentWeather && currentWeather.type === 'sunny' && currentWeather.isDay) {
+            weatherCatMsg = "「平阳阳光好暖和呀！小咪晒着太阳伸个大大的懒腰~ 喵呜~ 蹭蹭宝贝~」";
+        } else if (currentWeather && !currentWeather.isDay) {
+            weatherCatMsg = "「夜深啦，平阳的夜空好静。小咪打着小呼噜陪珊珊，今晚也要做好梦哦~ 💤」";
+        }
+
+        showFloatingNotice("🐱 咪咪惬意地伸了个大懒腰~", weatherCatMsg);
+        requestRender(140);
+    }
+
+    // ================================================================
+    // 🌤️ 浙江温州平阳实时天气系统与 3D 房间环境联动
+    // ================================================================
+    const PINGYANG_WEATHER_API = 'https://api.open-meteo.com/v1/forecast?latitude=27.666&longitude=120.57&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,weather_code&timezone=Asia%2FShanghai';
+    const WEATHER_CACHE_KEY = 'love_cabin_pingyang_weather';
+
+    function getWeatherInfo(code, isDay) {
+        if (code === 0) return { desc: isDay ? '晴朗明媚' : '晴朗星夜', icon: isDay ? '☀️' : '🌙', type: 'sunny' };
+        if (code === 1) return { desc: isDay ? '晴间多云' : '微云夜', icon: isDay ? '🌤️' : '☁️', type: 'cloudy' };
+        if (code === 2) return { desc: '多云和煦', icon: '⛅', type: 'cloudy' };
+        if (code === 3) return { desc: '阴天温和', icon: '☁️', type: 'overcast' };
+        if (code === 45 || code === 48) return { desc: '薄雾迷蒙', icon: '🌫️', type: 'fog' };
+        if (code >= 51 && code <= 55) return { desc: '毛毛细雨', icon: '🌦️', type: 'rain' };
+        if (code >= 61 && code <= 65) return { desc: '淅沥雨天', icon: '🌧️', type: 'rain' };
+        if (code === 66 || code === 67) return { desc: '冻雨微凉', icon: '🌧️', type: 'rain' };
+        if (code >= 71 && code <= 77) return { desc: '浪漫小雪', icon: '❄️', type: 'snow' };
+        if (code >= 80 && code <= 82) return { desc: '阵雨淅沥', icon: '🌧️', type: 'rain' };
+        if (code === 85 || code === 86) return { desc: '阵雪纷飞', icon: '🌨️', type: 'snow' };
+        if (code >= 95) return { desc: '雷阵雨', icon: '⛈️', type: 'storm' };
+        return { desc: isDay ? '舒适微风' : '恬静夜晚', icon: isDay ? '🌤️' : '🌙', type: 'sunny' };
+    }
+
+    function fetchPingyangWeather() {
+        // 先检查本地缓存 (15 分钟内有效)
+        const cachedStr = localStorage.getItem(WEATHER_CACHE_KEY);
+        if (cachedStr) {
+            try {
+                const cached = JSON.parse(cachedStr);
+                if (Date.now() - cached.timestamp < 15 * 60 * 1000) {
+                    currentWeather = cached.data;
+                    updateWeatherBadge(currentWeather);
+                    applyWeatherToRoom(currentWeather);
+                    return;
+                }
+            } catch (e) {}
+        }
+
+        fetch(PINGYANG_WEATHER_API)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.current) {
+                    const c = data.current;
+                    const info = getWeatherInfo(c.weather_code, c.is_day);
+                    const weatherData = {
+                        temp: Math.round(c.temperature_2m),
+                        humidity: c.relative_humidity_2m,
+                        isDay: c.is_day === 1,
+                        code: c.weather_code,
+                        rain: c.rain || c.precipitation || 0,
+                        desc: info.desc,
+                        icon: info.icon,
+                        type: info.type
+                    };
+
+                    currentWeather = weatherData;
+                    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
+                        data: weatherData,
+                        timestamp: Date.now()
+                    }));
+
+                    updateWeatherBadge(weatherData);
+                    applyWeatherToRoom(weatherData);
+                }
+            })
+            .catch(err => {
+                console.warn("Pingyang weather fetch fallback:", err);
+                // 离线时间感知智能兜底 (UTC+8)
+                const chinaHour = (new Date().getUTCHours() + 8) % 24;
+                const isDay = chinaHour >= 6 && chinaHour < 18;
+                const fallbackData = {
+                    temp: 21,
+                    humidity: 85,
+                    isDay: isDay,
+                    code: isDay ? 1 : 80,
+                    rain: isDay ? 0 : 0.4,
+                    desc: isDay ? '晴间多云' : '小阵雨',
+                    icon: isDay ? '🌤️' : '🌧️',
+                    type: isDay ? 'cloudy' : 'rain'
+                };
+                currentWeather = fallbackData;
+                updateWeatherBadge(fallbackData);
+                applyWeatherToRoom(fallbackData);
+            });
+    }
+
+    // 更新界面天气挂件
+    function updateWeatherBadge(data) {
+        const badge = document.getElementById('cabin-weather-badge');
+        const iconEl = document.getElementById('cabin-weather-icon');
+        const tempEl = document.getElementById('cabin-weather-temp');
+        const textEl = document.getElementById('cabin-weather-text');
+
+        if (iconEl) iconEl.textContent = data.icon;
+        if (tempEl) tempEl.textContent = `${data.temp}°C`;
+        if (textEl) textEl.textContent = data.desc;
+
+        if (badge) {
+            badge.onclick = () => showWeatherCard(data);
+        }
+    }
+
+    // 气候与 3D 房间环境材质/光影动态联动
+    function applyWeatherToRoom(data) {
+        if (!roomGroup || !skyMat) return;
+
+        const isDay = data.isDay;
+        const type = data.type;
+
+        // 1. 窗外天空颜色与天象切换
+        if (!isDay) {
+            // 夜晚深邃暗夜蓝
+            skyMat.color.setHex(0x0a081a);
+            if (starsGroup) starsGroup.visible = true;
+            if (moonMesh) moonMesh.visible = true;
+            if (sunbeamMesh) sunbeamMesh.visible = false;
+        } else {
+            // 白天隐藏星月
+            if (starsGroup) starsGroup.visible = false;
+            if (moonMesh) moonMesh.visible = false;
+
+            if (type === 'sunny') {
+                skyMat.color.setHex(0x64b5f6); // 蔚蓝晴空
+                if (sunbeamMesh) sunbeamMesh.visible = true;
+            } else if (type === 'cloudy' || type === 'overcast') {
+                skyMat.color.setHex(0x94a3b8); // 柔和银灰云天
+                if (sunbeamMesh) sunbeamMesh.visible = false;
+            } else if (type === 'rain' || type === 'storm') {
+                skyMat.color.setHex(0x334155); // 阴郁水汽蓝灰
+                if (sunbeamMesh) sunbeamMesh.visible = false;
+            } else {
+                skyMat.color.setHex(0x78909c);
+                if (sunbeamMesh) sunbeamMesh.visible = false;
+            }
+        }
+
+        // 2. 雨滴粒子系统开关
+        if (rainGroup) {
+            rainGroup.visible = (type === 'rain' || type === 'storm' || (data.rain && data.rain > 0));
+        }
+
+        // 3. 室内光影系统随平阳昼夜与天候联动
+        if (ambientLight && sunLight && pinkPointLight) {
+            if (!isDay) {
+                // 夜晚模式：暖光包裹，床头爱心夜灯加亮，小窝极具私密温馨安全感
+                ambientLight.color.setHex(0xffdfd3);
+                ambientLight.intensity = 0.65;
+                sunLight.color.setHex(0x829bb5); // 窗外淡淡银白月辉
+                sunLight.intensity = 0.45;
+                pinkPointLight.intensity = 1.6;
+            } else if (type === 'sunny') {
+                // 晴朗白天：阳光明媚通透
+                ambientLight.color.setHex(0xfff5ea);
+                ambientLight.intensity = 1.05;
+                sunLight.color.setHex(0xfff0d4);
+                sunLight.intensity = 1.35;
+                pinkPointLight.intensity = 0.8;
+            } else if (type === 'rain' || type === 'storm') {
+                // 雨天白天：室内暖光比外面明亮温馨
+                ambientLight.color.setHex(0xd0d8e2);
+                ambientLight.intensity = 0.75;
+                sunLight.color.setHex(0x8fa3b8);
+                sunLight.intensity = 0.55;
+                pinkPointLight.intensity = 1.35;
+            } else {
+                // 多云舒适
+                ambientLight.color.setHex(0xfff0f3);
+                ambientLight.intensity = 0.95;
+                sunLight.color.setHex(0xfff5eb);
+                sunLight.intensity = 1.1;
+                pinkPointLight.intensity = 1.0;
+            }
+        }
+
+        requestRender(60);
+    }
+
+    // 点击平阳天气挂件的宠溺寄语弹窗
+    function showWeatherCard(data) {
+        const isDay = data.isDay;
+        const type = data.type;
+        const temp = data.temp;
+
+        let greeting = "";
+        if (type === 'rain' || type === 'storm') {
+            greeting = isDay 
+                ? "平阳今天正下着雨呢，出门千万记得带伞、穿双防水的鞋子哦！小窝里小猫咪已经暖好窝啦，有臭臭牵挂着你，别着凉了宝贝~ 🌧️❤️"
+                : "平阳今晚有细雨淅淅沥沥，空气湿润微凉。小猫咪正舒舒服服打着呼噜呢！哲哲已经为珊珊暖好被窝啦，盖好被子，听着雨声甜甜入睡吧~ 💤❤️";
+        } else if (type === 'sunny') {
+            greeting = isDay 
+                ? "平阳今天阳光明媚，微风正好！小猫咪正躺在窗台边晒太阳呢。愿珊珊宝贝今天的心情也像晴空一样灿烂明媚，想你每一分每一秒~ ☀️✨"
+                : "平阳的夜空晴朗静谧，满天繁星闪烁。小窝里好温暖，臭臭随时都在宝贝身边。今晚要乖乖睡个美容觉哦~ 🌙💕";
+        } else if (type === 'cloudy' || type === 'overcast') {
+            greeting = isDay 
+                ? "平阳今天多云微风，天色柔和舒服。不管窗外云层多厚，珊珊永远是哲哲心底最温暖闪亮的小太阳~ ⛅🌸"
+                : "平阳今夜云影轻柔，凉风习习。猫咪打呼噜的声音真治愈，有臭臭一直陪着珊珊，心安又甜蜜~ ☁️❤️";
+        } else {
+            greeting = `平阳此刻气温 ${temp}°C，舒适宜人。不管天晴下雨，这个小窝永远是属于我们最温馨的港湾~ ❤️`;
+        }
+
+        alert(`📍 浙江温州 · 平阳县实时天气联动\n\n【${data.icon} ${data.desc} · 气温 ${temp}°C · 湿度 ${data.humidity}%】\n\n💬 哲哲的暖心叮嘱：\n${greeting}`);
+    }
+
     // 渲染循环 (极速按需渲染，静止时 0% 负载)
     function animate() {
         animationFrameId = requestAnimationFrame(animate);
 
-        if (isDragging || renderFramesLeft > 0) {
+        // 1. 猫咪伸懒腰动画计算
+        if (isStretching && catGroup && catGroup.userData.catAnim) {
+            const elapsed = (performance.now() - stretchStartTime) / 1000;
+            const anim = catGroup.userData.catAnim;
+            const body = catGroup.userData.body;
+            const head = catGroup.userData.headGroup;
+            const pawL = catGroup.userData.pawL;
+            const pawR = catGroup.userData.pawR;
+            const tail = catGroup.userData.tailGroup;
+
+            if (elapsed < 0.5) {
+                // 阶段 1: 前爪前伸低趴，后半身拱起拉伸 (经典下犬伸懒腰)
+                const p = elapsed / 0.5;
+                const easeP = Math.sin((p * Math.PI) / 2);
+
+                anim.rotation.x = -0.38 * easeP;
+                anim.position.y = 0.12 - 0.06 * easeP;
+
+                pawL.position.z = 0.42 + 0.28 * easeP;
+                pawL.position.y = 0.12 - 0.05 * easeP;
+                pawR.position.z = 0.42 + 0.28 * easeP;
+                pawR.position.y = 0.12 - 0.05 * easeP;
+
+                head.position.y = 0.6 - 0.14 * easeP;
+                head.position.z = 0.42 + 0.16 * easeP;
+
+                body.scale.set(0.85, 0.72, 1.15 + 0.35 * easeP);
+
+                tail.position.y = 0.32 + 0.15 * easeP;
+                tail.rotation.x = 0.9 * easeP;
+            } else if (elapsed < 1.0) {
+                // 阶段 2: 保持深度伸展，全身呼噜高频微震颤，尾巴惬意摆动
+                const vib = Math.sin(elapsed * 45) * 0.015;
+                anim.position.y = 0.06 + vib;
+                tail.rotation.z = Math.sin(elapsed * 16) * 0.35;
+                head.rotation.z = Math.sin(elapsed * 10) * 0.1;
+            } else if (elapsed < 1.5) {
+                // 阶段 3: 弓背大拉伸 (拱成一道软萌彩虹)
+                const p = (elapsed - 1.0) / 0.5;
+                const archP = Math.sin(p * Math.PI);
+
+                anim.rotation.x = 0.28 * archP;
+                anim.position.y = 0.12 + 0.08 * archP;
+
+                pawL.position.z = 0.42;
+                pawL.position.y = 0.12;
+                pawR.position.z = 0.42;
+                pawR.position.y = 0.12;
+
+                head.position.y = 0.6 + 0.06 * archP;
+                head.position.z = 0.42 - 0.05 * archP;
+
+                body.scale.set(0.88, 0.8 + 0.4 * archP, 1.15 - 0.2 * archP);
+                tail.rotation.x = -0.4 * archP;
+                tail.rotation.z = Math.sin(elapsed * 8) * 0.2;
+            } else if (elapsed < 1.9) {
+                // 阶段 4: 平滑收回原位
+                const p = (elapsed - 1.5) / 0.4;
+                const settleP = 1 - p;
+
+                anim.rotation.x = 0;
+                anim.position.y = 0.12;
+
+                pawL.position.set(-0.16, 0.12, 0.42);
+                pawR.position.set(0.16, 0.12, 0.42);
+
+                head.position.set(0, 0.6, 0.42);
+                head.rotation.set(0, 0, 0);
+
+                body.scale.set(0.85, 0.8, 1.15);
+
+                tail.position.set(0, 0.32, -0.45);
+                tail.rotation.set(0, 0, 0);
+            } else {
+                // 伸展完成，恢复待机
+                isStretching = false;
+                anim.rotation.set(0, 0, 0);
+                anim.position.set(0, 0.12, 0);
+                pawL.position.set(-0.16, 0.12, 0.42);
+                pawR.position.set(0.16, 0.12, 0.42);
+                head.position.set(0, 0.6, 0.42);
+                head.rotation.set(0, 0, 0);
+                body.scale.set(0.85, 0.8, 1.15);
+                tail.position.set(0, 0.32, -0.45);
+                tail.rotation.set(0, 0, 0);
+            }
+        } else if (!isStretching && catGroup && catGroup.userData.catAnim) {
+            // 待机轻缓呼吸与尾巴摆动
+            const time = performance.now() * 0.002;
+            const body = catGroup.userData.body;
+            const tail = catGroup.userData.tailGroup;
+            if (body) {
+                body.scale.y = 0.8 + Math.sin(time * 1.6) * 0.02;
+            }
+            if (tail) {
+                tail.rotation.z = Math.sin(time * 1.2) * 0.15;
+            }
+        }
+
+        // 2. 雨天平阳雨丝粒子向下流动
+        if (rainGroup && rainGroup.visible) {
+            const drops = rainGroup.children;
+            for (let i = 0; i < drops.length; i++) {
+                drops[i].position.y -= 0.12;
+                if (drops[i].position.y < 2.1) {
+                    drops[i].position.y = 4.3;
+                    drops[i].position.z = -0.7 + Math.random() * 2.4;
+                }
+            }
+        }
+
+        // 3. 动态渲染控制 (有雨、有拉伸或有拖拽时连续渲染，其余静止省电)
+        const shouldContinuousRender = isDragging || isStretching || (rainGroup && rainGroup.visible) || renderFramesLeft > 0;
+
+        if (shouldContinuousRender) {
             currentRotationY += (targetRotationY - currentRotationY) * 0.1;
             currentRotationX += (targetRotationX - currentRotationX) * 0.1;
 
@@ -609,7 +1309,7 @@
 
             renderer.render(scene, camera);
 
-            if (!isDragging) {
+            if (!isDragging && !isStretching && (!rainGroup || !rainGroup.visible)) {
                 renderFramesLeft--;
             }
         }
@@ -617,6 +1317,9 @@
 
     window.Cabin3D = {
         init: init3DStage,
+        interactCat: triggerCatStretch,
+        showWeather: () => currentWeather && showWeatherCard(currentWeather),
+        refreshWeather: fetchPingyangWeather,
         destroy: () => {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             isInitialized = false;

@@ -2833,7 +2833,69 @@ details[open] .drawer-arrow {
 .cabin-3d-subbar {
     display: flex;
     justify-content: flex-start;
+    padding: 0 4px 6px;
+}
+
+.cabin-couple-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 0 4px 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+}
+.cabin-couple-bar::-webkit-scrollbar {
+    display: none;
+}
+.couple-bar-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #ff477e;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.couple-loc-btn {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 117, 151, 0.35);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4a4e69;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(255, 117, 151, 0.08);
+    user-select: none;
+    white-space: nowrap;
+}
+.couple-loc-btn:hover {
+    transform: translateY(-2px);
+    border-color: #ff477e;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(255, 71, 126, 0.2);
+}
+.couple-loc-btn.active {
+    background: linear-gradient(135deg, #ff758c 0%, #ff477e 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(255, 71, 126, 0.35);
+    transform: scale(1.04);
+}
+[data-theme="dark"] .couple-loc-btn {
+    background: rgba(35, 25, 48, 0.88);
+    color: #f7cad0;
+    border-color: rgba(255, 117, 151, 0.3);
+}
+[data-theme="dark"] .couple-loc-btn.active {
+    background: linear-gradient(135deg, #ff477e 0%, #d90429 100%);
+    color: #fff;
 }
 
 .cabin-weather-badge {

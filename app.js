@@ -2528,7 +2528,7 @@
         // 清理旧版本缓存
         caches.keys().then((keys) => {
             keys.forEach((key) => {
-                if (key !== 'love-cabin-v3.6') {
+                if (key !== 'love-cabin-v3.7') {
                     caches.delete(key);
                 }
             });

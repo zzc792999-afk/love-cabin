@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=3.6">
+    <link rel="stylesheet" href="style.css?v=3.7">
 </head>
 <body>
 
@@ -78,6 +78,15 @@
                         <div class="cabin-3d-hint">
                             <i class="fas fa-heart" style="color:#ff477e;"></i> 点击哲哲与珊珊贴贴抱抱 · 摸摸小猫咪 · 平阳实时天气
                         </div>
+                    </div>
+
+                    <!-- 💑 哲哲与珊珊专属互动切换栏 (告别罚站，随意切换床上/沙发/地毯/窗边) -->
+                    <div class="cabin-couple-bar" id="cabin-couple-bar">
+                        <span class="couple-bar-label"><i class="fas fa-heart"></i> 牵手去哪：</span>
+                        <button class="couple-loc-btn active" data-loc="bed" onclick="window.Cabin3D && window.Cabin3D.moveCouple('bed')">🛏️ 窝在床上</button>
+                        <button class="couple-loc-btn" data-loc="sofa" onclick="window.Cabin3D && window.Cabin3D.moveCouple('sofa')">🛋️ 坐沙发看大片</button>
+                        <button class="couple-loc-btn" data-loc="rug" onclick="window.Cabin3D && window.Cabin3D.moveCouple('rug')">🐱 地毯逗猫</button>
+                        <button class="couple-loc-btn" data-loc="window" onclick="window.Cabin3D && window.Cabin3D.moveCouple('window')">🪟 窗台看风景</button>
                     </div>
 
                     <!-- 3D 视口画布 -->
@@ -471,12 +480,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=3.6"></script>
+    <script src="app.js?v=3.7"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=3.6"></script>
+    <script src="js/cabin3d.js?v=3.7"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=3.6"></script>
+    <script src="js/features3.js?v=3.7"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

@@ -41,8 +41,13 @@
     const FURNITURE_DEFS = {
         couple: {
             title: "💑 哲哲与珊珊",
-            desc: "我们的时光小窝！点击甜蜜贴贴抱抱~ ❤️",
+            desc: "点击甜蜜贴贴抱抱！也可以在上方切换去沙发或地毯哦~ ❤️",
             action: () => triggerCoupleCuddle()
+        },
+        sofa: {
+            title: "🛋️ 浪漫双人沙发",
+            desc: "点击让哲哲和珊珊坐到沙发上看放映机大片！",
+            action: () => moveCoupleToLocation('sofa')
         },
         cat: {
             title: "🐱 暖心陪伴小咪",
@@ -127,6 +132,7 @@
         buildBed();
         buildFridge();
         buildTV();
+        buildSofa();
         buildPunchingBag();
         buildMailbox();
         buildGramophone();
@@ -363,6 +369,61 @@
         tvGroup.position.set(0.8, 0, -3.2);
         roomGroup.add(tvGroup);
         registerInteractive(tvGroup, 'tv');
+    }
+
+    // 🛋️ 双人马卡龙爱心沙发 (放映机前温馨观影专属小座)
+    function buildSofa() {
+        const sofaGroup = new THREE.Group();
+        sofaGroup.name = "sofa";
+
+        const sofaMat = new THREE.MeshStandardMaterial({ color: 0xffccd5, roughness: 0.6 }); // 温柔奶油粉
+        const cushionMat = new THREE.MeshStandardMaterial({ color: 0xffb3c1, roughness: 0.5 }); // 坐垫
+
+        // 底座与坐垫
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.3, 0.85), sofaMat);
+        seat.position.set(0, 0.2, 0);
+        sofaGroup.add(seat);
+
+        const cushionL = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.75), cushionMat);
+        cushionL.position.set(-0.38, 0.38, 0.02);
+        sofaGroup.add(cushionL);
+
+        const cushionR = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.75), cushionMat);
+        cushionR.position.set(0.38, 0.38, 0.02);
+        sofaGroup.add(cushionR);
+
+        // 靠背
+        const back = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.65, 0.22), sofaMat);
+        back.position.set(0, 0.6, 0.34);
+        sofaGroup.add(back);
+
+        // 两侧扶手
+        const armL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.46, 0.86), sofaMat);
+        armL.position.set(-0.85, 0.4, 0);
+        sofaGroup.add(armL);
+
+        const armR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.46, 0.86), sofaMat);
+        armR.position.set(0.85, 0.4, 0);
+        sofaGroup.add(armR);
+
+        // 沙发可爱抱枕
+        const pillowMatL = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const pillowL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.12), pillowMatL);
+        pillowL.position.set(-0.58, 0.52, 0.2);
+        pillowL.rotation.z = 0.2;
+        sofaGroup.add(pillowL);
+
+        const pillowMatR = new THREE.MeshStandardMaterial({ color: 0xa2d2ff });
+        const pillowR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.12), pillowMatR);
+        pillowR.position.set(0.58, 0.52, 0.2);
+        pillowR.rotation.z = -0.2;
+        sofaGroup.add(pillowR);
+
+        // 放置在电视放映机对面
+        sofaGroup.position.set(0.8, 0, -1.35);
+        sofaGroup.rotation.y = Math.PI; // 面朝放映机
+        roomGroup.add(sofaGroup);
+        registerInteractive(sofaGroup, 'sofa');
     }
 
     // 🥊 暴揍出气沙袋 (悬挂臭臭搞怪头像)
@@ -636,7 +697,7 @@
         registerInteractive(catGroup, 'cat');
     }
 
-    // 💑 哲哲 & 珊珊 专属 3D Q版情侣形象 (依偎在双人暖萌床前，甜蜜贴贴)
+    // 💑 哲哲 & 珊珊 专属 3D Q版情侣形象 (舒适依偎在被窝里/沙发上)
     function buildCoupleFigures() {
         coupleGroup = new THREE.Group();
         coupleGroup.name = "couple";
@@ -662,7 +723,7 @@
         boyBody.position.set(0, 0.22, 0);
         zhezhe.add(boyBody);
 
-        // 卫衣帽子圈与拉链装饰
+        // 卫衣帽子圈
         const boyHoodMat = new THREE.MeshStandardMaterial({ color: 0x2b3a4a });
         const boyHood = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.045, 8, 16), boyHoodMat);
         boyHood.rotation.x = Math.PI / 2.2;
@@ -685,7 +746,6 @@
         boyHairTop.position.set(0, 0.04, -0.03);
         boyHeadGroup.add(boyHairTop);
 
-        // 额前刘海碎发
         for (let i = -2; i <= 2; i++) {
             const bang = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.12, 4), boyHairMat);
             bang.position.set(i * 0.05, 0.12, 0.18);
@@ -709,7 +769,6 @@
         boyShineR.position.set(0.075, 0.005, 0.21);
         boyHeadGroup.add(boyShineR);
 
-        // 哲哲微腮红与宠溺微笑
         const boyBlushL = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.03), blushMat);
         boyBlushL.position.set(-0.11, -0.06, 0.2);
         boyHeadGroup.add(boyBlushL);
@@ -717,7 +776,7 @@
         boyBlushR.position.set(0.11, -0.06, 0.2);
         boyHeadGroup.add(boyBlushR);
 
-        // 哲哲手臂 (右臂自然环绕抱向珊珊)
+        // 哲哲手臂 (右臂深情搭在珊珊肩膀上)
         const boyArmL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.32, 8), boyHoodieMat);
         boyArmL.position.set(-0.25, 0.2, 0.05);
         boyArmL.rotation.z = 0.2;
@@ -725,35 +784,35 @@
 
         const boyArmR = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.35, 8), boyHoodieMat);
         boyArmR.position.set(0.24, 0.24, 0.06);
-        boyArmR.rotation.z = -1.1; // 宠溺搭向珊珊肩膀
+        boyArmR.rotation.z = -1.15;
         boyArmR.rotation.x = -0.3;
         zhezhe.add(boyArmR);
 
-        // 哲哲悬空晃荡小腿与球鞋
+        // 哲哲舒适坐姿双腿 (向前自然屈膝坐卧，彻底告别直立罚站)
         const pantsMat = new THREE.MeshStandardMaterial({ color: 0x293241 });
         const shoeMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
-        const boyLegGroupL = new THREE.Group();
-        boyLegGroupL.position.set(-0.1, 0.02, 0.12);
-        const boyLegL = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.38, 8), pantsMat);
-        boyLegL.position.set(0, -0.19, 0);
-        boyLegGroupL.add(boyLegL);
-        const boyShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.07, 0.16), shoeMat);
-        boyShoeL.position.set(0, -0.38, 0.05);
-        boyLegGroupL.add(boyShoeL);
-        zhezhe.add(boyLegGroupL);
-        coupleGroup.userData.boyLegL = boyLegGroupL;
+        const boyLegs = new THREE.Group();
+        boyLegs.position.set(0, 0.06, 0.1);
+        zhezhe.add(boyLegs);
+        coupleGroup.userData.boyLegs = boyLegs;
 
-        const boyLegGroupR = new THREE.Group();
-        boyLegGroupR.position.set(0.1, 0.02, 0.12);
-        const boyLegR = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.38, 8), pantsMat);
-        boyLegR.position.set(0, -0.19, 0);
-        boyLegGroupR.add(boyLegR);
-        const boyShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.07, 0.16), shoeMat);
-        boyShoeR.position.set(0, -0.38, 0.05);
-        boyLegGroupR.add(boyShoeR);
-        zhezhe.add(boyLegGroupR);
-        coupleGroup.userData.boyLegR = boyLegGroupR;
+        const boyThighL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.055, 0.3, 8), pantsMat);
+        boyThighL.rotation.x = -Math.PI / 2.3;
+        boyThighL.position.set(-0.1, 0, 0.14);
+        boyLegs.add(boyThighL);
+
+        const boyThighR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.055, 0.3, 8), pantsMat);
+        boyThighR.rotation.x = -Math.PI / 2.3;
+        boyThighR.position.set(0.1, 0, 0.14);
+        boyLegs.add(boyThighR);
+
+        const boyShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.07, 0.14), shoeMat);
+        boyShoeL.position.set(-0.1, -0.06, 0.28);
+        boyLegs.add(boyShoeL);
+        const boyShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.07, 0.14), shoeMat);
+        boyShoeR.position.set(0.1, -0.06, 0.28);
+        boyLegs.add(boyShoeR);
 
         // ==========================================
         // 👧 2. 珊珊宝贝 (白珊珊) - 樱花粉毛衣裙，甜美依偎
@@ -764,37 +823,34 @@
         coupleGroup.add(shanshan);
         coupleGroup.userData.shanshan = shanshan;
 
-        // 身体/裙装 (温柔樱花粉)
+        // 身体/裙装
         const girlDressMat = new THREE.MeshStandardMaterial({ color: 0xffb3c1, roughness: 0.5 });
         const girlBody = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 0.42, 16), girlDressMat);
         girlBody.position.set(0, 0.21, 0);
         shanshan.add(girlBody);
 
-        // 珍珠白领口结
         const collarMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
         const girlCollar = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 8, 16), collarMat);
         girlCollar.rotation.x = Math.PI / 2;
         girlCollar.position.set(0, 0.41, 0.02);
         shanshan.add(girlCollar);
 
-        // 珊珊头部 (略带倾斜依偎向哲哲肩膀)
+        // 珊珊头部 (甜甜倾斜倚靠在哲哲肩膀上)
         const girlHeadGroup = new THREE.Group();
         girlHeadGroup.position.set(0, 0.63, 0);
-        girlHeadGroup.rotation.z = -0.18; // 甜蜜倚靠角度
+        girlHeadGroup.rotation.z = -0.22; // 深度依偎
         shanshan.add(girlHeadGroup);
         coupleGroup.userData.girlHead = girlHeadGroup;
 
         const girlHead = new THREE.Mesh(new THREE.SphereGeometry(0.21, 16, 16), skinMat);
         girlHeadGroup.add(girlHead);
 
-        // 珊珊温婉栗色长发
         const girlHairMat = new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.7 });
         const girlHairTop = new THREE.Mesh(new THREE.SphereGeometry(0.23, 16, 16), girlHairMat);
         girlHairTop.scale.set(1.03, 1.05, 1.04);
         girlHairTop.position.set(0, 0.03, -0.03);
         girlHeadGroup.add(girlHairTop);
 
-        // 垂落肩头的两缕软萌长发
         const hairStrandL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.03, 0.45, 8), girlHairMat);
         hairStrandL.position.set(-0.16, -0.22, 0.1);
         hairStrandL.rotation.z = 0.15;
@@ -805,7 +861,7 @@
         hairStrandR.rotation.z = -0.15;
         girlHeadGroup.add(hairStrandR);
 
-        // 珊珊头上的粉红宝石蝴蝶结发夹
+        // 蝴蝶结发夹
         const bowMat = new THREE.MeshStandardMaterial({ color: 0xff4d6d, roughness: 0.4 });
         const bowCenter = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), bowMat);
         bowCenter.position.set(-0.15, 0.22, 0.12);
@@ -819,7 +875,7 @@
         bowWingR.position.set(-0.1, 0.22, 0.12);
         girlHeadGroup.add(bowWingR);
 
-        // 珊珊萌萌大眼与娇羞腮红
+        // 五官
         const girlEyeL = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 8), eyeMat);
         girlEyeL.position.set(-0.075, -0.01, 0.185);
         girlHeadGroup.add(girlEyeL);
@@ -841,54 +897,55 @@
         girlBlushR.position.set(0.11, -0.065, 0.19);
         girlHeadGroup.add(girlBlushR);
 
-        // 珊珊小手 (双手乖巧环抱胸前，捧着一颗小红心)
-        const girlArmL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.28, 8), girlDressMat);
-        girlArmL.position.set(-0.16, 0.18, 0.12);
-        girlArmL.rotation.x = -0.8;
-        girlArmL.rotation.z = -0.4;
-        shanshan.add(girlArmL);
-
-        const girlArmR = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.28, 8), girlDressMat);
-        girlArmR.position.set(0.16, 0.18, 0.12);
-        girlArmR.rotation.x = -0.8;
-        girlArmR.rotation.z = 0.4;
-        shanshan.add(girlArmR);
-
         // 珊珊捧着的水晶爱心
         const miniHeartGeo = new THREE.SphereGeometry(0.05, 12, 12);
         miniHeartGeo.scale(1, 1.2, 0.6);
-        const miniHeart = new THREE.Mesh(miniHeartGeo, new THREE.MeshStandardMaterial({ color: 0xff477e, emissive: 0xff477e, emissiveIntensity: 0.3 }));
+        const miniHeart = new THREE.Mesh(miniHeartGeo, new THREE.MeshStandardMaterial({ color: 0xff477e, emissive: 0xff477e, emissiveIntensity: 0.4 }));
         miniHeart.position.set(0, 0.14, 0.24);
         shanshan.add(miniHeart);
 
-        // 珊珊悬空小细腿与小粉鞋
-        const girlLegMat = new THREE.MeshStandardMaterial({ color: 0xffffff }); // 软白袜
-        const girlShoeMat = new THREE.MeshStandardMaterial({ color: 0xff758c }); // 甜粉鞋
+        // 珊珊舒适坐姿双腿
+        const girlLegMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const girlShoeMat = new THREE.MeshStandardMaterial({ color: 0xff758c });
 
-        const girlLegGroupL = new THREE.Group();
-        girlLegGroupL.position.set(-0.08, 0.02, 0.12);
-        const girlLegL = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.36, 8), girlLegMat);
-        girlLegL.position.set(0, -0.18, 0);
-        girlLegGroupL.add(girlLegL);
-        const girlShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.14), girlShoeMat);
-        girlShoeL.position.set(0, -0.36, 0.04);
-        girlLegGroupL.add(girlShoeL);
-        shanshan.add(girlLegGroupL);
-        coupleGroup.userData.girlLegL = girlLegGroupL;
+        const girlLegs = new THREE.Group();
+        girlLegs.position.set(0, 0.06, 0.1);
+        shanshan.add(girlLegs);
+        coupleGroup.userData.girlLegs = girlLegs;
 
-        const girlLegGroupR = new THREE.Group();
-        girlLegGroupR.position.set(0.08, 0.02, 0.12);
-        const girlLegR = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.36, 8), girlLegMat);
-        girlLegR.position.set(0, -0.18, 0);
-        girlLegGroupR.add(girlLegR);
-        const girlShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.14), girlShoeMat);
-        girlShoeR.position.set(0, -0.36, 0.04);
-        girlLegGroupR.add(girlShoeR);
-        shanshan.add(girlLegGroupR);
-        coupleGroup.userData.girlLegR = girlLegGroupR;
+        const girlThighL = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.045, 0.28, 8), girlLegMat);
+        girlThighL.rotation.x = -Math.PI / 2.3;
+        girlThighL.position.set(-0.08, 0, 0.13);
+        girlLegs.add(girlThighL);
+
+        const girlThighR = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.045, 0.28, 8), girlLegMat);
+        girlThighR.rotation.x = -Math.PI / 2.3;
+        girlThighR.position.set(0.08, 0, 0.13);
+        girlLegs.add(girlThighR);
+
+        const girlShoeL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.13), girlShoeMat);
+        girlShoeL.position.set(-0.08, -0.05, 0.26);
+        girlLegs.add(girlShoeL);
+        const girlShoeR = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.06, 0.13), girlShoeMat);
+        girlShoeR.position.set(0.08, -0.05, 0.26);
+        girlLegs.add(girlShoeR);
 
         // ==========================================
-        // 💖 3. 头顶悬浮闪耀浪漫爱心
+        // 🛌 3. 温暖甜心膝盖小盖毯 (让两人真实坐在被窝中)
+        // ==========================================
+        const blanketMat = new THREE.MeshStandardMaterial({ color: 0xffccd5, roughness: 0.7 });
+        const blanket = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.16, 0.42), blanketMat);
+        blanket.position.set(-0.04, 0.08, 0.22);
+        coupleGroup.add(blanket);
+
+        const trimMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const trim = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.84, 12), trimMat);
+        trim.rotation.z = Math.PI / 2;
+        trim.position.set(-0.04, 0.15, 0.02);
+        coupleGroup.add(trim);
+
+        // ==========================================
+        // 💖 4. 头顶悬浮闪耀浪漫爱心
         // ==========================================
         const loveHeartMat = new THREE.MeshStandardMaterial({
             color: 0xff477e,
@@ -912,9 +969,9 @@
         bottomCone.position.set(0, -0.02, 0);
         heartGroup.add(bottomCone);
 
-        // 放置在双人暖萌床床沿，面对镜头与小猫咪
-        coupleGroup.position.set(-1.45, 0.88, -0.22);
-        coupleGroup.rotation.y = 0.22;
+        // 默认安放在双人暖萌床中央，背靠大枕头，享受温暖被窝！
+        coupleGroup.position.set(-1.75, 0.95, -1.75);
+        coupleGroup.rotation.y = 0.45;
         roomGroup.add(coupleGroup);
 
         registerInteractive(coupleGroup, 'couple');
@@ -1306,6 +1363,81 @@
 
         showFloatingNotice("💑 哲哲与珊珊甜蜜贴贴抱抱~", quote);
         requestRender(160);
+    }
+
+    // 📍 哲哲与珊珊四大甜蜜互动地点 (床上/沙发/地毯/窗台)
+    let currentCoupleLoc = 'bed';
+    const COUPLE_LOCATIONS = {
+        bed: {
+            title: "🛏️ 暖萌双人床 · 被窝贴贴",
+            desc: "哲哲和珊珊钻进暖烘烘的被窝里贴贴抱抱，暖和到不想起床啦~ mua❤️",
+            pos: { x: -1.75, y: 0.95, z: -1.75 },
+            rotY: 0.45
+        },
+        sofa: {
+            title: "🛋️ 浪漫双人沙发 · 依偎看大片",
+            desc: "哲哲和珊珊窝在双人沙发上，一边吃爆米花零食一边看放映机~ 🍿💕",
+            pos: { x: 0.8, y: 0.46, z: -1.35 },
+            rotY: Math.PI - 0.2
+        },
+        rug: {
+            title: "🌸 软萌地毯 · 逗逗小橘猫",
+            desc: "哲哲和珊珊来到粉红地毯上，正拿着逗猫棒陪咪咪玩耍，咕噜噜~ 🐱✨",
+            pos: { x: 0.35, y: 0.08, z: 0.55 },
+            rotY: -0.65
+        },
+        window: {
+            title: "🪟 浪漫飘窗 · 欣赏平阳风景",
+            desc: "哲哲和珊珊坐在大飘窗前，吹着微风，一起看平阳的天空与繁星~ 🌤️🌸",
+            pos: { x: -3.0, y: 0.08, z: 0.5 },
+            rotY: Math.PI / 2
+        }
+    };
+
+    function moveCoupleToLocation(targetLoc) {
+        if (!coupleGroup || !COUPLE_LOCATIONS[targetLoc]) return;
+        currentCoupleLoc = targetLoc;
+        const info = COUPLE_LOCATIONS[targetLoc];
+
+        // 播放轻快灵动音效
+        playCoupleLoveSound();
+
+        // 绚丽爱心烟花
+        if (typeof window.confetti === 'function') {
+            window.confetti({
+                particleCount: 35,
+                spread: 60,
+                origin: { y: 0.65 },
+                colors: ['#ff477e', '#ff758c', '#ffccd5', '#ffd166']
+            });
+        }
+
+        // 更新按钮激活状态
+        document.querySelectorAll('.couple-loc-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.loc === targetLoc);
+        });
+
+        // 萌趣小跳跃过渡到新位置
+        const origY = info.pos.y;
+        coupleGroup.position.set(info.pos.x, origY + 0.5, info.pos.z);
+        coupleGroup.rotation.y = info.rotY;
+
+        let hopFrames = 15;
+        const hopStep = () => {
+            if (hopFrames > 0) {
+                hopFrames--;
+                coupleGroup.position.y -= 0.5 / 15;
+                requestRender(10);
+                requestAnimationFrame(hopStep);
+            } else {
+                coupleGroup.position.y = origY;
+                requestRender(30);
+            }
+        };
+        requestAnimationFrame(hopStep);
+
+        showFloatingNotice(info.title, info.desc);
+        requestRender(60);
     }
 
     // 🐱 伸懒腰与打呼噜核心互动
@@ -1792,6 +1924,8 @@
     window.Cabin3D = {
         init: init3DStage,
         interactCouple: triggerCoupleCuddle,
+        moveCouple: moveCoupleToLocation,
+        getCurrentCoupleLoc: () => currentCoupleLoc,
         interactCat: triggerCatStretch,
         showWeather: () => currentWeather && showWeatherCard(currentWeather),
         refreshWeather: fetchPingyangWeather,

@@ -1,5 +1,5 @@
 // Service Worker for Love Cabin PWA / Android App
-const CACHE_NAME = 'love-cabin-v3.8';
+const CACHE_NAME = 'love-cabin-v3.9';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

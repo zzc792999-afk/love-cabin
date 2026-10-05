@@ -114,12 +114,18 @@
         },
         fridge: {
             title: "🧊 爱心小冰箱",
-            desc: "冰镇饮料与美味外卖已备齐！点击进入外卖店选餐",
-            action: () => { window.location.href = 'other/takeout.html'; }
+            desc: "冷藏着珊珊最爱的草莓圣代与全糖奶茶！点击投喂~ 🍓🍰",
+            action: () => {
+                if (typeof window.openFridgeModal === 'function') {
+                    window.openFridgeModal();
+                } else {
+                    window.location.href = 'other/takeout.html';
+                }
+            }
         },
         tv: {
             title: "📺 回忆时光放映机",
-            desc: "放映我们从相识至今的美好回忆与合照",
+            desc: "点击开始在小窝 3D 屏幕上放映我们的甜蜜相册！",
             action: () => triggerPhotoSlideshow()
         },
         punchingBag: {
@@ -204,9 +210,14 @@
         requestRender(60);
         animate();
 
-        // 7. 启动平阳天气联动系统
+        // 7. 启动平阳天气联动系统与每分钟昼夜光影自动流转
         fetchPingyangWeather();
         setInterval(fetchPingyangWeather, 10 * 60 * 1000);
+        setInterval(() => {
+            if (typeof applyDayNightLighting === 'function') {
+                applyDayNightLighting(currentWeather);
+            }
+        }, 60 * 1000);
     }
 
     // 构建简约房间基础结构 (地板与两面墙壁)
@@ -425,7 +436,7 @@
         registerInteractive(fridgeGroup, 'fridge');
     }
 
-    // 📺 回忆放映机 (复古小电视)
+    // 📺 回忆放映机 (复古小电视 + 3D 胶片投影系统)
     function buildTV() {
         const tvGroup = new THREE.Group();
         tvGroup.name = "tv";
@@ -446,6 +457,25 @@
         const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.8), screenMat);
         screen.position.set(0, 1.3, 0.31);
         tvGroup.add(screen);
+
+        // 柔和投影光柱 (从放映机屏幕向前投向客厅沙发)
+        const beamGeo = new THREE.CylinderGeometry(0.35, 1.3, 2.5, 16, 1, true);
+        const beamMat = new THREE.MeshBasicMaterial({
+            color: 0xffd1dc,
+            transparent: true,
+            opacity: 0,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        });
+        const beamMesh = new THREE.Mesh(beamGeo, beamMat);
+        beamMesh.position.set(0, 1.3, 1.4);
+        beamMesh.rotation.x = Math.PI / 2;
+        beamMesh.visible = false;
+        tvGroup.add(beamMesh);
+
+        tvGroup.userData.screen = screen;
+        tvGroup.userData.screenMat = screenMat;
+        tvGroup.userData.beamMesh = beamMesh;
 
         tvGroup.position.set(0.8, 0, -3.2);
         roomGroup.add(tvGroup);
@@ -1395,9 +1425,277 @@
         }
     }
 
+    // ================================================================
+    // 📺 回忆放映机真实 3D 胶片相册放映系统 (沉浸式相册光影)
+    // ================================================================
+    const TV_PHOTOS = [
+        { url: 'images/1.jpg', title: '📷 定格心动', desc: '初见时的羞涩与满心欢喜，每一帧都值得珍藏~ ❤️' },
+        { url: 'images/2.jpg', title: '📷 温柔相伴', desc: '看珊珊吃得开开心心，就是哲哲最幸福的时光！🍰' },
+        { url: 'images/mmexport1770353248593.jpg', title: '📷 时光印记', desc: '无论走到哪里，只要两只手牵在一起就是家。💕' },
+        { url: 'images/IMG_20260206_124425.webp', title: '📷 专属偏爱', desc: '小仙女珊珊在镜头前闪闪发光，满心满眼都是你！✨' },
+        { url: 'images/IMG_20260206_124443.webp', title: '📷 平阳暖阳', desc: '走过平阳的街头巷尾，未来的每一步也要一起走。🌤️' },
+        { url: 'images/IMG_20260206_124500.webp', title: '📷 岁岁年年', desc: '兜兜转转，这次紧紧拥抱，永不分离。🔒' }
+    ];
+    let tvPhotoIndex = 0;
+    const tvTextureCache = {};
+
+    function playProjectorSound() {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            if (!window.__catAudioCtx) window.__catAudioCtx = new AudioCtx();
+            const ctx = window.__catAudioCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            [0, 0.08].forEach((offset) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(820, now + offset);
+                osc.frequency.exponentialRampToValueAtTime(160, now + offset + 0.04);
+
+                gain.gain.setValueAtTime(0.06, now + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.045);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now + offset);
+                osc.stop(now + offset + 0.05);
+            });
+        } catch (e) {}
+    }
+
+    function playTVSlideshow() {
+        const tvGroup = roomGroup && roomGroup.getObjectByName('tv');
+        if (!tvGroup || !tvGroup.userData.screen) {
+            const photosTab = document.querySelectorAll('.nav-item')[1];
+            if (photosTab) photosTab.click();
+            return;
+        }
+
+        const screen = tvGroup.userData.screen;
+        const beamMesh = tvGroup.userData.beamMesh;
+
+        playProjectorSound();
+
+        const curItem = TV_PHOTOS[tvPhotoIndex];
+        const loader = new THREE.TextureLoader();
+
+        const applyTexture = (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            screen.material.map = texture;
+            screen.material.color.setHex(0xffffff);
+            screen.material.needsUpdate = true;
+
+            if (beamMesh) {
+                beamMesh.visible = true;
+                beamMesh.material.opacity = 0.22;
+            }
+            requestRender(80);
+        };
+
+        if (tvTextureCache[curItem.url]) {
+            applyTexture(tvTextureCache[curItem.url]);
+        } else {
+            loader.load(curItem.url, (tex) => {
+                tvTextureCache[curItem.url] = tex;
+                applyTexture(tex);
+            });
+        }
+
+        showFloatingNotice(`📺 放映机放映 (${tvPhotoIndex + 1}/${TV_PHOTOS.length})`, `${curItem.title} · ${curItem.desc}`);
+
+        // 如果情侣就在沙发上，触发甜蜜贴贴与情话
+        if (currentCoupleLoc === 'sofa') {
+            triggerCoupleCuddle();
+        } else {
+            setTimeout(() => {
+                showFloatingNotice("🛋️ 观影提示", "点击【坐沙发看大片】，和臭臭并肩靠在沙发上观赏哦！🍿");
+            }, 1800);
+        }
+
+        if (typeof window.confetti === 'function') {
+            window.confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
+        }
+
+        tvPhotoIndex = (tvPhotoIndex + 1) % TV_PHOTOS.length;
+        requestRender(60);
+    }
+
     function triggerPhotoSlideshow() {
-        const photosTab = document.querySelectorAll('.nav-item')[1];
-        if (photosTab) photosTab.click();
+        playTVSlideshow();
+    }
+
+    // ================================================================
+    // 🍧 小冰箱 3D 投喂甜点互动与吃甜品萌音
+    // ================================================================
+    let activeTreatGroup = null;
+
+    function playTreatEatSound() {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            if (!window.__catAudioCtx) window.__catAudioCtx = new AudioCtx();
+            const ctx = window.__catAudioCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            [0, 0.08, 0.16, 0.24].forEach((offset, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+                const f = [523.25, 659.25, 783.99, 1046.50][idx];
+                osc.frequency.setValueAtTime(f, now + offset);
+                osc.frequency.exponentialRampToValueAtTime(f * 1.25, now + offset + 0.06);
+
+                gain.gain.setValueAtTime(0.08, now + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.09);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now + offset);
+                osc.stop(now + offset + 0.1);
+            });
+        } catch (e) {}
+    }
+
+    function createTreatMesh(type) {
+        const group = new THREE.Group();
+        group.name = "coupleTreat";
+
+        if (type === 'sundae') {
+            // 🍓 草莓圣代：高脚杯 + 粉红草莓冰淇淋球 + 红色小草莓
+            const glassMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.75,
+                roughness: 0.1
+            });
+            const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.08, 0.28, 16), glassMat);
+            cup.position.y = 0.14;
+            group.add(cup);
+
+            const iceCreamMat = new THREE.MeshStandardMaterial({ color: 0xff758f, roughness: 0.6 });
+            const scoop = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), iceCreamMat);
+            scoop.position.y = 0.28;
+            group.add(scoop);
+
+            const berryMat = new THREE.MeshStandardMaterial({ color: 0xd90429, roughness: 0.3 });
+            const berry = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.09, 12), berryMat);
+            berry.position.set(0, 0.40, 0);
+            berry.rotation.x = Math.PI;
+            group.add(berry);
+        } else if (type === 'boba') {
+            // 🧋 全糖波波奶茶：圆柱杯 + 奶茶色 + 黑色珍珠 + 粗吸管
+            const cupMat = new THREE.MeshStandardMaterial({
+                color: 0xf4a261,
+                roughness: 0.3,
+                transparent: true,
+                opacity: 0.85
+            });
+            const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.32, 16), cupMat);
+            cup.position.y = 0.16;
+            group.add(cup);
+
+            const lidMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 16), lidMat);
+            lid.position.y = 0.33;
+            group.add(lid);
+
+            const strawMat = new THREE.MeshStandardMaterial({ color: 0xff477e });
+            const straw = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.24, 8), strawMat);
+            straw.position.set(0.03, 0.40, 0);
+            straw.rotation.z = 0.2;
+            group.add(straw);
+
+            const pearlMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+            for (let i = 0; i < 6; i++) {
+                const pearl = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), pearlMat);
+                pearl.position.set((Math.random() - 0.5) * 0.12, 0.05 + Math.random() * 0.06, (Math.random() - 0.5) * 0.12);
+                group.add(pearl);
+            }
+        } else {
+            // 🍰 草莓芝士小蛋糕
+            const cakeMat = new THREE.MeshStandardMaterial({ color: 0xffe3a8, roughness: 0.5 });
+            const cake = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.15, 0.28), cakeMat);
+            cake.position.y = 0.08;
+            group.add(cake);
+
+            const creamMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+            const cream = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.04, 0.29), creamMat);
+            cream.position.y = 0.17;
+            group.add(cream);
+
+            const berryMat = new THREE.MeshStandardMaterial({ color: 0xd90429, roughness: 0.3 });
+            const berry = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 12), berryMat);
+            berry.position.set(0, 0.22, 0);
+            group.add(berry);
+        }
+
+        group.scale.set(0.9, 0.9, 0.9);
+        return group;
+    }
+
+    function feedCoupleTreat(type = 'sundae') {
+        if (!coupleGroup || !roomGroup) return;
+
+        if (activeTreatGroup) {
+            roomGroup.remove(activeTreatGroup);
+            activeTreatGroup = null;
+        }
+
+        playTreatEatSound();
+
+        const treat = createTreatMesh(type);
+        const couplePos = coupleGroup.position;
+        treat.position.set(couplePos.x + 0.3, couplePos.y + (currentCoupleLoc === 'bed' ? 0.45 : 0.65), couplePos.z + 0.35);
+        roomGroup.add(treat);
+        activeTreatGroup = treat;
+
+        let treatTime = 0;
+        const treatInterval = setInterval(() => {
+            treatTime += 0.15;
+            if (activeTreatGroup) {
+                activeTreatGroup.position.y += Math.sin(treatTime) * 0.005;
+                activeTreatGroup.rotation.y += 0.04;
+                requestRender(10);
+            }
+        }, 30);
+
+        triggerCoupleCuddle();
+
+        if (typeof window.addVaultCoins === 'function') {
+            window.addVaultCoins(5);
+        }
+
+        const TREAT_DIALOGUES = {
+            sundae: "「哲哲舀起一大勺草莓雪糕：‘宝贝张嘴，啊——！最甜的一口给珊珊！’ 珊珊满足地眯起眼睛：‘好冰好甜好幸福！’🍓」",
+            boba: "「哲哲把插好吸管的波波奶茶递给珊珊：‘给小公主加满珍珠！’ 珊珊大吸一口：‘吸到五颗珍珠啦！臭臭最好啦！’🧋」",
+            cake: "「哲哲切下第一块芝士蛋糕：‘一口芝士，一生只心动珊珊~’ 珊珊甜甜一笑：‘嘴这么甜，今天不揍你啦！’🍰」"
+        };
+
+        showFloatingNotice(`🍧 投喂成功！爱心金库 +5 🪙`, TREAT_DIALOGUES[type] || TREAT_DIALOGUES.sundae);
+
+        setTimeout(() => {
+            let shrinkFrames = 15;
+            const shrinkStep = () => {
+                if (shrinkFrames > 0 && activeTreatGroup) {
+                    shrinkFrames--;
+                    activeTreatGroup.scale.multiplyScalar(0.85);
+                    requestRender(10);
+                    requestAnimationFrame(shrinkStep);
+                } else {
+                    clearInterval(treatInterval);
+                    if (activeTreatGroup) {
+                        roomGroup.remove(activeTreatGroup);
+                        activeTreatGroup = null;
+                    }
+                    requestRender(20);
+                }
+            };
+            requestAnimationFrame(shrinkStep);
+        }, 3200);
     }
 
     function triggerMailboxAction() {
@@ -1959,79 +2257,163 @@
         }
     }
 
-    // 气候与 3D 房间环境材质/光影动态联动
-    function applyWeatherToRoom(data) {
+    // ================================================================
+    // 🌅 100% 自动真实平阳昼夜光影系统 (纯自动联动 · 零人工开关按键)
+    // 晨曦朝阳(05:30-08:30) / 明媚白昼(08:30-17:00) / 浪漫暮霞(17:00-19:15) / 星空暖夜(19:15-05:30)
+    // ================================================================
+    function applyDayNightLighting(weatherData) {
         if (!roomGroup || !skyMat) return;
 
-        const isDay = data.isDay;
-        const type = data.type;
+        // 获取北京时间当前时分 (平阳当地 UTC+8)
+        const now = new Date();
+        const chinaHour = (now.getUTCHours() + 8 + now.getUTCMinutes() / 60) % 24;
 
-        // 1. 窗外天空颜色与天象切换
-        if (!isDay) {
-            // 夜晚深邃暗夜蓝
-            skyMat.color.setHex(0x0a081a);
+        const weatherType = (weatherData && weatherData.type) || 'sunny';
+        const isRain = !!(weatherData && (weatherData.type === 'rain' || weatherData.type === 'storm' || (weatherData.rain && weatherData.rain > 0)));
+
+        // 1. 雨滴粒子系统自动控制
+        if (rainGroup) {
+            rainGroup.visible = isRain;
+        }
+
+        // 2. 四时光影与天空天象根据平阳当地时间流转
+        if (chinaHour >= 5.5 && chinaHour < 8.5) {
+            // 🌅 晨曦拂晓 (05:30 - 08:30)：天边微白，清澈朝霞柔光
+            skyMat.color.setHex(0x8ecae6);
+            if (starsGroup) starsGroup.visible = false;
+            if (moonMesh) moonMesh.visible = false;
+            if (sunbeamMesh) {
+                sunbeamMesh.visible = !isRain;
+                sunbeamMesh.material.color.setHex(0xffdfba);
+                sunbeamMesh.material.opacity = 0.16;
+            }
+
+            if (ambientLight) {
+                ambientLight.color.setHex(0xfff0f3);
+                ambientLight.intensity = 0.95;
+            }
+            if (sunLight) {
+                sunLight.color.setHex(0xffeedb);
+                sunLight.intensity = 1.15;
+                sunLight.position.set(6, 12, 5);
+            }
+            if (pinkPointLight) {
+                pinkPointLight.color.setHex(0xff758c);
+                pinkPointLight.intensity = 0.8;
+            }
+        } else if (chinaHour >= 8.5 && chinaHour < 17.0) {
+            // ☀️ 明媚白昼 (08:30 - 17:00)：光芒通透自然
+            if (isRain) {
+                skyMat.color.setHex(0x334155); // 雨天水汽暗蓝
+                if (sunbeamMesh) sunbeamMesh.visible = false;
+                if (ambientLight) {
+                    ambientLight.color.setHex(0xd0d8e2);
+                    ambientLight.intensity = 0.78;
+                }
+                if (sunLight) {
+                    sunLight.color.setHex(0x8fa3b8);
+                    sunLight.intensity = 0.65;
+                }
+                if (pinkPointLight) {
+                    pinkPointLight.color.setHex(0xffb703);
+                    pinkPointLight.intensity = 1.35; // 雨天室内开灯更温馨
+                }
+            } else if (weatherType === 'cloudy' || weatherType === 'overcast') {
+                skyMat.color.setHex(0x94a3b8); // 柔和银灰
+                if (sunbeamMesh) sunbeamMesh.visible = false;
+                if (ambientLight) {
+                    ambientLight.color.setHex(0xfff0f3);
+                    ambientLight.intensity = 0.95;
+                }
+                if (sunLight) {
+                    sunLight.color.setHex(0xfff5eb);
+                    sunLight.intensity = 1.1;
+                }
+                if (pinkPointLight) {
+                    pinkPointLight.color.setHex(0xff758c);
+                    pinkPointLight.intensity = 0.85;
+                }
+            } else {
+                skyMat.color.setHex(0x64b5f6); // 蔚蓝晴空
+                if (sunbeamMesh) {
+                    sunbeamMesh.visible = true;
+                    sunbeamMesh.material.color.setHex(0xffe8a1);
+                    sunbeamMesh.material.opacity = 0.15;
+                }
+                if (ambientLight) {
+                    ambientLight.color.setHex(0xfff5ea);
+                    ambientLight.intensity = 1.1;
+                }
+                if (sunLight) {
+                    sunLight.color.setHex(0xfff0d4);
+                    sunLight.intensity = 1.35;
+                    sunLight.position.set(8, 14, 6);
+                }
+                if (pinkPointLight) {
+                    pinkPointLight.color.setHex(0xff758c);
+                    pinkPointLight.intensity = 0.75;
+                }
+            }
+            if (starsGroup) starsGroup.visible = false;
+            if (moonMesh) moonMesh.visible = false;
+        } else if (chinaHour >= 17.0 && chinaHour < 19.25) {
+            // 🌆 浪漫暮霞与粉紫黄昏 (17:00 - 19:15)：Golden Hour 绝美光晕
+            skyMat.color.setHex(0x9d4edd); // 暮光晚霞粉紫
+            if (starsGroup) starsGroup.visible = false;
+            if (moonMesh) moonMesh.visible = true;
+            if (sunbeamMesh) {
+                sunbeamMesh.visible = !isRain;
+                sunbeamMesh.material.color.setHex(0xff9e7d); // 暖橘夕阳斜射
+                sunbeamMesh.material.opacity = 0.18;
+            }
+
+            if (ambientLight) {
+                ambientLight.color.setHex(0xffccd5); // 桃粉夕阳漫射
+                ambientLight.intensity = 0.9;
+            }
+            if (sunLight) {
+                sunLight.color.setHex(0xff9e7d); // 暖橙色夕阳光
+                sunLight.intensity = 1.0;
+                sunLight.position.set(10, 8, 4);
+            }
+            if (pinkPointLight) {
+                pinkPointLight.color.setHex(0xffb703); // 室内暖光渐亮
+                pinkPointLight.intensity = 1.35;
+            }
+        } else {
+            // 🌙 星空暖夜 (19:15 - 05:30)：静谧深邃星夜，床头暖灯温馨守护
+            skyMat.color.setHex(0x090714); // 极深蓝黑夜
             if (starsGroup) starsGroup.visible = true;
             if (moonMesh) moonMesh.visible = true;
             if (sunbeamMesh) sunbeamMesh.visible = false;
-        } else {
-            // 白天隐藏星月
-            if (starsGroup) starsGroup.visible = false;
-            if (moonMesh) moonMesh.visible = false;
 
-            if (type === 'sunny') {
-                skyMat.color.setHex(0x64b5f6); // 蔚蓝晴空
-                if (sunbeamMesh) sunbeamMesh.visible = true;
-            } else if (type === 'cloudy' || type === 'overcast') {
-                skyMat.color.setHex(0x94a3b8); // 柔和银灰云天
-                if (sunbeamMesh) sunbeamMesh.visible = false;
-            } else if (type === 'rain' || type === 'storm') {
-                skyMat.color.setHex(0x334155); // 阴郁水汽蓝灰
-                if (sunbeamMesh) sunbeamMesh.visible = false;
-            } else {
-                skyMat.color.setHex(0x78909c);
-                if (sunbeamMesh) sunbeamMesh.visible = false;
-            }
-        }
-
-        // 2. 雨滴粒子系统开关
-        if (rainGroup) {
-            rainGroup.visible = (type === 'rain' || type === 'storm' || (data.rain && data.rain > 0));
-        }
-
-        // 3. 室内光影系统随平阳昼夜与天候联动
-        if (ambientLight && sunLight && pinkPointLight) {
-            if (!isDay) {
-                // 夜晚模式：暖光包裹，床头爱心夜灯加亮，小窝极具私密温馨安全感
+            if (ambientLight) {
                 ambientLight.color.setHex(0xffdfd3);
-                ambientLight.intensity = 0.65;
-                sunLight.color.setHex(0x829bb5); // 窗外淡淡银白月辉
-                sunLight.intensity = 0.45;
-                pinkPointLight.intensity = 1.6;
-            } else if (type === 'sunny') {
-                // 晴朗白天：阳光明媚通透
-                ambientLight.color.setHex(0xfff5ea);
-                ambientLight.intensity = 1.05;
-                sunLight.color.setHex(0xfff0d4);
-                sunLight.intensity = 1.35;
-                pinkPointLight.intensity = 0.8;
-            } else if (type === 'rain' || type === 'storm') {
-                // 雨天白天：室内暖光比外面明亮温馨
-                ambientLight.color.setHex(0xd0d8e2);
-                ambientLight.intensity = 0.75;
-                sunLight.color.setHex(0x8fa3b8);
-                sunLight.intensity = 0.55;
-                pinkPointLight.intensity = 1.35;
-            } else {
-                // 多云舒适
-                ambientLight.color.setHex(0xfff0f3);
-                ambientLight.intensity = 0.95;
-                sunLight.color.setHex(0xfff5eb);
-                sunLight.intensity = 1.1;
-                pinkPointLight.intensity = 1.0;
+                ambientLight.intensity = 0.62;
+            }
+            if (sunLight) {
+                sunLight.color.setHex(0x829bb5); // 银白月光
+                sunLight.intensity = 0.38;
+                sunLight.position.set(-5, 12, -4);
+            }
+            if (pinkPointLight) {
+                pinkPointLight.color.setHex(0xffb703); // 暖黄色床头夜灯
+                pinkPointLight.intensity = 1.65;
             }
         }
 
         requestRender(60);
+    }
+
+    // 气候与 3D 房间环境材质/光影动态联动
+    function applyWeatherToRoom(data) {
+        if (!roomGroup || !skyMat) return;
+        applyDayNightLighting(data);
+
+        // 联动平阳专属贴心降温/降雨私密陪伴提醒 (零复制按钮，纯男友关怀)
+        if (typeof window.checkPingyangWeatherCare === 'function') {
+            window.checkPingyangWeatherCare(data);
+        }
     }
 
     // 点击平阳天气挂件的宠溺寄语弹窗
@@ -2340,6 +2722,10 @@
         interactCat: triggerCatStretch,
         showWeather: () => currentWeather && showWeatherCard(currentWeather),
         refreshWeather: fetchPingyangWeather,
+        getWeather: () => currentWeather,
+        playTV: playTVSlideshow,
+        feedTreat: feedCoupleTreat,
+        applyLighting: () => applyDayNightLighting(currentWeather),
         destroy: () => {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             isInitialized = false;

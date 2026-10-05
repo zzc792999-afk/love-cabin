@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=3.8">
+    <link rel="stylesheet" href="style.css?v=3.9">
 </head>
 <body>
 
@@ -104,13 +104,14 @@
 
                     <!-- 快捷家具快速交互药丸 -->
                     <div class="cabin-quick-pills">
+                        <button class="quick-pill" id="quick-pill-ritual" onclick="window.openMorningNightRitual && window.openMorningNightRitual()"><i class="fas fa-sun" style="color:#ffb703;"></i> ☀️ 早安/晚安仪式</button>
                         <button class="quick-pill" onclick="window.Cabin3D && window.Cabin3D.interactCouple()"><i class="fas fa-heart" style="color:#ff477e;"></i> 💑 哲哲与珊珊 (贴贴/情话)</button>
                         <button class="quick-pill" onclick="window.Cabin3D && window.Cabin3D.interactCat()"><i class="fas fa-paw" style="color:#ff9f1c;"></i> 🐱 逗逗小猫咪 (伸懒腰/呼噜)</button>
                         <button class="quick-pill" onclick="window.openLovePostcard && window.openLovePostcard()"><i class="fas fa-envelope-open-text" style="color:#ff758c;"></i> 💌 今日恋爱明信片 (平阳专属)</button>
                         <button class="quick-pill" onclick="window.triggerHeartbeatSync && window.triggerHeartbeatSync()"><i class="fas fa-heart-pulse" style="color:#ff477e;"></i> 💓 心跳同频共振</button>
-                        <button class="quick-pill" onclick="window.location.href='other/takeout.html'"><i class="fas fa-utensils" style="color:#ffb703;"></i> 🧊 打开小冰箱</button>
+                        <button class="quick-pill" onclick="window.openFridgeModal ? window.openFridgeModal() : (window.location.href='other/takeout.html')"><i class="fas fa-ice-cream" style="color:#ff758c;"></i> 🧊 小冰箱 (投喂甜点)</button>
+                        <button class="quick-pill" onclick="window.Cabin3D ? window.Cabin3D.playTV() : document.querySelectorAll('.nav-item')[1].click()"><i class="fas fa-camera-retro" style="color:#a17fe0;"></i> 📺 放映机播相册</button>
                         <button class="quick-pill" onclick="window.location.href='other/slap.html'"><i class="fas fa-hand-sparkles" style="color:#e63946;"></i> 🥊 暴揍臭臭</button>
-                        <button class="quick-pill" onclick="document.querySelectorAll('.nav-item')[1].click()"><i class="fas fa-camera-retro" style="color:#a17fe0;"></i> 📺 回忆放映机</button>
                         <button class="quick-pill" onclick="document.querySelectorAll('.nav-item')[2].click()"><i class="fas fa-envelope" style="color:#52b788;"></i> 💌 床头信箱</button>
                         <button class="quick-pill" onclick="window.openLoveDigest && window.openLoveDigest()"><i class="fas fa-chart-pie" style="color:#ffb703;"></i> 📊 查看恋爱月报</button>
                     </div>
@@ -492,12 +493,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=3.8"></script>
+    <script src="app.js?v=3.9"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=3.8"></script>
+    <script src="js/cabin3d.js?v=3.9"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=3.8"></script>
+    <script src="js/features3.js?v=3.9"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

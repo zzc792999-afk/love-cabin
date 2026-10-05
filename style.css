@@ -3605,3 +3605,513 @@ details[open] .drawer-arrow {
         padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 }
+
+/* ==========================================
+   🧊 3D 爱心小冰箱投喂甜点 Modal
+   ========================================== */
+.fridge-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.fridge-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.fridge-modal-card {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 440px;
+    padding: 26px 22px 20px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    position: relative;
+    color: #2b2d42;
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: linear-gradient(145deg, #fffafb 0%, #ffffff 100%);
+    border: 2px solid #ffe3ea;
+}
+
+[data-theme="dark"] .fridge-modal-card {
+    background: linear-gradient(145deg, #241d33 0%, #1e192c 100%);
+    border-color: rgba(255, 117, 151, 0.3);
+    color: #f7cad0;
+}
+
+.fridge-modal-overlay.active .fridge-modal-card {
+    transform: scale(1);
+}
+
+.fridge-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.fridge-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.fridge-badge {
+    background: rgba(255, 117, 151, 0.12);
+    color: #ff477e;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.fridge-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #ff477e;
+    margin-bottom: 4px;
+}
+
+.fridge-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.fridge-treat-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.fridge-treat-item {
+    background: rgba(255, 245, 247, 0.9);
+    border: 1.5px solid rgba(255, 182, 193, 0.6);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-theme="dark"] .fridge-treat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 117, 151, 0.25);
+}
+
+.fridge-treat-item:hover {
+    transform: translateY(-2px);
+    border-color: #ff477e;
+    box-shadow: 0 6px 16px rgba(255, 71, 126, 0.18);
+}
+
+.fridge-treat-item .treat-emoji {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.fridge-treat-item .treat-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #2b2d42;
+}
+
+[data-theme="dark"] .fridge-treat-item .treat-name {
+    color: #fff;
+}
+
+.fridge-treat-item .treat-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    flex: 1;
+}
+
+.treat-feed-btn {
+    background: linear-gradient(135deg, #ff477e, #ff758f);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(255, 71, 126, 0.3);
+}
+
+.fridge-takeout-box {
+    border-top: 1px dashed rgba(255, 117, 151, 0.3);
+    padding-top: 12px;
+}
+
+.takeout-tip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.takeout-link-btn {
+    background: rgba(255, 183, 3, 0.12);
+    color: #d48b00;
+    border: 1px solid rgba(255, 183, 3, 0.4);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.takeout-link-btn:hover {
+    background: #ffb703;
+    color: #fff;
+}
+
+/* ==========================================
+   🌧️ 平阳降雨/降温专属私密陪伴关怀 Modal
+   ========================================== */
+.weather-care-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s;
+}
+
+.weather-care-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.weather-care-card {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 420px;
+    padding: 26px 22px 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    position: relative;
+    color: #2b2d42;
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: linear-gradient(145deg, #fffcfd 0%, #ffffff 100%);
+    border: 2px solid #ffd6e0;
+}
+
+[data-theme="dark"] .weather-care-card {
+    background: linear-gradient(145deg, #241d33 0%, #1e192c 100%);
+    border-color: rgba(255, 117, 151, 0.3);
+    color: #f7cad0;
+}
+
+.weather-care-modal-overlay.active .weather-care-card {
+    transform: scale(1);
+}
+
+.weather-care-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.weather-care-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.weather-care-icon {
+    font-size: 2.4rem;
+}
+
+.weather-care-badge {
+    background: rgba(255, 117, 151, 0.12);
+    color: #ff477e;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 3px;
+}
+
+.weather-care-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #2b2d42;
+    margin: 0;
+}
+
+[data-theme="dark"] .weather-care-title {
+    color: #fff;
+}
+
+.weather-care-body {
+    background: #fff5f7;
+    border-left: 4px solid #ff758c;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #4a4e69;
+}
+
+[data-theme="dark"] .weather-care-body {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f7cad0;
+}
+
+.weather-care-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.weather-care-btn-bed {
+    flex: 1;
+    background: rgba(255, 117, 151, 0.14);
+    color: #ff477e;
+    border: 1px solid rgba(255, 117, 151, 0.35);
+    padding: 11px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.weather-care-btn-bed:hover {
+    background: #ff477e;
+    color: #fff;
+}
+
+.weather-care-btn-ack {
+    flex: 1.2;
+    background: linear-gradient(135deg, #ff477e, #ff758f);
+    color: #fff;
+    border: none;
+    padding: 11px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 71, 126, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.weather-care-btn-ack:active {
+    transform: scale(0.96);
+}
+
+/* ==========================================
+   ☀️/🌙 早安/晚安仪式签 Modal
+   ========================================== */
+.ritual-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.ritual-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ritual-card {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    position: relative;
+    color: #2b2d42;
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: linear-gradient(145deg, #fffafb 0%, #ffffff 100%);
+    border: 2px solid #ffe3ea;
+}
+
+[data-theme="dark"] .ritual-card {
+    background: linear-gradient(145deg, #241d33 0%, #1e192c 100%);
+    border-color: rgba(255, 117, 151, 0.3);
+    color: #f7cad0;
+}
+
+.ritual-modal-overlay.active .ritual-card {
+    transform: scale(1);
+}
+
+.ritual-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.ritual-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.ritual-badge {
+    background: rgba(255, 117, 151, 0.12);
+    color: #ff477e;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 16px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.ritual-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #ff477e;
+    margin-bottom: 4px;
+}
+
+.ritual-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.ritual-quote-box {
+    background: #fff5f7;
+    border-left: 4px solid #ff477e;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #4a4e69;
+    font-style: italic;
+    min-height: 70px;
+}
+
+[data-theme="dark"] .ritual-quote-box {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f7cad0;
+}
+
+.ritual-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.ritual-btn-sub {
+    flex: 1;
+    background: rgba(255, 117, 151, 0.12);
+    color: #ff477e;
+    border: 1px solid rgba(255, 117, 151, 0.3);
+    padding: 11px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ritual-btn-sub:hover {
+    background: #ff477e;
+    color: #fff;
+}
+
+.ritual-btn-main {
+    flex: 1.2;
+    background: linear-gradient(135deg, #ff477e, #ff758f);
+    color: #fff;
+    border: none;
+    padding: 11px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 71, 126, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ritual-btn-main:active {
+    transform: scale(0.96);
+}

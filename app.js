@@ -1015,6 +1015,35 @@
                 const reunionD = parseSafeDate(state.reunionDate);
                 reunionDateLabel.textContent = `复合纪念日：${reunionD.getFullYear()}年${reunionD.getMonth() + 1}月${reunionD.getDate()}日`;
             }
+
+            // 🍱 同步 Bento Grid 细分统计时间格
+            const subMeetDays = document.getElementById('sub-meet-days');
+            if (subMeetDays) subMeetDays.textContent = meetDays;
+
+            const subLoveCoins = document.getElementById('sub-love-coins');
+            if (subLoveCoins) subLoveCoins.textContent = safeGet('sweetpact_love_coins', '100');
+
+            const now = new Date();
+            let target300 = parseSafeDate('2026-11-13');
+            const d300Diff = Math.max(0, Math.ceil((target300 - now) / (1000 * 3600 * 24)));
+            const d300Bento = document.getElementById('d300-days-bento');
+            if (d300Bento) d300Bento.textContent = d300Diff;
+            const d300Summary = document.getElementById('d300-summary-days');
+            if (d300Summary) d300Summary.textContent = `${d300Diff}天`;
+
+            let targetAnniv = parseSafeDate(state.anniversaryDate);
+            if (targetAnniv - now < 0) targetAnniv.setFullYear(now.getFullYear() + 1);
+            const annivDiff = Math.max(0, Math.ceil((targetAnniv - now) / (1000 * 3600 * 24)));
+            const daysBento = document.getElementById('days-bento');
+            if (daysBento) daysBento.textContent = annivDiff;
+            const annivSummary = document.getElementById('anniversary-summary-days');
+            if (annivSummary) annivSummary.textContent = `${annivDiff}天`;
+
+            let targetReunion = parseSafeDate(state.reunionAnniversaryDate);
+            if (targetReunion - now < 0) targetReunion.setFullYear(now.getFullYear() + 1);
+            const reunionDiff = Math.max(0, Math.ceil((targetReunion - now) / (1000 * 3600 * 24)));
+            const reunionSummary = document.getElementById('reunion-summary-days');
+            if (reunionSummary) reunionSummary.textContent = `${reunionDiff}天`;
         }
 
         updateCardCounters();
@@ -2119,6 +2148,86 @@
                 audio.play().catch(err => console.log("重播受阻:", err));
             }
         });
+
+        // 🍱 同步 Bento Grid 黑胶留声机微播放器
+        const bentoVinyl = document.getElementById('bento-vinyl-disc');
+        const bentoPlayIcon = document.getElementById('bento-play-icon');
+        const bentoIndicator = document.getElementById('bento-music-indicator');
+        const bentoSongTitle = document.getElementById('bento-song-title');
+        const bentoPlayBtn = document.getElementById('bento-play-btn');
+        const bentoVinylWrap = document.getElementById('bento-vinyl-btn');
+        const bentoNextBtn = document.getElementById('bento-next-btn');
+        const bentoPrevBtn = document.getElementById('bento-prev-btn');
+
+        function syncBentoPlayer(isPlaying) {
+            if (bentoVinyl) bentoVinyl.classList.toggle('playing', isPlaying);
+            if (bentoPlayIcon) bentoPlayIcon.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+            if (bentoIndicator) {
+                bentoIndicator.textContent = isPlaying ? 'PLAYING 🎶' : 'PAUSED';
+                bentoIndicator.classList.toggle('playing', isPlaying);
+            }
+            if (bentoSongTitle && state.playlist && state.playlist.length > 0) {
+                const cur = state.playlist[state.currentSongIndex];
+                if (cur && cur.title) bentoSongTitle.textContent = `${cur.title} · 专属BGM`;
+            }
+        }
+
+        if (bentoPlayBtn) {
+            bentoPlayBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                player.click();
+            });
+        }
+        if (bentoVinylWrap) {
+            bentoVinylWrap.addEventListener('click', (e) => {
+                e.stopPropagation();
+                player.click();
+            });
+        }
+        if (bentoNextBtn) {
+            bentoNextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (state.playlist && state.playlist.length > 1) {
+                    state.currentSongIndex = (state.currentSongIndex + 1) % state.playlist.length;
+                    const nextSong = state.playlist[state.currentSongIndex];
+                    audio.innerHTML = `<source src="${nextSong.url}" type="audio/mpeg">`;
+                    audio.load();
+                    audio.play().then(() => syncBentoPlayer(true)).catch(() => {});
+                }
+            });
+        }
+        if (bentoPrevBtn) {
+            bentoPrevBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (state.playlist && state.playlist.length > 1) {
+                    state.currentSongIndex = (state.currentSongIndex - 1 + state.playlist.length) % state.playlist.length;
+                    const prevSong = state.playlist[state.currentSongIndex];
+                    audio.innerHTML = `<source src="${prevSong.url}" type="audio/mpeg">`;
+                    audio.load();
+                    audio.play().then(() => syncBentoPlayer(true)).catch(() => {});
+                }
+            });
+        }
+
+        audio.addEventListener('play', () => syncBentoPlayer(true));
+        audio.addEventListener('pause', () => syncBentoPlayer(false));
+
+        // 💌 初始化 Bento 今日手写便签预览
+        try {
+            const noteEl = document.getElementById('bento-preview-note');
+            if (noteEl) {
+                const stored = localStorage.getItem('sweet_notes') || localStorage.getItem('stickyNotes');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        const latest = parsed[parsed.length - 1];
+                        if (latest && latest.text) {
+                            noteEl.textContent = `“${latest.text}”`;
+                        }
+                    }
+                }
+            }
+        } catch(e) {}
     }
 
     /* ================================================================

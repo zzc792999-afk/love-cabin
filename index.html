@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=4.1">
 </head>
 <body>
 
@@ -161,44 +161,188 @@
                 <p>在这个属于我们的小屋里：你可以去<strong>“相册”</strong>重温定格的每一个温柔瞬间，去<strong>“留言便签墙”</strong>给我贴满甜甜的悄悄话，翻开属于高三毕业后的顶峰之约回忆录。希望每一个细微的瞬间，都能化作属于我们的浪漫宇宙。✨</p>
             </div>
 
-            <!-- 恋爱天数大卡片 (Luxury Editorial Milestones) -->
-            <div class="counter-grid">
-                <!-- 复合时光卡片 -->
-                <div class="glass-panel counter-card luxury-counter-card">
+            <!-- ==========================================
+                 🍱 风格二：现代便当盒心动格 (Bento Grid Space)
+                 ========================================== -->
+            <div class="bento-grid-container">
+                <!-- 1. 💑 情侣专属名片 (Couple Profile) -->
+                <div class="glass-panel bento-card bento-profile-card">
                     <div class="card-glare"></div>
-                    <div class="counter-milestone-badge milestone-reunion">
-                        <i class="fas fa-sparkles"></i> 复合里程碑 · REUNION CHAPTER
+                    <div class="bento-card-header">
+                        <span class="bento-badge profile-badge"><i class="fas fa-heart"></i> COUPLE PROFILE</span>
+                        <span class="bento-role-sync-tip" title="点击可快速切换男女视角" onclick="document.getElementById('role-toggle').click()">切换视角 <i class="fas fa-arrows-rotate"></i></span>
                     </div>
-                    <h3>💞 我们重新走到一起</h3>
-                    <div class="counter-num-box">
-                        <span class="counter-num" id="together-days-card">--</span>
-                        <span class="counter-unit">DAYS</span>
+                    <div class="bento-couple-avatars">
+                        <div class="bento-avatar z-avatar" title="陈祖哲">
+                            <span class="avatar-icon">👨</span>
+                            <span class="avatar-label">陈祖哲</span>
+                        </div>
+                        <div class="bento-love-bridge">
+                            <i class="fas fa-heart beat"></i>
+                            <span class="bridge-line"></span>
+                        </div>
+                        <div class="bento-avatar s-avatar" title="白珊珊">
+                            <span class="avatar-icon">👩</span>
+                            <span class="avatar-label">白珊珊</span>
+                        </div>
                     </div>
-                    <p class="subtitle" id="reunion-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
-                        复合纪念日：2026年1月18日
-                    </p>
-                    <p class="counter-quote">
-                        “兜兜转转还是你，这次绝不放手。”
-                    </p>
+                    <div class="bento-status-pill">
+                        <span class="pulse-dot"></span> TOGETHER IN LOVE · 甜蜜热恋中
+                    </div>
+                    <p class="bento-profile-quote">“在各自的跑道拼尽全力，在彼此的世界心安归途”</p>
                 </div>
 
-                <!-- 招牌天数卡片 -->
-                <div class="glass-panel counter-card luxury-counter-card">
+                <!-- 2. 🎯 核心纪念日天数大卡片 (Anniversary Countdown Hero) -->
+                <div class="glass-panel bento-card bento-hero-countdown-card">
                     <div class="card-glare"></div>
-                    <div class="counter-milestone-badge milestone-meet">
-                        <i class="fas fa-seedling"></i> 初见里程碑 · FIRST SIGHT
+                    <div class="bento-card-header">
+                        <span class="bento-badge hero-badge"><i class="fas fa-sparkles"></i> ANNIVERSARY COUNTDOWN</span>
+                        <span class="bento-dots">•••</span>
                     </div>
-                    <h3>🌱 我们的爱意已萌芽</h3>
-                    <div class="counter-num-box">
-                        <span class="counter-num" id="meet-days-card">--</span>
-                        <span class="counter-unit">DAYS</span>
+                    <div class="bento-hero-title">💞 我们重新走到一起</div>
+                    <div class="bento-days-large">
+                        <span class="bento-num" id="together-days-card">--</span>
+                        <span class="bento-unit">DAYS TOGETHER</span>
                     </div>
-                    <p class="subtitle" id="meet-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
-                        初次相遇：2024年5月3日
+                    <!-- 细分统计时间格 (相识天数 / 300天 / 周年 / 金币) -->
+                    <div class="bento-sub-timer-grid">
+                        <div class="sub-timer-box">
+                            <span class="st-num" id="sub-meet-days">--</span>
+                            <span class="st-lbl">相知天数</span>
+                        </div>
+                        <div class="sub-timer-box">
+                            <span class="st-num" id="d300-days-bento">--</span>
+                            <span class="st-lbl">300天倒计</span>
+                        </div>
+                        <div class="sub-timer-box">
+                            <span class="st-num" id="days-bento">--</span>
+                            <span class="st-lbl">下次周年</span>
+                        </div>
+                        <div class="sub-timer-box">
+                            <span class="st-num" id="sub-love-coins">100</span>
+                            <span class="st-lbl">爱意金币</span>
+                        </div>
+                    </div>
+                    <p class="bento-timeline-sub" id="reunion-date-sublabel">
+                        复合纪念日：2026年1月18日
                     </p>
-                    <p class="counter-quote">
-                        “阳光正好，你的笑容格外温暖。”
-                    </p>
+                    <p class="bento-subquote" id="meet-date-sublabel" style="display:none;">初次相遇：2024年5月3日</p>
+                    <span id="meet-days-card" style="display:none;">--</span>
+                </div>
+
+                <!-- 3. 💿 浪漫黑胶留声机微播放器 (Vinyl Music Player Widget) -->
+                <div class="glass-panel bento-card bento-music-card" id="bento-music-widget">
+                    <div class="card-glare"></div>
+                    <div class="bento-card-header">
+                        <span class="bento-badge music-badge"><i class="fas fa-compact-disc"></i> MUSIC PLAYER</span>
+                        <span class="bento-music-status" id="bento-music-indicator">PAUSED</span>
+                    </div>
+                    <div class="bento-vinyl-wrapper" id="bento-vinyl-btn" title="点击转动/暂停黑胶唱片">
+                        <div class="bento-vinyl-disc" id="bento-vinyl-disc">
+                            <div class="bento-vinyl-grooves"></div>
+                            <div class="bento-vinyl-center">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bento-music-info">
+                        <div class="bento-song-title" id="bento-song-title">晴天 · 属于我们的专属BGM</div>
+                        <div class="bento-song-artist">周杰伦 / 陪伴我们的每一次心跳</div>
+                    </div>
+                    <div class="bento-music-controls">
+                        <button class="bento-audio-btn" id="bento-prev-btn" title="切上一首"><i class="fas fa-backward-step"></i></button>
+                        <button class="bento-audio-btn play-pause-btn" id="bento-play-btn" title="播放/暂停"><i class="fas fa-play" id="bento-play-icon"></i></button>
+                        <button class="bento-audio-btn" id="bento-next-btn" title="切下一首"><i class="fas fa-forward-step"></i></button>
+                    </div>
+                </div>
+
+                <!-- 4. 📸 精选画廊瞬间 (Our Gallery Preview) -->
+                <div class="glass-panel bento-card bento-gallery-card" onclick="document.querySelectorAll('.nav-item')[1].click()" title="点击前往相册流">
+                    <div class="card-glare"></div>
+                    <div class="bento-card-header">
+                        <span class="bento-badge gallery-badge"><i class="fas fa-camera-retro"></i> OUR GALLERY</span>
+                        <span class="bento-link-arrow">查看全部 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="bento-gallery-previews">
+                        <div class="bento-photo-thumb" style="background-image: url('images/1.jpg');">
+                            <span class="bento-thumb-tag">初见心动</span>
+                        </div>
+                        <div class="bento-photo-thumb" style="background-image: url('images/2.jpg');">
+                            <span class="bento-thumb-tag">温柔对视</span>
+                        </div>
+                        <div class="bento-photo-thumb" style="background-image: url('images/IMG_20260206_124425.png');">
+                            <span class="bento-thumb-tag">定格浪漫</span>
+                        </div>
+                    </div>
+                    <div class="bento-gallery-footer">
+                        <span>定格我们生命中每一个值得珍藏的温度瞬间 ✨</span>
+                    </div>
+                </div>
+
+                <!-- 5. 💌 今日手写暖心便签 (Sweet Note) -->
+                <div class="glass-panel bento-card bento-note-card" onclick="document.querySelectorAll('.nav-item')[2].click()" title="点击前往留言墙贴悄悄话">
+                    <div class="card-glare"></div>
+                    <div class="bento-card-header">
+                        <span class="bento-badge note-badge"><i class="fas fa-sticky-note"></i> SWEET NOTE</span>
+                        <span class="bento-tape-clip">📌 每日手账</span>
+                    </div>
+                    <div class="bento-note-paper">
+                        <p class="bento-note-text" id="bento-preview-note">
+                            “珊珊宝贝，今天也要开开心心，好好吃饭，好好想我哦！mua~ ❤️”
+                        </p>
+                        <div class="bento-note-signature">
+                            <span class="note-author">— 哲哲留</span>
+                            <span class="note-hint">点击去便签墙写悄悄话 ✍️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. 🎯 即将到来的重要里程碑 (Upcoming Milestones) -->
+                <div class="glass-panel bento-card bento-milestones-card">
+                    <div class="card-glare"></div>
+                    <div class="bento-card-header">
+                        <span class="bento-badge milestone-badge"><i class="fas fa-calendar-check"></i> UPCOMING MILESTONES</span>
+                        <span class="bento-dots">•••</span>
+                    </div>
+                    <div class="bento-milestone-list">
+                        <a href="300days.html" class="bento-milestone-item highlight">
+                            <div class="bmi-left">
+                                <span class="bmi-icon">🎯</span>
+                                <div class="bmi-text">
+                                    <div class="bmi-title">在一起第 300 天纪念日</div>
+                                    <div class="bmi-date">2026年11月13日</div>
+                                </div>
+                            </div>
+                            <div class="bmi-right">
+                                <span class="bmi-days" id="d300-summary-days">--天</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <div class="bento-milestone-item">
+                            <div class="bmi-left">
+                                <span class="bmi-icon">🌸</span>
+                                <div class="bmi-text">
+                                    <div class="bmi-title">下一个相识周年纪念</div>
+                                    <div class="bmi-date">2026年5月3日</div>
+                                </div>
+                            </div>
+                            <div class="bmi-right">
+                                <span class="bmi-days" id="anniversary-summary-days">--天</span>
+                            </div>
+                        </div>
+                        <div class="bento-milestone-item">
+                            <div class="bmi-left">
+                                <span class="bmi-icon">💞</span>
+                                <div class="bmi-text">
+                                    <div class="bmi-title">复合一周年纪念日</div>
+                                    <div class="bmi-date">2027年1月18日</div>
+                                </div>
+                            </div>
+                            <div class="bmi-right">
+                                <span class="bmi-days" id="reunion-summary-days">--天</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -521,17 +665,17 @@
     <footer>
         <p>© 2026 属于我们的时光小屋 | 版权所有 © 白珊珊 & 陈祖哲</p>
         <p>愿我们珍惜彼此，携手从心动走到心安 <span class="heart">❤️</span></p>
-        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻典藏版 4.0 | 用心定格我们每一次的心跳</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻典藏 Bento 版 4.1 | 用心定格我们每一次的心跳</p>
     </footer>
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=4.0"></script>
+    <script src="app.js?v=4.1"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=4.0"></script>
+    <script src="js/cabin3d.js?v=4.1"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=4.0"></script>
+    <script src="js/features3.js?v=4.1"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

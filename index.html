@@ -19,7 +19,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=3.9">
+    <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 <body>
 
@@ -44,10 +44,31 @@
             </button>
         </div>
 
-        <!-- 头部标题 -->
-        <header class="main-header">
-            <h1 class="header-title"><i class="fas fa-heart"></i> 致<span id="header-girlfriend-name">珊珊</span>宝贝 <i class="fas fa-heart"></i></h1>
+        <!-- 头部杂志风轻奢标题 (Editorial Romance Hero) -->
+        <header class="main-header editorial-header">
+            <!-- 专属情侣 Monogram 标志 -->
+            <div class="header-monogram-badge">
+                <div class="monogram-emblem">
+                    <span class="mono-letter">Z</span>
+                    <span class="mono-amp">&</span>
+                    <span class="mono-letter">S</span>
+                </div>
+                <div class="editorial-caps-tag">L'AMOUR TOUJOURS · VOLUME 2026</div>
+            </div>
+
+            <h1 class="header-title">
+                <span class="title-sparkle">✦</span>
+                致<span id="header-girlfriend-name">珊珊</span>宝贝
+                <span class="title-sparkle">✦</span>
+            </h1>
             <p class="subtitle">记录我们的相遇、重逢与未来的每一天</p>
+
+            <!-- 雅致格调标签组 (Editorial Meta Tags) -->
+            <div class="header-meta-tags">
+                <span class="meta-tag"><i class="fas fa-feather-pointed"></i> 专属时光纪念志</span>
+                <span class="meta-tag"><i class="fas fa-compass"></i> 山河远阔 心安归途</span>
+                <span class="meta-tag"><i class="fas fa-infinity"></i> 始于二零二四</span>
+            </div>
         </header>
 
         <!-- 📢 管理员公告条 -->
@@ -140,30 +161,42 @@
                 <p>在这个属于我们的小屋里：你可以去<strong>“相册”</strong>重温定格的每一个温柔瞬间，去<strong>“留言便签墙”</strong>给我贴满甜甜的悄悄话，翻开属于高三毕业后的顶峰之约回忆录。希望每一个细微的瞬间，都能化作属于我们的浪漫宇宙。✨</p>
             </div>
 
-            <!-- 恋爱天数大卡片 -->
+            <!-- 恋爱天数大卡片 (Luxury Editorial Milestones) -->
             <div class="counter-grid">
                 <!-- 复合时光卡片 -->
-                <div class="glass-panel counter-card">
+                <div class="glass-panel counter-card luxury-counter-card">
                     <div class="card-glare"></div>
+                    <div class="counter-milestone-badge milestone-reunion">
+                        <i class="fas fa-sparkles"></i> 复合里程碑 · REUNION CHAPTER
+                    </div>
                     <h3>💞 我们重新走到一起</h3>
-                    <div class="counter-num" id="together-days-card">正在计算...</div>
+                    <div class="counter-num-box">
+                        <span class="counter-num" id="together-days-card">--</span>
+                        <span class="counter-unit">DAYS</span>
+                    </div>
                     <p class="subtitle" id="reunion-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
                         复合纪念日：2026年1月18日
                     </p>
-                    <p style="margin-top: 10px; color: var(--primary-dark); font-size: 0.9rem; font-weight: 600;">
+                    <p class="counter-quote">
                         “兜兜转转还是你，这次绝不放手。”
                     </p>
                 </div>
 
                 <!-- 招牌天数卡片 -->
-                <div class="glass-panel counter-card">
+                <div class="glass-panel counter-card luxury-counter-card">
                     <div class="card-glare"></div>
+                    <div class="counter-milestone-badge milestone-meet">
+                        <i class="fas fa-seedling"></i> 初见里程碑 · FIRST SIGHT
+                    </div>
                     <h3>🌱 我们的爱意已萌芽</h3>
-                    <div class="counter-num" id="meet-days-card">正在计算...</div>
+                    <div class="counter-num-box">
+                        <span class="counter-num" id="meet-days-card">--</span>
+                        <span class="counter-unit">DAYS</span>
+                    </div>
                     <p class="subtitle" id="meet-date-sublabel" style="font-size: 0.95rem; color: var(--text-muted);">
                         初次相遇：2024年5月3日
                     </p>
-                    <p style="margin-top: 10px; color: var(--secondary); font-size: 0.9rem; font-weight: 600;">
+                    <p class="counter-quote">
                         “阳光正好，你的笑容格外温暖。”
                     </p>
                 </div>
@@ -488,17 +521,17 @@
     <footer>
         <p>© 2026 属于我们的时光小屋 | 版权所有 © 白珊珊 & 陈祖哲</p>
         <p>愿我们珍惜彼此，携手从心动走到心安 <span class="heart">❤️</span></p>
-        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻高级版 | 用心定格我们每一次的心跳</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻典藏版 4.0 | 用心定格我们每一次的心跳</p>
     </footer>
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=3.9"></script>
+    <script src="app.js?v=4.0"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=3.9"></script>
+    <script src="js/cabin3d.js?v=4.0"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=3.9"></script>
+    <script src="js/features3.js?v=4.0"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

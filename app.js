@@ -898,6 +898,27 @@
     function initTimers() {
         const anniversaryCount = document.getElementById('meet-days-card');
         const togetherCount = document.getElementById('together-days-card');
+        let hasAnimatedCounters = false;
+
+        // 🌟 动态平滑数字滚动动效 (CountUp with Ease-Out-Expo)
+        function animateCountUp(el, targetVal, duration = 1400) {
+            if (!el || isNaN(targetVal)) return;
+            const startTime = performance.now();
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // 缓动曲线：easeOutExpo (快速启动，细腻平滑减速定格)
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const current = Math.floor(targetVal * ease);
+                el.textContent = current;
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    el.textContent = targetVal;
+                }
+            }
+            requestAnimationFrame(step);
+        }
 
         function updateCardCounters() {
             const today = new Date();
@@ -906,12 +927,19 @@
             const meetStart = parseSafeDate(state.meetDate);
             meetStart.setHours(0,0,0,0);
             const meetDays = Math.floor((today - meetStart) / (1000 * 3600 * 24)) + 1;
-            if (anniversaryCount) anniversaryCount.textContent = meetDays;
 
             const reunionStart = parseSafeDate(state.reunionDate);
             reunionStart.setHours(0,0,0,0);
             const togetherDays = Math.floor((today - reunionStart) / (1000 * 3600 * 24)) + 1;
-            if (togetherCount) togetherCount.textContent = togetherDays;
+
+            if (!hasAnimatedCounters) {
+                if (anniversaryCount) animateCountUp(anniversaryCount, meetDays, 1400);
+                if (togetherCount) animateCountUp(togetherCount, togetherDays, 1400);
+                hasAnimatedCounters = true;
+            } else {
+                if (anniversaryCount) anniversaryCount.textContent = meetDays;
+                if (togetherCount) togetherCount.textContent = togetherDays;
+            }
 
             // 动态同步卡片底部的副标题日期文字
             const meetDateLabel = document.getElementById('meet-date-sublabel');

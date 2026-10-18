@@ -1199,11 +1199,49 @@
                     return res.json();
                 })
                 .then(cfg => {
-                    // 云端配置强制覆盖本地缓存，确保每次打开无滞后数据
-                    safeSet('gashapon_extra_spins', String(cfg.gashapon_extra_spins !== undefined ? cfg.gashapon_extra_spins : '0'));
-                    safeSet('gashapon_last_free_date', String(cfg.gashapon_last_free_date !== undefined ? cfg.gashapon_last_free_date : ''));
-                    safeSet('gashapon_infinite_spins', String(cfg.gashapon_infinite_spins !== undefined ? cfg.gashapon_infinite_spins : 'false'));
-                    safeSet('gashapon_used_keys', String(cfg.gashapon_used_keys !== undefined ? cfg.gashapon_used_keys : '[]'));
+                    // 🛡️ 智能防洗白与反向自愈同步
+                    let localInv = {};
+                    try {
+                        const stored = safeGet('gashapon_inventory');
+                        if (stored) localInv = JSON.parse(stored);
+                    } catch(e) {}
+
+                    let cloudInv = {};
+                    if (cfg.gashapon_inventory !== undefined) {
+                        try {
+                            cloudInv = typeof cfg.gashapon_inventory === 'object' ? cfg.gashapon_inventory : JSON.parse(cfg.gashapon_inventory);
+                        } catch(e) {}
+                    }
+
+                    // 合并卡包：两者数量取最大，绝不丢卡
+                    const mergedInv = Object.assign({}, localInv);
+                    let needBackfill = false;
+                    for (const [k, v] of Object.entries(cloudInv)) {
+                        mergedInv[k] = Math.max(mergedInv[k] || 0, v || 0);
+                    }
+                    for (const [k, v] of Object.entries(localInv)) {
+                        if ((cloudInv[k] || 0) < v) needBackfill = true;
+                    }
+
+                    inventory = mergedInv;
+                    safeSet('gashapon_inventory', JSON.stringify(inventory));
+
+                    // 额外抽卡次数：本地与云端取较大值，防止部署清空
+                    const localExtra = parseInt(safeGet('gashapon_extra_spins', '0')) || 0;
+                    const cloudExtra = cfg.gashapon_extra_spins !== undefined ? (parseInt(cfg.gashapon_extra_spins) || 0) : 0;
+                    const finalExtra = Math.max(localExtra, cloudExtra);
+                    safeSet('gashapon_extra_spins', String(finalExtra));
+                    if (localExtra > cloudExtra) needBackfill = true;
+
+                    if (cfg.gashapon_infinite_spins !== undefined) {
+                        safeSet('gashapon_infinite_spins', String(cfg.gashapon_infinite_spins));
+                    }
+                    if (cfg.gashapon_last_free_date !== undefined) {
+                        safeSet('gashapon_last_free_date', String(cfg.gashapon_last_free_date));
+                    }
+                    if (cfg.gashapon_used_keys !== undefined) {
+                        safeSet('gashapon_used_keys', typeof cfg.gashapon_used_keys === 'object' ? JSON.stringify(cfg.gashapon_used_keys) : String(cfg.gashapon_used_keys));
+                    }
 
                     if (cfg.gashapon_prizes !== undefined) {
                         const val = typeof cfg.gashapon_prizes === 'object' ? JSON.stringify(cfg.gashapon_prizes) : String(cfg.gashapon_prizes);
@@ -1216,20 +1254,21 @@
                             }
                         } catch(e) {}
                     } else {
-                        // 云端没有则使用默认
                         safeSet('gashapon_prizes', JSON.stringify(PRIZES));
                     }
 
-                    if (cfg.gashapon_inventory !== undefined) {
-                        const val = typeof cfg.gashapon_inventory === 'object' ? JSON.stringify(cfg.gashapon_inventory) : String(cfg.gashapon_inventory);
-                        safeSet('gashapon_inventory', val);
-                        try { inventory = JSON.parse(val); } catch(e) {}
-                    } else {
-                        // 云端不存在则置空，不读取本地残留
-                        safeSet('gashapon_inventory', '{}');
-                        inventory = {};
+                    // 如果本地存在比云端更新的卡包或次数（例如网站刚重新部署完），自动回填云端！
+                    if (needBackfill) {
+                        fetch('/api/config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                gashapon_inventory: JSON.stringify(inventory),
+                                gashapon_extra_spins: String(finalExtra)
+                            })
+                        }).catch(e => console.warn("Auto backfill gashapon to cloud failed:", e));
                     }
-                    
+
                     updateSpinsDisplay();
                     renderWallet();
                 })

@@ -1743,12 +1743,38 @@
                         }).catch(e => console.error("Initialize scratch_prizes failed:", e));
                     }
 
+                    // 🛡️ 智能防洗白与反向自愈同步
+                    let localInv = {};
+                    try {
+                        const stored = safeGet('gashapon_inventory');
+                        if (stored) localInv = JSON.parse(stored);
+                    } catch(e) {}
+
+                    let cloudInv = {};
                     if (cfg.gashapon_inventory !== undefined) {
-                        const val = typeof cfg.gashapon_inventory === 'object' ? JSON.stringify(cfg.gashapon_inventory) : String(cfg.gashapon_inventory);
-                        safeSet('gashapon_inventory', val);
-                        try { inventory = JSON.parse(val); } catch(e) {}
-                    } else {
-                        inventory = {};
+                        try {
+                            cloudInv = typeof cfg.gashapon_inventory === 'object' ? cfg.gashapon_inventory : JSON.parse(cfg.gashapon_inventory);
+                        } catch(e) {}
+                    }
+
+                    const mergedInv = Object.assign({}, localInv);
+                    let needBackfill = false;
+                    for (const [k, v] of Object.entries(cloudInv)) {
+                        mergedInv[k] = Math.max(mergedInv[k] || 0, v || 0);
+                    }
+                    for (const [k, v] of Object.entries(localInv)) {
+                        if ((cloudInv[k] || 0) < v) needBackfill = true;
+                    }
+
+                    inventory = mergedInv;
+                    safeSet('gashapon_inventory', JSON.stringify(inventory));
+
+                    if (needBackfill) {
+                        fetch('/api/config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ gashapon_inventory: JSON.stringify(inventory) })
+                        }).catch(e => console.warn("Auto backfill inventory from scratch failed:", e));
                     }
                     
                     updateCountsDisplay();

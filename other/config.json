@@ -5,5 +5,8 @@
     "config_countdown_title": "在一起第 300 天",
     "config_custom_announcement": "",
     "gashapon_extra_spins": "0",
-    "gashapon_infinite_spins": "false"
+    "gashapon_infinite_spins": "false",
+    "gashapon_inventory": "{}",
+    "sweetpact_love_coins": "100",
+    "sweetpact_peace_count": "0"
 }

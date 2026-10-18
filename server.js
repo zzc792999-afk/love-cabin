@@ -173,6 +173,7 @@ function ensureConfigFile() {
             config_custom_announcement: "",
             gashapon_extra_spins: "0",
             gashapon_infinite_spins: "false",
+            gashapon_inventory: "{}",
             scratch_extra_spins: "0",
             scratch_infinite_spins: "false",
             scratch_used_keys: "[]",

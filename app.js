@@ -248,15 +248,77 @@
                 'config_playlist', 'sweetpact_wheel_options'
             ];
 
+            // 🛡️ 智能防洗白与双向合并逻辑（绝不因云端重启或部署清空本地珍贵资产）
+            const INVENTORY_KEYS = ['gashapon_inventory', 'scratch_inventory'];
+            const NUMERIC_KEYS = ['gashapon_extra_spins', 'scratch_extra_spins', 'sweetpact_love_coins', 'sweetpact_peace_count'];
+            const PRESERVE_KEYS = [
+                'gashapon_infinite_spins', 'gashapon_used_keys', 'gashapon_prizes',
+                'scratch_infinite_spins', 'scratch_used_keys', 'scratch_prizes',
+                'sweetpact_contract_signed', 'sweetpact_partner_a', 'sweetpact_partner_b',
+                'sweetpact_history_logs', 'sweetpact_boardgame_won', 'sweetpact_prank_diagnosed'
+            ];
+
+            const pendingBackfill = {};
+
             CONFIG_KEYS.forEach(key => {
-                if (cfg[key] !== undefined) {
-                    const val = typeof cfg[key] === 'object' ? JSON.stringify(cfg[key]) : String(cfg[key]);
-                    safeSet(key, val);
+                const cloudVal = cfg[key];
+                const localVal = safeGet(key);
+
+                if (INVENTORY_KEYS.includes(key)) {
+                    // 特权卡包智能合并 (按卡片数量取最大值，双方抽到的卡片永不丢失)
+                    let localInv = {};
+                    let cloudInv = {};
+                    try { if (localVal) localInv = JSON.parse(localVal); } catch(e) {}
+                    try { if (cloudVal) cloudInv = typeof cloudVal === 'object' ? cloudVal : JSON.parse(cloudVal); } catch(e) {}
+
+                    const merged = Object.assign({}, localInv);
+                    let hasNewFromLocal = false;
+                    for (const [cardId, count] of Object.entries(cloudInv)) {
+                        merged[cardId] = Math.max(merged[cardId] || 0, count || 0);
+                    }
+                    for (const [cardId, count] of Object.entries(localInv)) {
+                        if ((cloudInv[cardId] || 0) < count) hasNewFromLocal = true;
+                    }
+
+                    safeSet(key, JSON.stringify(merged));
+                    if (hasNewFromLocal || (!cloudVal && Object.keys(merged).length > 0)) {
+                        pendingBackfill[key] = JSON.stringify(merged);
+                    }
+                } else if (NUMERIC_KEYS.includes(key)) {
+                    // 数值型资产（额外抽卡次数、爱意金币等）：取最大值，不让重置清零冲掉本地
+                    const localNum = parseInt(localVal) || 0;
+                    const cloudNum = cloudVal !== undefined ? (parseInt(cloudVal) || 0) : 0;
+                    const finalNum = Math.max(localNum, cloudNum);
+                    safeSet(key, String(finalNum));
+                    if (localNum > cloudNum) {
+                        pendingBackfill[key] = String(finalNum);
+                    }
+                } else if (PRESERVE_KEYS.includes(key)) {
+                    // 核心进度与誓约标志
+                    if (cloudVal !== undefined && cloudVal !== null && cloudVal !== '') {
+                        const val = typeof cloudVal === 'object' ? JSON.stringify(cloudVal) : String(cloudVal);
+                        safeSet(key, val);
+                    } else if (localVal) {
+                        // 云端临时丢失（如容器重启），本地依然健在，则反向补齐给云端
+                        pendingBackfill[key] = localVal;
+                    }
                 } else {
-                    // 云端无数据，直接移除或重置，防止 localStorage 缓存过期残留不同步
-                    try { localStorage.removeItem(key); } catch(e) {}
+                    // 常规展示性配置（纪念日、倒计时标题、公告、背景音乐等）以云端配置为准
+                    if (cloudVal !== undefined) {
+                        const val = typeof cloudVal === 'object' ? JSON.stringify(cloudVal) : String(cloudVal);
+                        safeSet(key, val);
+                    }
                 }
             });
+
+            // 若本地有比云端更完整的资产数据（例如网站刚重新部署），自动反向补全云端数据！
+            if (Object.keys(pendingBackfill).length > 0) {
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pendingBackfill)
+                }).catch(e => console.warn("Auto backfill to cloud failed:", e));
+            }
 
             // 实时同步爱意树数值到内存与本地
             if (cfg.tree_points !== undefined) {

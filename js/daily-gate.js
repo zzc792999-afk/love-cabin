@@ -430,17 +430,9 @@
         fetch('/api/config')
             .then(res => res.json())
             .then(cfg => {
-                // A. 哲哲在后台一键特权放行
+                // 哲哲在后台一键特权放行
                 if (cfg && cfg.daily_gate_release_date === today) {
                     grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
-                    return;
-                }
-                // B. 管理员重置了门禁，允许重新答题
-                const forceRetestAt = parseInt((cfg && cfg.daily_gate_force_retest_at) || '0', 10);
-                if (forceRetestAt > 0 && forceRetestAt > failTime && failDate === today) {
-                    safeStorageRemove('love_gate_fail_date');
-                    safeStorageRemove('love_gate_fail_time');
-                    renderQuizView();
                 }
             })
             .catch(() => {});
@@ -536,15 +528,8 @@
                             if (cfg && cfg.daily_gate_release_date === today) {
                                 grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
                             } else {
-                                const forceRetestAt = parseInt((cfg && cfg.daily_gate_force_retest_at) || '0', 10);
-                                if (forceRetestAt > 0 && forceRetestAt > failTime) {
-                                    safeStorageRemove('love_gate_fail_date');
-                                    safeStorageRemove('love_gate_fail_time');
-                                    renderQuizView();
-                                } else {
-                                    if (unlockErrorMsg) {
-                                        unlockErrorMsg.textContent = '🥺 哲哲还没在后台放行哦，快发微信找臭臭放行吧～❤️';
-                                    }
+                                if (unlockErrorMsg) {
+                                    unlockErrorMsg.textContent = '🥺 哲哲还没在后台放行哦，快发微信找臭臭放行吧～❤️';
                                 }
                             }
                         })

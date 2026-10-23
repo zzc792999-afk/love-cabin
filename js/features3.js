@@ -474,17 +474,20 @@
         `;
         document.body.appendChild(modal);
 
-        document.getElementById('fridge-close-btn').addEventListener('click', () => {
+        function closeFridge() {
             modal.classList.remove('active');
-        });
+            document.body.classList.remove('modal-open');
+        }
+
+        document.getElementById('fridge-close-btn').addEventListener('click', closeFridge);
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
+            if (e.target === modal) closeFridge();
         });
 
         modal.querySelectorAll('.fridge-treat-item').forEach(item => {
             item.addEventListener('click', () => {
                 const treatType = item.dataset.treat;
-                modal.classList.remove('active');
+                closeFridge();
                 if (window.Cabin3D && typeof window.Cabin3D.feedTreat === 'function') {
                     window.Cabin3D.feedTreat(treatType);
                 }
@@ -493,6 +496,8 @@
 
         window.openFridgeModal = () => {
             modal.classList.add('active');
+            document.body.classList.add('modal-open');
+            try { history.pushState({ modal: 'fridge' }, ''); } catch(e) {}
         };
     }
 
@@ -530,15 +535,18 @@
         `;
         document.body.appendChild(modal);
 
-        document.getElementById('weather-care-close-btn').addEventListener('click', () => {
+        function closeWeatherCare() {
             modal.classList.remove('active');
-        });
+            document.body.classList.remove('modal-open');
+        }
+
+        document.getElementById('weather-care-close-btn').addEventListener('click', closeWeatherCare);
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
+            if (e.target === modal) closeWeatherCare();
         });
 
         document.getElementById('weather-care-bed-btn').addEventListener('click', () => {
-            modal.classList.remove('active');
+            closeWeatherCare();
             if (window.Cabin3D) {
                 window.Cabin3D.moveCouple('bed');
                 setTimeout(() => window.Cabin3D.interactCouple(), 350);
@@ -546,7 +554,7 @@
         });
 
         document.getElementById('weather-care-ack-btn').addEventListener('click', () => {
-            modal.classList.remove('active');
+            closeWeatherCare();
             if (typeof window.confetti === 'function') {
                 window.confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
             }
@@ -601,6 +609,8 @@
 
             setTimeout(() => {
                 modal.classList.add('active');
+                document.body.classList.add('modal-open');
+                try { history.pushState({ modal: 'weatherCare' }, ''); } catch(e) {}
             }, 1200);
         };
     }
@@ -643,11 +653,14 @@
         `;
         document.body.appendChild(modal);
 
-        document.getElementById('ritual-close-btn').addEventListener('click', () => {
+        function closeRitual() {
             modal.classList.remove('active');
-        });
+            document.body.classList.remove('modal-open');
+        }
+
+        document.getElementById('ritual-close-btn').addEventListener('click', closeRitual);
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
+            if (e.target === modal) closeRitual();
         });
 
         window.openMorningNightRitual = () => {
@@ -672,11 +685,11 @@
                     <button class="ritual-btn-main" id="ritual-ok-btn"><i class="fas fa-sun"></i> 元气开启今天</button>
                 `;
                 document.getElementById('ritual-cat-btn').onclick = () => {
-                    modal.classList.remove('active');
+                    closeRitual();
                     if (window.Cabin3D) window.Cabin3D.interactCat();
                 };
                 document.getElementById('ritual-ok-btn').onclick = () => {
-                    modal.classList.remove('active');
+                    closeRitual();
                     if (typeof window.confetti === 'function') {
                         window.confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
                     }
@@ -692,14 +705,14 @@
                     <button class="ritual-btn-main" id="ritual-ok-btn"><i class="fas fa-moon"></i> 晚安好梦 mua~</button>
                 `;
                 document.getElementById('ritual-lullaby-btn').onclick = () => {
-                    modal.classList.remove('active');
+                    closeRitual();
                     if (window.Cabin3D) {
                         window.Cabin3D.moveCouple('bed');
                         setTimeout(() => window.Cabin3D.interactCouple(), 350);
                     }
                 };
                 document.getElementById('ritual-ok-btn').onclick = () => {
-                    modal.classList.remove('active');
+                    closeRitual();
                     if (typeof window.confetti === 'function') {
                         window.confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
                     }
@@ -707,6 +720,8 @@
             }
 
             modal.classList.add('active');
+            document.body.classList.add('modal-open');
+            try { history.pushState({ modal: 'ritual' }, ''); } catch(e) {}
         };
     }
 

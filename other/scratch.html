@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>🎟️ 恋爱心动刮刮乐 - 时光小屋</title>
     
     <!-- 谷歌字体与图标 -->
@@ -50,16 +50,27 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        button, a, .deck-btn, .btn-action {
+            touch-action: manipulation;
+        }
+
+        #scratch-canvas {
+            touch-action: none;
+        }
+
         body {
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Outfit', 'OPPOSans', 'OPlusSans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: var(--bg-grad);
             color: var(--text-color);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: calc(15px + env(safe-area-inset-top, 0px)) 12px calc(30px + env(safe-area-inset-bottom, 12px)) 12px;
             overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
             transition: background 0.8s ease;
         }
 
@@ -698,14 +709,46 @@
             100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.2); opacity: 0; }
         }
 
-        /* 移动端适配 */
+        /* 移动端适配 (OPPO / ColorOS 全面屏与小屏自适应) */
         @media (max-width: 600px) {
             .scratch-card-box {
-                width: 280px;
-                height: 380px;
+                width: 275px;
+                height: 375px;
             }
             .wallet-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .btn-back {
+                min-height: 44px;
+                padding: 8px 16px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                touch-action: manipulation;
+            }
+            .deck-btn {
+                min-height: 44px;
+                padding: 8px 14px;
+                touch-action: manipulation;
+            }
+            .btn-scratch-action {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .scratch-card-box {
+                width: 250px;
+                height: 345px;
+            }
+            .deck-btn {
+                padding: 8px 10px;
+                font-size: 0.76rem;
+            }
+            .scratch-title-box h2 {
+                font-size: 1.35rem;
             }
         }
     </style>
@@ -1606,20 +1649,22 @@
             isDrawing = false;
         });
 
-        // 移动端 Touch 支持
+        // 移动端 Touch 支持 (OPPO / ColorOS 触控优化，阻止滚动穿透)
         canvas.addEventListener('touchstart', (e) => {
             isDrawing = true;
+            if (e.cancelable) e.preventDefault();
             const t = e.touches[0];
             const pos = getBrushPos(t.clientX, t.clientY);
             scratch(pos.x, pos.y);
-        });
+        }, { passive: false });
 
         canvas.addEventListener('touchmove', (e) => {
             if (!isDrawing) return;
+            if (e.cancelable) e.preventDefault();
             const t = e.touches[0];
             const pos = getBrushPos(t.clientX, t.clientY);
             scratch(pos.x, pos.y);
-        });
+        }, { passive: false });
 
         canvas.addEventListener('touchend', () => {
             isDrawing = false;

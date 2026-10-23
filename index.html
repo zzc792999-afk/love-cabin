@@ -7,6 +7,8 @@
     <!-- 安卓 / 手机专属原生 App 配置 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff758c">
+    <meta name="color-scheme" content="light dark">
+    <meta name="format-detection" content="telephone=no, email=no, address=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,7 +21,7 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=4.1">
+    <link rel="stylesheet" href="style.css?v=4.2">
 </head>
 <body>
 
@@ -623,11 +625,11 @@
     <!-- ================================================================
          全局悬浮组件 (BGM 黑胶留声机唱片 & 音频声波均衡条)
          ================================================================ -->
-    <div class="vinyl-music-player" id="vinyl-player" title="点击播放/暂停背景音乐">
+    <div class="vinyl-music-player" id="vinyl-player" role="button" aria-label="播放或暂停背景音乐" title="点击播放/暂停背景音乐">
         <div class="grooves"></div>
     </div>
 
-    <div class="equalizer" id="audio-equalizer">
+    <div class="equalizer" id="audio-equalizer" aria-hidden="true">
         <div class="eq-bar"></div>
         <div class="eq-bar"></div>
         <div class="eq-bar"></div>
@@ -636,15 +638,15 @@
     </div>
 
     <!-- 背景音乐音频元素 (other/1.mp3) -->
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop preload="metadata">
         <source src="other/1.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ================================================================
          相册大图预览灯箱 (Lightbox)
          ================================================================ -->
-    <div id="lightbox" class="lightbox">
-        <span class="lightbox-close"><i class="fas fa-times"></i></span>
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="相册大图预览">
+        <span class="lightbox-close" role="button" aria-label="关闭预览"><i class="fas fa-times"></i></span>
         <div class="lightbox-content">
             <img id="lightbox-img" src="" alt="放大图">
             <div id="lightbox-caption" class="lightbox-caption">图片标题</div>
@@ -654,28 +656,28 @@
     <!-- ================================================================
          底部 Tab 切换固定导航栏
          ================================================================ -->
-    <nav class="nav-bar">
-        <div class="nav-item active" data-tab="home"><i class="fas fa-home"></i> 首页</div>
-        <div class="nav-item" data-tab="album"><i class="fas fa-images"></i> 相册</div>
-        <div class="nav-item" data-tab="notes"><i class="fas fa-sticky-note"></i> 留言板</div>
-        <div class="nav-item" data-tab="promise"><i class="fas fa-handshake"></i> 约定</div>
+    <nav class="nav-bar" role="navigation" aria-label="底部导航">
+        <div class="nav-item active" data-tab="home" role="button" tabindex="0"><i class="fas fa-home"></i> 首页</div>
+        <div class="nav-item" data-tab="album" role="button" tabindex="0"><i class="fas fa-images"></i> 相册</div>
+        <div class="nav-item" data-tab="notes" role="button" tabindex="0"><i class="fas fa-sticky-note"></i> 留言板</div>
+        <div class="nav-item" data-tab="promise" role="button" tabindex="0"><i class="fas fa-handshake"></i> 约定</div>
     </nav>
 
     <!-- 页脚 -->
     <footer>
         <p>© 2026 属于我们的时光小屋 | 版权所有 © 白珊珊 & 陈祖哲</p>
         <p>愿我们珍惜彼此，携手从心动走到心安 <span class="heart">❤️</span></p>
-        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻典藏 Bento 版 4.1 | 用心定格我们每一次的心跳</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.7;">至臻典藏 Bento 版 4.2 · OPPO 移动端全适配 | 用心定格我们每一次的心跳</p>
     </footer>
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=4.1"></script>
+    <script src="app.js?v=4.2"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=4.1"></script>
+    <script src="js/cabin3d.js?v=4.2"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=4.1"></script>
+    <script src="js/features3.js?v=4.2"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

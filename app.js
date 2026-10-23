@@ -1780,9 +1780,12 @@
 
     function makeElementDraggable(el, noteId) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        let touchStartPos = { x: 0, y: 0 };
+        let isIntentionalDrag = false;
+        let isScrolling = false;
 
         el.addEventListener('mousedown', dragMouseDown);
-        el.addEventListener('touchstart', dragTouchStart, { passive: false }); // 手机端拖拽关键：非 passive 监听
+        el.addEventListener('touchstart', dragTouchStart, { passive: true });
 
         function dragMouseDown(e) {
             e.preventDefault();
@@ -1793,13 +1796,14 @@
         }
 
         function dragTouchStart(e) {
-            // 阻止背景拖动
-            e.preventDefault();
             if (e.touches.length === 1) {
+                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 pos3 = e.touches[0].clientX;
                 pos4 = e.touches[0].clientY;
+                isIntentionalDrag = false;
+                isScrolling = false;
                 document.addEventListener('touchend', closeDragElement);
-                document.addEventListener('touchmove', elementTouchDrag, { passive: false }); // 非 passive 监听以允许 preventDefault
+                document.addEventListener('touchmove', elementTouchDrag, { passive: false });
             }
         }
 
@@ -1813,25 +1817,48 @@
         }
 
         function elementTouchDrag(e) {
-            e.preventDefault(); // 阻止背景滚动
-            pos1 = pos3 - e.touches[0].clientX;
-            pos2 = pos4 - e.touches[0].clientY;
-            pos3 = e.touches[0].clientX;
-            pos4 = e.touches[0].clientY;
-            updateElementPosition();
+            if (isScrolling) return;
+            const touch = e.touches[0];
+            const dx = Math.abs(touch.clientX - touchStartPos.x);
+            const dy = Math.abs(touch.clientY - touchStartPos.y);
+
+            if (!isIntentionalDrag) {
+                // OPPO / 移动端自然滚动判定：若垂直滑动幅度明显大于横向，放行页面正常滚动
+                if (dy > dx && dy > 8) {
+                    isScrolling = true;
+                    return;
+                }
+                // 若横向或特定拖拽滑动超过阈值，判定为想要移动便签
+                if (dx > 8 || dy > 8) {
+                    isIntentionalDrag = true;
+                }
+            }
+
+            if (isIntentionalDrag) {
+                if (e.cancelable) e.preventDefault(); // 阻止背景滚动
+                pos1 = pos3 - touch.clientX;
+                pos2 = pos4 - touch.clientY;
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                updateElementPosition();
+            }
         }
 
         function updateElementPosition() {
             const boardWidth = wallBoard.clientWidth;
             const boardHeight = wallBoard.clientHeight;
+            const elWidth = el.offsetWidth || 155;
+            const elHeight = el.offsetHeight || 130;
 
             let newTop = el.offsetTop - pos2;
             let newLeft = el.offsetLeft - pos1;
 
             if (newLeft < 5) newLeft = 5;
             if (newTop < 5) newTop = 5;
-            if (newLeft > boardWidth - 230) newLeft = boardWidth - 230;
-            if (newTop > boardHeight - 170) newTop = boardHeight - 170;
+            const maxLeft = Math.max(5, boardWidth - elWidth - 5);
+            const maxTop = Math.max(5, boardHeight - elHeight - 5);
+            if (newLeft > maxLeft) newLeft = maxLeft;
+            if (newTop > maxTop) newTop = maxTop;
 
             el.style.top = newTop + "px";
             el.style.left = newLeft + "px";
@@ -1842,6 +1869,8 @@
             document.removeEventListener('mousemove', elementDrag);
             document.removeEventListener('touchend', closeDragElement);
             document.removeEventListener('touchmove', elementTouchDrag);
+
+            if (!isIntentionalDrag && !pos1 && !pos2) return;
 
             const idx = state.stickyNotes.findIndex(n => n.id === noteId);
             if (idx !== -1) {
@@ -1912,9 +1941,16 @@
                     card.style.display = 'block';
                 }
 
-                // 移动端宽度自适应调整偏移量
-                const isMobile = window.matchMedia("(max-width: 768px)").matches;
-                const gap = isMobile ? 120 : 180;
+                // 移动端宽度自适应调整偏移量 (支持 OPPO 常见 360-432px 宽度)
+                const screenW = window.innerWidth || document.documentElement.clientWidth || 375;
+                let gap = 180;
+                if (screenW <= 390) {
+                    gap = 85;
+                } else if (screenW <= 480) {
+                    gap = 105;
+                } else if (screenW <= 768) {
+                    gap = 130;
+                }
 
                 const translateVal = offset * gap;
                 const scaleVal = 1 - absOffset * 0.16;
@@ -1974,16 +2010,47 @@
         img.src = src;
         cap.textContent = caption;
         lb.classList.add('active');
+        document.body.classList.add('modal-open');
+        try {
+            history.pushState({ modal: 'lightbox' }, '');
+        } catch(e) {}
+    }
+
+    function closeLightbox() {
+        const lb = document.getElementById('lightbox');
+        if (lb && lb.classList.contains('active')) {
+            lb.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         const lb = document.getElementById('lightbox');
         if (lb) {
             const close = lb.querySelector('.lightbox-close');
-            close.addEventListener('click', () => lb.classList.remove('active'));
+            if (close) close.addEventListener('click', closeLightbox);
             lb.addEventListener('click', (e) => {
-                if (e.target === lb) lb.classList.remove('active');
+                if (e.target === lb || e.target.classList.contains('lightbox-close') || e.target.closest('.lightbox-close')) {
+                    closeLightbox();
+                }
             });
+        }
+    });
+
+    // OPPO / Android 侧滑返回手势兼容：拦截返回键优先关闭活动弹窗
+    window.addEventListener('popstate', function(e) {
+        let closedAny = false;
+        const lb = document.getElementById('lightbox');
+        if (lb && lb.classList.contains('active')) {
+            closeLightbox();
+            closedAny = true;
+        }
+        document.querySelectorAll('.fridge-modal-overlay.active, .weather-care-modal-overlay.active, .ritual-modal-overlay.active, .love-postcard-overlay.active, .island-modal-overlay.active').forEach(modal => {
+            modal.classList.remove('active');
+            closedAny = true;
+        });
+        if (closedAny) {
+            document.body.classList.remove('modal-open');
         }
     });
 
@@ -2211,6 +2278,32 @@
 
         audio.addEventListener('play', () => syncBentoPlayer(true));
         audio.addEventListener('pause', () => syncBentoPlayer(false));
+
+        // 兼容微信内置浏览器与 OPPO ColorOS 自带浏览器自动音频预热解锁
+        const unlockAudioContext = () => {
+            if (audio && state.musicPlaying && audio.paused) {
+                audio.play().then(() => {
+                    player.classList.add('playing');
+                    if (eq) eq.classList.add('active');
+                    syncBentoPlayer(true);
+                }).catch(() => {});
+            }
+            document.removeEventListener('touchstart', unlockAudioContext);
+            document.removeEventListener('click', unlockAudioContext);
+        };
+        document.addEventListener('touchstart', unlockAudioContext, { passive: true });
+        document.addEventListener('click', unlockAudioContext, { passive: true });
+
+        // 微信专有就绪事件监听
+        document.addEventListener('WeixinJSBridgeReady', () => {
+            if (audio && state.musicPlaying && audio.paused) {
+                audio.play().then(() => {
+                    player.classList.add('playing');
+                    if (eq) eq.classList.add('active');
+                    syncBentoPlayer(true);
+                }).catch(() => {});
+            }
+        }, false);
 
         // 💌 初始化 Bento 今日手写便签预览
         try {

@@ -13,7 +13,7 @@
     --shadow-glass: 0 12px 40px rgba(255, 140, 160, 0.12);
     --text-color: #5d4f55;
     --text-muted: #8c7880;
-    --font-family: 'Montserrat', 'Outfit', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    --font-family: 'Montserrat', 'Outfit', 'OPPOSans', 'OPlusSans', system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
     --equalizer-color: #ff7597;
 }
 
@@ -33,8 +33,15 @@
 }
 
 /* ==========================================
-   基本重置与基础布局
+   基本重置与基础布局 (OPPO / ColorOS 移动端优化)
    ========================================== */
+html {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    -webkit-text-size-adjust: 100%;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -43,16 +50,34 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+button, .btn-primary, .nav-item, .bento-card, .quick-pill, .fav-tool-card, .secondary-pill {
+    touch-action: manipulation;
+}
+
 body {
     background: var(--bg-grad);
     color: var(--text-color);
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
     min-height: 100vh;
-    padding-bottom: 90px; /* 底部导航栏空间 */
+    min-height: 100dvh;
+    padding-bottom: calc(95px + env(safe-area-inset-bottom, 12px)); /* 底部导航栏与 OPPO 虚拟手势安全空间 */
     position: relative;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     transition: background 0.8s ease, color 0.8s ease;
+}
+
+/* 弹窗打开时锁定背景滚动穿透 */
+body.modal-open {
+    overflow: hidden !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    touch-action: none;
+}
 }
 
 /* 渐变星空背景 Canvas */
@@ -829,7 +854,7 @@ h1.header-title {
 
 .bento-days-large .bento-num {
     font-family: -apple-system, BlinkMacSystemFont, "Playfair Display", "DIN Alternate", "Helvetica Neue", sans-serif;
-    font-size: 4rem;
+    font-size: clamp(2.4rem, 10vw, 4rem);
     line-height: 1;
     font-weight: 900;
     background: linear-gradient(135deg, var(--primary-dark) 20%, #ff477e 100%);
@@ -990,8 +1015,10 @@ h1.header-title {
 }
 
 .bento-audio-btn {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     border-radius: 50%;
     border: 1px solid rgba(161, 127, 224, 0.3);
     background: rgba(255, 255, 255, 0.75);
@@ -999,8 +1026,9 @@ h1.header-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     cursor: pointer;
+    touch-action: manipulation;
     transition: all 0.2s;
 }
 
@@ -1010,8 +1038,10 @@ h1.header-title {
 }
 
 .bento-audio-btn.play-pause-btn {
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     border-color: transparent;
@@ -2002,25 +2032,43 @@ h1.header-title {
 
 .lightbox img {
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 75vh;
+    max-height: 75dvh;
     border-radius: 8px;
     border: 4px solid white;
+    object-fit: contain;
 }
 
 .lightbox-caption {
     color: white;
     margin-top: 15px;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 600;
 }
 
 .lightbox-close {
-    position: absolute;
-    top: -45px;
-    right: -10px;
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top, 20px));
+    right: max(20px, env(safe-area-inset-right, 20px));
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
     color: white;
-    font-size: 2.2rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    z-index: 10005;
+    transition: transform 0.2s, background 0.2s;
+    touch-action: manipulation;
+}
+.lightbox-close:active {
+    transform: scale(0.92);
 }
 
 /* ==========================================
@@ -2477,30 +2525,40 @@ footer .heart {
 /* ==========================================
    响应式设计 (手机端极致轻量精致适配)
    ========================================== */
+/* ==========================================
+   响应式设计 (OPPO / ColorOS 移动端全适配系统)
+   覆盖 432px、412px、390px、375px、360px
+   ========================================== */
 @media (max-width: 768px) {
     body {
-        padding-bottom: 110px;
+        padding-bottom: calc(110px + env(safe-area-inset-bottom, 12px));
     }
     
     .container {
-        padding: 14px 12px 100px 12px;
+        padding: calc(14px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) calc(100px + env(safe-area-inset-bottom, 12px)) calc(12px + env(safe-area-inset-left, 0px));
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100vw;
     }
 
     .nav-bar {
         width: calc(100% - 24px);
         max-width: 440px;
-        bottom: max(12px, env(safe-area-inset-bottom, 12px));
+        bottom: calc(12px + env(safe-area-inset-bottom, 12px));
         gap: 6px;
-        padding: 6px 8px;
+        padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)) 8px;
         border-radius: 30px;
         display: flex;
         justify-content: space-around;
         align-items: center;
         box-sizing: border-box;
+        min-height: 52px;
+        z-index: 999;
     }
     
     .nav-item {
         flex: 1;
+        min-height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2510,6 +2568,7 @@ footer .heart {
         border-radius: 24px;
         white-space: nowrap;
         min-width: 0;
+        touch-action: manipulation;
     }
     
     h1.header-title {
@@ -2531,47 +2590,55 @@ footer .heart {
     .vinyl-music-player {
         width: 52px;
         height: 52px;
-        bottom: 85px;
+        bottom: calc(85px + env(safe-area-inset-bottom, 12px));
         right: 15px;
+        touch-action: manipulation;
     }
 
     .equalizer {
         right: auto;
         left: 15px;
-        bottom: 85px;
+        bottom: calc(85px + env(safe-area-inset-bottom, 12px));
     }
 }
 
 @media (max-width: 480px) {
     body {
-        padding-bottom: 100px;
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 12px));
     }
 
     .container {
-        padding: 10px 8px 95px 8px;
+        padding: calc(12px + env(safe-area-inset-top, 0px)) calc(10px + env(safe-area-inset-right, 0px)) calc(95px + env(safe-area-inset-bottom, 12px)) calc(10px + env(safe-area-inset-left, 0px));
     }
 
-    /* 顶部顶栏手机端紧凑布局 */
+    /* 顶部顶栏手机端紧凑布局 (OPPO 44px 交互热区) */
     .top-nav-bar {
-        gap: 6px;
-        margin-bottom: 10px;
+        gap: 8px;
+        margin-bottom: 12px;
     }
 
     .nav-circle-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1.05rem;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        touch-action: manipulation;
     }
 
     .island-capsule {
-        padding: 4px 6px;
-        gap: 4px;
+        padding: 4px 8px;
+        gap: 5px;
         border-radius: 24px;
     }
 
     .island-section {
         padding: 4px 8px;
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         gap: 4px;
     }
 
@@ -2580,12 +2647,12 @@ footer .heart {
     }
 
     .heartbeat-btn .hb-text {
-        font-size: 0.72rem;
+        font-size: 0.74rem;
     }
 
     /* 主标题卡片 */
     header, .main-header {
-        padding: 22px 14px;
+        padding: 20px 14px;
         border-radius: 20px;
         margin-bottom: 16px;
     }
@@ -2597,8 +2664,183 @@ footer .heart {
     }
 
     .subtitle {
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         letter-spacing: 0.5px;
+    }
+
+    /* 🍱 Bento Grid 移动端自适应 (单列流动) */
+    .bento-grid-container {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin: 16px 0 20px !important;
+        width: 100% !important;
+    }
+
+    .bento-card {
+        padding: 16px 14px;
+        border-radius: 20px;
+        min-height: unset;
+        box-sizing: border-box;
+    }
+
+    .bento-card-header {
+        margin-bottom: 10px;
+    }
+
+    .bento-couple-avatars {
+        gap: 12px;
+        margin: 6px 0 10px;
+    }
+
+    .avatar-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.6rem;
+    }
+
+    .avatar-label {
+        font-size: 0.76rem;
+    }
+
+    .bento-status-pill {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        margin-bottom: 8px;
+    }
+
+    .bento-hero-title {
+        font-size: 1.05rem;
+        margin-bottom: 4px;
+    }
+
+    .bento-days-large {
+        margin: 2px 0 10px;
+        gap: 6px;
+    }
+
+    .bento-days-large .bento-num {
+        font-size: clamp(2.6rem, 11vw, 3.6rem);
+    }
+
+    .bento-days-large .bento-unit {
+        font-size: 0.72rem;
+        letter-spacing: 1.5px;
+    }
+
+    .bento-sub-timer-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important;
+        margin: 8px 0 10px !important;
+    }
+
+    .sub-timer-box {
+        padding: 6px 3px;
+        border-radius: 10px;
+        min-width: 0;
+    }
+
+    .sub-timer-box .st-num {
+        font-size: 1.05rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sub-timer-box .st-lbl {
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
+
+    .bento-timeline-sub {
+        font-size: 0.78rem;
+    }
+
+    /* Bento 音乐播放器卡片 */
+    .bento-vinyl-disc {
+        width: 74px;
+        height: 74px;
+    }
+
+    .bento-song-title {
+        font-size: 0.82rem;
+        max-width: 100%;
+    }
+
+    .bento-music-controls {
+        gap: 10px;
+    }
+
+    .bento-audio-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 0.95rem;
+        touch-action: manipulation;
+    }
+
+    .bento-audio-btn.play-pause-btn {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 1.1rem;
+    }
+
+    /* Bento 相册画廊微缩 */
+    .bento-gallery-previews {
+        gap: 6px;
+        margin: 6px 0;
+    }
+
+    .bento-photo-thumb {
+        height: 72px;
+        border-radius: 10px;
+        min-width: 0;
+    }
+
+    .bento-thumb-tag {
+        font-size: 0.62rem;
+        padding: 2px 6px;
+    }
+
+    .bento-gallery-footer {
+        font-size: 0.72rem;
+    }
+
+    /* Bento 便签卡片 */
+    .bento-note-paper {
+        padding: 12px 10px;
+    }
+
+    .bento-note-text {
+        font-size: 0.86rem;
+        line-height: 1.5;
+    }
+
+    /* Bento 里程碑列表项 (44px 标准触控高) */
+    .bento-milestone-item {
+        padding: 10px 12px;
+        min-height: 44px;
+        gap: 8px;
+        border-radius: 14px;
+        box-sizing: border-box;
+    }
+
+    .bmi-icon {
+        font-size: 1.25rem;
+    }
+
+    .bmi-title {
+        font-size: 0.84rem;
+    }
+
+    .bmi-date {
+        font-size: 0.7rem;
+    }
+
+    .bmi-days {
+        font-size: 0.8rem;
     }
 
     /* 3D 虚拟小窝移动端自适应 */
@@ -2631,14 +2873,18 @@ footer .heart {
     }
 
     .cabin-quick-pills {
-        gap: 5px;
+        gap: 6px;
         margin-top: 10px;
     }
 
     .quick-pill {
-        padding: 5px 9px;
-        font-size: 0.72rem;
-        border-radius: 16px;
+        padding: 7px 11px;
+        font-size: 0.75rem;
+        min-height: 38px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        touch-action: manipulation;
     }
 
     /* 📖 青春回忆录横幅手机端适配 */
@@ -2647,6 +2893,7 @@ footer .heart {
         gap: 8px;
         margin-bottom: 16px;
         border-radius: 18px;
+        min-height: 44px;
     }
 
     .memory-banner-left {
@@ -2674,9 +2921,11 @@ footer .heart {
     }
 
     .memory-banner-btn {
-        padding: 6px 12px;
-        font-size: 0.76rem;
-        border-radius: 16px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+        min-height: 38px;
+        border-radius: 18px;
+        touch-action: manipulation;
     }
 
     /* 倒计时与纪念日卡片 */
@@ -2702,7 +2951,7 @@ footer .heart {
     }
 
     .countdown-flex {
-        gap: 5px;
+        gap: 6px;
         margin: 10px 0;
     }
 
@@ -2710,6 +2959,8 @@ footer .heart {
         min-width: 44px;
         padding: 6px 2px;
         border-radius: 10px;
+        flex: 1;
+        box-sizing: border-box;
     }
 
     .countdown-box .num {
@@ -2728,6 +2979,7 @@ footer .heart {
     .glass-panel {
         padding: 16px 12px;
         border-radius: 18px;
+        box-sizing: border-box;
     }
 
     /* 勋章墙 */
@@ -2739,6 +2991,7 @@ footer .heart {
     .medal-badge {
         padding: 10px 4px !important;
         border-radius: 12px !important;
+        min-height: 44px;
     }
 
     /* 时光任意门与心愿 */
@@ -2751,6 +3004,8 @@ footer .heart {
     .fav-tool-card {
         padding: 12px 14px !important;
         border-radius: 16px !important;
+        min-height: 52px;
+        touch-action: manipulation;
     }
 
     .fav-tool-icon {
@@ -2775,25 +3030,31 @@ footer .heart {
 
     .secondary-pill {
         padding: 10px 6px !important;
-        font-size: 0.76rem !important;
+        font-size: 0.78rem !important;
         justify-content: center !important;
         border-radius: 14px !important;
+        min-height: 44px;
+        touch-action: manipulation;
     }
 
     /* 📸 相册 3D 轮播手机端 */
+    .gallery-container {
+        overflow: hidden !important;
+    }
+
     .carousel-3d {
-        height: 310px;
+        height: 290px;
     }
 
     .carousel-card {
-        width: 205px;
-        height: 275px;
-        padding: 8px 8px 14px 8px;
+        width: 195px;
+        height: 265px;
+        padding: 8px 8px 12px 8px;
         border-radius: 12px;
     }
 
     .carousel-card img {
-        height: 195px;
+        height: 185px;
         border-radius: 6px;
     }
 
@@ -2810,8 +3071,12 @@ footer .heart {
     .wall-textarea {
         height: 110px;
         padding: 12px;
-        font-size: 0.92rem;
+        font-size: 16px; /* 防止移动浏览器聚焦时自动缩放页面 */
         border-radius: 14px;
+    }
+
+    .wall-author-wrapper input {
+        font-size: 16px !important; /* 防止聚焦自动缩放 */
     }
 
     .wall-controls {
@@ -2819,14 +3084,37 @@ footer .heart {
         width: 100% !important;
     }
 
+    .color-picker .color-option {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+
+    .emoji-selector .emoji-option {
+        font-size: 1.4rem;
+        padding: 6px;
+        min-width: 36px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #publish-note-btn {
+        min-height: 46px;
+        touch-action: manipulation;
+    }
+
     .wall-board {
         padding: 15px 8px;
-        min-height: 400px;
+        min-height: 380px;
         border-radius: 18px;
+        position: relative;
     }
 
     .sticky-note {
-        width: 160px;
+        width: 155px;
         padding: 12px 10px;
         font-size: 0.78rem;
     }
@@ -2852,32 +3140,36 @@ footer .heart {
         grid-template-columns: 1fr;
     }
 
-    /* 底部导航栏适配全面屏安全区 (居中等宽均分布局，彻底杜绝偏左) */
+    /* 底部导航栏适配 OPPO 全面屏安全区 (居中等宽均分布局，杜绝被虚拟小白条遮挡) */
     .nav-bar {
-        bottom: max(10px, env(safe-area-inset-bottom, 10px));
+        bottom: calc(10px + env(safe-area-inset-bottom, 10px));
         width: calc(100% - 20px);
-        max-width: 420px;
-        padding: 5px 6px;
+        max-width: 430px;
+        min-height: 52px;
+        padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px)) 6px;
         gap: 4px;
         border-radius: 28px;
         display: flex;
         justify-content: space-around;
         align-items: center;
         box-sizing: border-box;
+        z-index: 999;
     }
     
     .nav-item {
         flex: 1;
+        min-height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 8px 4px;
-        font-size: 0.78rem;
+        padding: 6px 4px;
+        font-size: 0.8rem;
         gap: 4px;
         text-align: center;
         border-radius: 22px;
         white-space: nowrap;
         min-width: 0;
+        touch-action: manipulation;
     }
     
     .nav-item i {
@@ -2888,19 +3180,44 @@ footer .heart {
         transform: none;
     }
 
-    /* 弹窗手机端大小自适应 */
-    .vault-modal-card {
-        padding: 20px 14px;
-        border-radius: 22px;
-        width: 95%;
-        max-height: 85vh;
+    /* 悬浮留声机唱片位置自适应 (OPPO 安全区偏移) */
+    .vinyl-music-player {
+        width: 48px;
+        height: 48px;
+        bottom: calc(75px + env(safe-area-inset-bottom, 10px));
+        right: 12px;
+        touch-action: manipulation;
     }
 
-    .digest-card {
-        padding: 20px 14px;
-        border-radius: 22px;
-        width: 95%;
-        max-height: 88vh;
+    .equalizer {
+        bottom: calc(75px + env(safe-area-inset-bottom, 10px));
+        left: 12px;
+    }
+
+    /* 弹窗手机端大小与刘海屏安全区自适应 */
+    .vault-modal-card,
+    .digest-card,
+    .fridge-modal-card,
+    .weather-care-card,
+    .ritual-card {
+        padding: 22px 16px 20px !important;
+        border-radius: 22px !important;
+        width: 95% !important;
+        max-height: calc(88dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        box-sizing: border-box !important;
+    }
+
+    .fridge-close-btn,
+    .weather-care-close-btn,
+    .ritual-close-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        font-size: 1.1rem !important;
+        touch-action: manipulation !important;
     }
 
     .digest-grid {
@@ -2909,25 +3226,139 @@ footer .heart {
     }
 }
 
+/* ==========================================
+   针对 OPPO 常见 390px / 375px 屏幕精细调优
+   ========================================== */
+@media (max-width: 390px) {
+    .container {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .bento-card {
+        padding: 15px 12px;
+    }
+
+    .bento-couple-avatars {
+        gap: 10px;
+        margin: 5px 0 8px;
+    }
+
+    .avatar-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
+
+    .bento-days-large .bento-num {
+        font-size: 2.85rem;
+    }
+
+    .bento-sub-timer-grid {
+        gap: 5px !important;
+    }
+
+    .sub-timer-box {
+        padding: 5px 2px;
+    }
+
+    .sub-timer-box .st-num {
+        font-size: 1rem;
+    }
+
+    .sub-timer-box .st-lbl {
+        font-size: 0.62rem;
+    }
+
+    .countdown-box {
+        min-width: 40px;
+        padding: 5px 1px;
+    }
+
+    .countdown-box .num {
+        font-size: 1.15rem;
+    }
+
+    .carousel-card {
+        width: 180px;
+        height: 250px;
+    }
+
+    .carousel-card img {
+        height: 175px;
+    }
+}
+
+/* ==========================================
+   针对 OPPO 360px 窄屏及大字号缩放模式精细适配
+   ========================================== */
 @media (max-width: 360px) {
+    .container {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
     .top-nav-bar {
-        gap: 4px;
+        gap: 5px;
     }
 
     .nav-circle-btn {
-        width: 34px;
-        height: 34px;
-        font-size: 0.95rem;
+        width: 44px;
+        height: 44px;
+        font-size: 1.05rem;
     }
 
     .island-capsule {
-        padding: 3px 4px;
-        gap: 2px;
+        padding: 3px 5px;
+        gap: 3px;
     }
 
     .island-section {
         padding: 3px 5px;
         font-size: 0.68rem;
+    }
+
+    .bento-card {
+        padding: 14px 10px;
+    }
+
+    .bento-couple-avatars {
+        gap: 8px;
+    }
+
+    .avatar-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.35rem;
+    }
+
+    .bento-hero-title {
+        font-size: 0.98rem;
+    }
+
+    .bento-days-large .bento-num {
+        font-size: 2.5rem;
+    }
+
+    .bento-sub-timer-grid {
+        gap: 4px !important;
+        margin: 6px 0 8px !important;
+    }
+
+    .sub-timer-box {
+        padding: 4px 1px;
+    }
+
+    .sub-timer-box .st-num {
+        font-size: 0.92rem;
+    }
+
+    .sub-timer-box .st-lbl {
+        font-size: 0.58rem;
+    }
+
+    .bento-photo-thumb {
+        height: 65px;
     }
 
     .medals-grid {
@@ -2939,20 +3370,38 @@ footer .heart {
         display: none;
     }
 
+    .countdown-box {
+        min-width: 36px;
+        padding: 4px 1px;
+    }
+
+    .countdown-box .num {
+        font-size: 1.05rem;
+    }
+
+    .countdown-box .label {
+        font-size: 0.58rem;
+    }
+
     .nav-bar {
-        width: calc(100% - 16px);
-        padding: 5px 3px;
+        width: calc(100% - 14px);
+        padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) 4px;
         gap: 2px;
     }
 
     .nav-item {
-        padding: 7px 2px;
+        padding: 6px 2px;
         font-size: 0.72rem;
-        gap: 3px;
+        gap: 2px;
+        min-height: 44px;
     }
 
     .nav-item i {
         font-size: 0.85rem;
+    }
+
+    #cabin-3d-viewport {
+        height: 250px;
     }
 }
 

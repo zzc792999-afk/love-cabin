@@ -21,15 +21,115 @@
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入毛玻璃拟态专属 CSS -->
-    <link rel="stylesheet" href="style.css?v=4.2">
+    <link rel="stylesheet" href="style.css?v=4.3">
+    <!-- 每日门禁极速防闪白检查 -->
+    <script>
+        (function() {
+            try {
+                var d = new Date();
+                var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                var pass = localStorage.getItem('love_gate_pass_date');
+                if (pass !== today) {
+                    document.documentElement.classList.add('gate-locked');
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 <body>
 
+    <!-- 🔐 每日恋爱通关门禁 (Daily Romance Gatekeeper) -->
+    <div id="daily-gatekeeper-overlay" class="daily-gate-overlay">
+        <div class="daily-gate-card">
+            <!-- 头部装饰与状态徽章 -->
+            <div class="daily-gate-badge">
+                <span>🔐</span>
+                <span>今日专属恋爱默契考验</span>
+            </div>
+
+            <!-- 📝 每日答题主视图 -->
+            <div id="gate-quiz-view">
+                <div class="gate-header">
+                    <h2 class="gate-title">欢迎来到时光小屋 ❤️</h2>
+                    <p class="gate-subtitle">进入专属小窝前，请答对今天的恋爱默契题哦～</p>
+                    <div class="gate-warning-pill">
+                        <i class="fas fa-triangle-exclamation"></i> 每天仅 1 次答题机会，答错今天整天都进不去哦！
+                    </div>
+                </div>
+
+                <div class="gate-question-box">
+                    <div class="gate-q-index" id="gate-q-date">📅 今日专属考验</div>
+                    <div class="gate-q-text" id="gate-q-title">正在加载今日题目...</div>
+                    
+                    <div class="gate-options-list" id="gate-options-list">
+                        <!-- 动态渲染选项 -->
+                    </div>
+                </div>
+
+                <div class="gate-actions">
+                    <button type="button" id="gate-submit-btn" class="gate-btn gate-btn-primary" disabled>
+                        <i class="fas fa-heart"></i> 确认提交答案
+                    </button>
+                </div>
+
+                <div class="gate-footer">
+                    <button type="button" id="gate-show-pwd-btn" class="gate-link-btn">
+                        <i class="fas fa-key"></i> 拥有专属密令？直接通关进入
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🚫 答错锁死视图 (Locked View) -->
+            <div id="gate-locked-view" style="display: none;">
+                <div class="gate-locked-icon">🔒</div>
+                <h2 class="gate-locked-title">今日访问权限已锁定</h2>
+                <p class="gate-locked-desc">
+                    哎呀！今天答错了恋爱题目，根据小屋守则，今天被关在门外啦～<br>
+                    明天 00:00 自动解锁重置，明天要加油哦！
+                </p>
+                <div class="gate-locked-quote">
+                    “无论进不进得去，哲哲的心里永远都有珊珊的一席之地 ❤️”
+                </div>
+
+                <div class="gate-admin-box">
+                    <div class="gate-admin-label"><i class="fas fa-shield-cat"></i> 专属解禁密令通道：</div>
+                    <div class="gate-pwd-row">
+                        <input type="password" id="gate-unlock-pwd-input" class="gate-pwd-input" placeholder="请输入专属密码" autocomplete="off">
+                        <button type="button" id="gate-unlock-pwd-btn" class="gate-btn gate-btn-unlock">解锁</button>
+                    </div>
+                    <div id="gate-pwd-error-msg" class="gate-error-tip"></div>
+                </div>
+            </div>
+
+            <!-- 🔑 密令直接输入抽屉 (答题前可点) -->
+            <div id="gate-pwd-drawer" style="display: none;">
+                <div class="gate-pwd-drawer-inner">
+                    <div class="gate-admin-label"><i class="fas fa-key"></i> 输入专属密码直接进入：</div>
+                    <div class="gate-pwd-row">
+                        <input type="password" id="gate-drawer-pwd-input" class="gate-pwd-input" placeholder="输入密码" autocomplete="off">
+                        <button type="button" id="gate-drawer-pwd-btn" class="gate-btn gate-btn-unlock">验证</button>
+                        <button type="button" id="gate-drawer-cancel-btn" class="gate-btn-text">返回答题</button>
+                    </div>
+                    <div id="gate-drawer-error-msg" class="gate-error-tip"></div>
+                </div>
+            </div>
+
+            <!-- 🎉 答对成功放行视图 -->
+            <div id="gate-success-view" style="display: none;">
+                <div class="gate-success-icon">🎉</div>
+                <h2 class="gate-success-title">默契满分！答对啦～</h2>
+                <p class="gate-success-desc">欢迎回家，珊珊宝贝！正在进入时光小屋...</p>
+            </div>
+        </div>
+    </div>
+    <!-- 🔐 每日恋爱通关门禁引擎 (优先就绪，阻断未通关访问) -->
+    <script src="js/daily-gate.js?v=4.3"></script>
+
     <!-- 渐变星空背景 Canvas -->
-    <canvas id="bg-canvas"></canvas>
+    <canvas id="bg-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none;"></canvas>
 
     <!-- 鼠标/触屏粉心流光粒子 Canvas -->
-    <canvas id="heart-trail-canvas"></canvas>
+    <canvas id="heart-trail-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;"></canvas>
 
     <!-- 欢迎气泡 -->
     <div id="welcome-toast" class="toast-message">珊珊宝贝，欢迎来到属于我们的时光小屋！mua~ ❤️</div>
@@ -672,12 +772,12 @@
 
     <!-- 引入核心逻辑 JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="app.js?v=4.2"></script>
+    <script src="app.js?v=4.3"></script>
     <!-- 🏡 3D 虚拟恋爱小窝核心引擎 (本地极速按需渲染) -->
     <script src="js/three.min.js"></script>
-    <script src="js/cabin3d.js?v=4.2"></script>
+    <script src="js/cabin3d.js?v=4.3"></script>
     <!-- 💖 简约灵动岛与情侣特权商城 -->
-    <script src="js/features3.js?v=4.2"></script>
+    <script src="js/features3.js?v=4.3"></script>
     <script>
 
         // 🤫 管理员隐藏彩蛋入口：连续点击页脚的红心 5 次即可跳转至后台控制台

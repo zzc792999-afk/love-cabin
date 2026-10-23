@@ -1353,15 +1353,15 @@
                 </div>
 
                 <div style="background: rgba(255, 117, 151, 0.08); border-left: 3px solid var(--primary); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.6; color: #f1f2f6;">
-                    💡 <strong>使用说明</strong>：如果珊珊答错了今天的恋爱默契题被锁定在门外，或者你想直接让她免答题进入，只需点击下方 <strong>【一键为珊珊放行】</strong>，云端将即刻生效。珊珊手机上的页面会自动解锁进入！
+                    💡 <strong>使用说明</strong>：如果想让珊珊直接进入，点击 <strong>【一键为珊珊放行】</strong>；如果想让她重新答题考核（无论刚才是否答过、答对或被放行），点击 <strong>【撤销放行 & 强制重新答题】</strong>，系统将<strong>立即清空本地通关缓存与云端放行记录</strong>，所有设备刷新后均须重新答题！
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
                     <button type="button" id="btn-admin-gate-release" style="background: linear-gradient(135deg, #00b894, #00cec9); border: none; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 184, 148, 0.35); transition: all 0.3s;">
-                        <i class="fas fa-heart-circle-check"></i> 一键为珊珊放行 (解除锁定)
+                        <i class="fas fa-heart-circle-check"></i> 一键为珊珊放行 (免答题直接进入)
                     </button>
                     <button type="button" id="btn-admin-gate-reset" style="background: linear-gradient(135deg, #e17055, #d63031); border: none; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(214, 48, 49, 0.35); transition: all 0.3s;">
-                        <i class="fas fa-rotate-left"></i> 撤销放行 (要求正常答题)
+                        <i class="fas fa-rotate-left"></i> 撤销放行 & 强制重新答题 (清空缓存)
                     </button>
                 </div>
             </div>
@@ -1611,7 +1611,8 @@
                         'sweetpact_partner_a', 'sweetpact_partner_b', 'sweetpact_history_logs',
                         'sweetpact_miss_trigger_zuzhe', 'sweetpact_miss_trigger_shanshan',
                         'sweetpact_prank_diagnosed', 'sweetpact_boardgame_won',
-                        'config_playlist', 'sweetpact_wheel_options', 'daily_gate_release_date'
+                        'config_playlist', 'sweetpact_wheel_options', 'daily_gate_release_date',
+                        'daily_gate_force_retest_at'
                     ];
 
                     CONFIG_KEYS.forEach(key => {
@@ -3204,7 +3205,20 @@
         if (btnRelease) {
             btnRelease.addEventListener('click', () => {
                 const today = getTodayDateStr();
-                saveConfigToServer({ daily_gate_release_date: today }, '🎉 已成功为珊珊特权放行！她现在打开网页将直接通行！');
+                const nowTs = Date.now();
+                // 本地同步标记已放行
+                try {
+                    localStorage.setItem('love_gate_pass_date', today);
+                    localStorage.setItem('love_gate_pass_time', String(nowTs));
+                    localStorage.removeItem('love_gate_fail_date');
+                    localStorage.removeItem('love_gate_fail_time');
+                } catch(e) {}
+
+                saveConfigToServer({
+                    daily_gate_release_date: today,
+                    daily_gate_force_retest_at: '0'
+                }, '🎉 已成功为珊珊特权放行！她现在打开网页将直接通行！');
+
                 const badge = document.getElementById('gate-admin-status-badge');
                 if (badge) {
                     badge.innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> 今日已特权放行 ✅';
@@ -3218,7 +3232,22 @@
         const btnReset = document.getElementById('btn-admin-gate-reset');
         if (btnReset) {
             btnReset.addEventListener('click', () => {
-                saveConfigToServer({ daily_gate_release_date: '' }, '🔄 已撤销放行！恢复正常每日门禁考核！');
+                const nowTs = Date.now();
+                // 1. 彻底清空当前设备的本地通关与答错缓存（无论是在手机还是电脑测试）
+                try {
+                    localStorage.removeItem('love_gate_pass_date');
+                    localStorage.removeItem('love_gate_pass_time');
+                    localStorage.removeItem('love_gate_fail_date');
+                    localStorage.removeItem('love_gate_fail_time');
+                    sessionStorage.removeItem('love_gate_pass_date');
+                } catch(e) {}
+
+                // 2. 云端重置：清空 release_date 并更新 force_retest_at 时间戳，强制全网设备重新答题
+                saveConfigToServer({
+                    daily_gate_release_date: '',
+                    daily_gate_force_retest_at: String(nowTs)
+                }, '🔄 已撤销放行并清空本地缓存！今日门禁已全面重置，返回首页或对方手机刷新均须重新答题！');
+
                 const badge = document.getElementById('gate-admin-status-badge');
                 if (badge) {
                     badge.innerHTML = '<i class="fas fa-lock" style="color: #f1c40f;"></i> 正常门禁考核中 (尚未放行)';

@@ -283,10 +283,15 @@
         const unlockPwdBtn = document.getElementById('gate-unlock-pwd-btn');
         const unlockErrorMsg = document.getElementById('gate-pwd-error-msg');
 
+        const passTime = parseInt(safeStorageGet('love_gate_pass_time') || '0', 10);
+        const failTime = parseInt(safeStorageGet('love_gate_fail_time') || '0', 10);
+
         // 放行解锁通用方法
         function grantAccess(isPasswordUnlock = false, customTitle = null, customDesc = null) {
             safeStorageSet('love_gate_pass_date', today);
+            safeStorageSet('love_gate_pass_time', String(Date.now()));
             safeStorageRemove('love_gate_fail_date');
+            safeStorageRemove('love_gate_fail_time');
 
             if (quizView) quizView.style.display = 'none';
             if (lockedView) lockedView.style.display = 'none';
@@ -320,20 +325,122 @@
             }, 1200);
         }
 
-        // 1. 如果今天已经通关过，直接退出，不打扰正常浏览
+        // 渲染每日答题主视图
+        function renderQuizView() {
+            document.documentElement.classList.add('gate-locked');
+            document.body.classList.add('modal-open');
+            overlay.style.display = 'flex';
+            overlay.classList.remove('gate-fade-out');
+
+            if (quizView) quizView.style.display = 'block';
+            if (lockedView) lockedView.style.display = 'none';
+            if (pwdDrawer) pwdDrawer.style.display = 'none';
+            if (successView) successView.style.display = 'none';
+
+            const { item } = getTodayQuestion(today);
+            if (qDateEl) {
+                const parts = today.split('-');
+                qDateEl.innerHTML = `<i class="fas fa-calendar-heart"></i> ${parts[0]}年${parts[1]}月${parts[2]}日 · 今日专属恋爱考验`;
+            }
+            if (qTitleEl) {
+                qTitleEl.textContent = item.q;
+            }
+
+            let selectedOptionIdx = -1;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('active');
+            }
+
+            if (optionsListEl) {
+                optionsListEl.innerHTML = '';
+                item.options.forEach((optText, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'gate-option-btn';
+                    btn.innerHTML = `<span class="opt-prefix">${['A', 'B', 'C', 'D'][idx]}</span><span class="opt-text">${optText}</span>`;
+                    btn.addEventListener('click', () => {
+                        optionsListEl.querySelectorAll('.gate-option-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        selectedOptionIdx = idx;
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.add('active');
+                        }
+                    });
+                    optionsListEl.appendChild(btn);
+                });
+            }
+
+            // 确认提交答案按钮
+            if (submitBtn) {
+                submitBtn.onclick = () => {
+                    if (selectedOptionIdx === -1) return;
+
+                    if (selectedOptionIdx === item.ans) {
+                        // 答对！
+                        grantAccess(false);
+                    } else {
+                        // 答错！锁定全天
+                        safeStorageSet('love_gate_fail_date', today);
+                        safeStorageSet('love_gate_fail_time', String(Date.now()));
+                        if (quizView) {
+                            quizView.classList.add('shake-anim');
+                            setTimeout(() => {
+                                quizView.style.display = 'none';
+                                if (lockedView) lockedView.style.display = 'block';
+                                setupLockedViewEvents();
+                            }, 500);
+                        }
+                    }
+                };
+            }
+        }
+
+        // 1. 如果本地缓存显示今天已经通关过
         if (passDate === today) {
+            // 先在本地隐藏遮罩，正常加载页面
             document.documentElement.classList.remove('gate-locked');
             overlay.style.display = 'none';
-            overlay.remove();
+
+            // 异步核对云端：管理员是否在今天放行之后又在后台发起了“强制重新考核答题”
+            fetch('/api/config')
+                .then(res => res.json())
+                .then(cfg => {
+                    const forceRetestAt = parseInt((cfg && cfg.daily_gate_force_retest_at) || '0', 10);
+                    // 如果管理员点击了撤销放行/重新答题，且其时间晚于本地通关时间：
+                    if (forceRetestAt > 0 && forceRetestAt > passTime) {
+                        safeStorageRemove('love_gate_pass_date');
+                        safeStorageRemove('love_gate_pass_time');
+                        safeStorageRemove('love_gate_fail_date');
+                        safeStorageRemove('love_gate_fail_time');
+                        renderQuizView();
+                        return;
+                    }
+                    // 确认放行无误，销毁遮罩节点
+                    if (overlay) overlay.remove();
+                })
+                .catch(() => {
+                    if (overlay) overlay.remove();
+                });
             return;
         }
 
-        // 异步检查云端：哲哲是否已在后台一键为珊珊放行
+        // 异步检查云端状态 (未通关情况)
         fetch('/api/config')
             .then(res => res.json())
             .then(cfg => {
+                // A. 哲哲在后台一键特权放行
                 if (cfg && cfg.daily_gate_release_date === today) {
                     grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
+                    return;
+                }
+                // B. 管理员重置了门禁，允许重新答题
+                const forceRetestAt = parseInt((cfg && cfg.daily_gate_force_retest_at) || '0', 10);
+                if (forceRetestAt > 0 && forceRetestAt > failTime && failDate === today) {
+                    safeStorageRemove('love_gate_fail_date');
+                    safeStorageRemove('love_gate_fail_time');
+                    renderQuizView();
                 }
             })
             .catch(() => {});
@@ -354,64 +461,7 @@
         }
 
         // 3. 今日尚未答题，进入答题流程
-        if (quizView) quizView.style.display = 'block';
-        if (lockedView) lockedView.style.display = 'none';
-        if (pwdDrawer) pwdDrawer.style.display = 'none';
-        if (successView) successView.style.display = 'none';
-
-        const { item } = getTodayQuestion(today);
-        if (qDateEl) {
-            const parts = today.split('-');
-            qDateEl.innerHTML = `<i class="fas fa-calendar-heart"></i> ${parts[0]}年${parts[1]}月${parts[2]}日 · 今日专属恋爱考验`;
-        }
-        if (qTitleEl) {
-            qTitleEl.textContent = item.q;
-        }
-
-        let selectedOptionIdx = -1;
-
-        if (optionsListEl) {
-            optionsListEl.innerHTML = '';
-            item.options.forEach((optText, idx) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'gate-option-btn';
-                btn.innerHTML = `<span class="opt-prefix">${['A', 'B', 'C', 'D'][idx]}</span><span class="opt-text">${optText}</span>`;
-                btn.addEventListener('click', () => {
-                    optionsListEl.querySelectorAll('.gate-option-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOptionIdx = idx;
-                    if (submitBtn) {
-                        submitBtn.disabled = false;
-                        submitBtn.classList.add('active');
-                    }
-                });
-                optionsListEl.appendChild(btn);
-            });
-        }
-
-        // 确认提交答案按钮
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
-                if (selectedOptionIdx === -1) return;
-
-                if (selectedOptionIdx === item.ans) {
-                    // 答对！
-                    grantAccess(false);
-                } else {
-                    // 答错！锁定全天
-                    safeStorageSet('love_gate_fail_date', today);
-                    if (quizView) {
-                        quizView.classList.add('shake-anim');
-                        setTimeout(() => {
-                            quizView.style.display = 'none';
-                            if (lockedView) lockedView.style.display = 'block';
-                            setupLockedViewEvents();
-                        }, 500);
-                    }
-                }
-            });
-        }
+        renderQuizView();
 
         // "拥有专属密令？直接通关"
         if (showPwdBtn && pwdDrawer) {
@@ -486,8 +536,15 @@
                             if (cfg && cfg.daily_gate_release_date === today) {
                                 grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
                             } else {
-                                if (unlockErrorMsg) {
-                                    unlockErrorMsg.textContent = '🥺 哲哲还没在后台放行哦，快发微信找臭臭放行吧～❤️';
+                                const forceRetestAt = parseInt((cfg && cfg.daily_gate_force_retest_at) || '0', 10);
+                                if (forceRetestAt > 0 && forceRetestAt > failTime) {
+                                    safeStorageRemove('love_gate_fail_date');
+                                    safeStorageRemove('love_gate_fail_time');
+                                    renderQuizView();
+                                } else {
+                                    if (unlockErrorMsg) {
+                                        unlockErrorMsg.textContent = '🥺 哲哲还没在后台放行哦，快发微信找臭臭放行吧～❤️';
+                                    }
                                 }
                             }
                         })

@@ -51,10 +51,10 @@
             tip: "无论绕了多远，依然坚定奔向对方的心～"
         },
         {
-            q: "我们迎来在一起整整‘第 300 天纪念日’的准确目标日期是？",
-            options: ["2026年 10月13日", "2026年 11月13日", "2026年 11月23日", "2026年 12月13日"],
+            q: "在哲哲与珊珊的高甜私密世界里，哲哲是默默守护的‘笨笨牛’，而珊珊宝贝专属的代号是？",
+            options: ["调皮金丝雀 🐤", "白羊座小兔 🐰", "傲娇波斯猫 🐱", "温柔小海獭 🦦"],
             ans: 1,
-            tip: "笨笨牛守护珊珊小兔的 300 天浪漫里程碑～"
+            tip: "处女座笨笨牛 🐂 ✕ 白羊座小兔 🐰，是全宇宙最宠溺的绝配组合～"
         },
         {
             q: "哲哲与珊珊在纪念宇宙里的属相与星座配对是？",
@@ -135,22 +135,32 @@
             tip: "让两个人的心跳节拍在此刻完全同步！"
         },
         {
-            q: "在 300 天小牛接胡萝卜街机挑战中，需要左右移动避开的捣蛋道具是？",
-            options: ["小炸弹 💣", "小骨头 🦴", "小闹钟 ⏰", "红辣椒 🌶️"],
-            ans: 2,
-            tip: "避开催人起床的小闹钟，才能接住爱心胡萝卜！"
-        },
-        {
-            q: "在 300 天街机游戏中，需要累计接住多少分才能解锁真心情书？",
-            options: ["100 分", "80 分", "150 分", "200 分"],
+            q: "在小窝的留言便签墙上，哲哲在 2026 年 1 月 18 日重新牵手时写下的第一句话是？",
+            options: [
+                "珊珊宝贝，我们和好啦！希望以后有矛盾我们要及时沟通，永远不分开好不好！mua~~",
+                "遇见你是所有故事的开始，今天也是超级想你的一天！",
+                "白珊珊小仙女，祝你今天开开心心，好好吃饭！",
+                "牵着你的手，走过四季，一直走到白头偕老！"
+            ],
             ans: 0,
-            tip: "拿到满分 100 分，开启处女座小牛的真心话！"
+            tip: "“珊珊宝贝，我们和好啦！希望以后有矛盾我们要及时沟通，永远不分开好不好！mua~~” 永远不分开的约定～"
         },
         {
-            q: "笨笨牛在 300 天真心情书里向珊珊承诺，爱她不仅是这 300 天，还要爱接下来的？",
-            options: ["1000天、10000天，长长久久", "5000天、50000天，生生世世", "接下来的每一万个春夏秋冬", "3000天、30000天，直到永远"],
-            ans: 3,
-            tip: "笨笨牛会永远守护他的珊珊小兔，爱到宇宙尽头！"
+            q: "在两人的恋爱心愿单里，排在【看海】与【摩天轮】之后的 No.03 心动心愿是？",
+            options: ["一起去自驾旅行", "一起吃一顿烛光晚餐", "一起养一只可爱的小狗", "一起去看跨年演唱会"],
+            ans: 1,
+            tip: "安静柔和的烛光里，深情看着心爱的宝贝～"
+        },
+        {
+            q: "在 3D 小窝的草莓圣代与冰淇淋互动中，哲哲每次给珊珊投喂甜点时最常宠溺说的话是？",
+            options: [
+                "吃饱了才有力气想我哦！",
+                "吃完记得要漱口，小懒虫～",
+                "第一口给珊珊，因为珊珊比草莓还要甜！",
+                "喜欢吃就全吃光，臭臭管够！"
+            ],
+            ans: 2,
+            tip: "“第一口给珊珊，因为珊珊比草莓还要甜！”——甜到心坎里！"
         },
         {
             q: "每次打开时光小屋，顶部最先飘出来的欢迎气泡完整原文是？",
@@ -274,7 +284,7 @@
         const unlockErrorMsg = document.getElementById('gate-pwd-error-msg');
 
         // 放行解锁通用方法
-        function grantAccess(isPasswordUnlock = false) {
+        function grantAccess(isPasswordUnlock = false, customTitle = null, customDesc = null) {
             safeStorageSet('love_gate_pass_date', today);
             safeStorageRemove('love_gate_fail_date');
 
@@ -285,7 +295,10 @@
                 successView.style.display = 'block';
                 const successTitle = successView.querySelector('.gate-success-title');
                 const successDesc = successView.querySelector('.gate-success-desc');
-                if (isPasswordUnlock) {
+                if (customTitle && successTitle) {
+                    successTitle.textContent = customTitle;
+                    if (customDesc && successDesc) successDesc.textContent = customDesc;
+                } else if (isPasswordUnlock) {
                     if (successTitle) successTitle.textContent = '✨ 专属密令正确！特权通行';
                     if (successDesc) successDesc.textContent = '欢迎回家～正在为你开启时光小屋！';
                 } else {
@@ -314,6 +327,16 @@
             overlay.remove();
             return;
         }
+
+        // 异步检查云端：哲哲是否已在后台一键为珊珊放行
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(cfg => {
+                if (cfg && cfg.daily_gate_release_date === today) {
+                    grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
+                }
+            })
+            .catch(() => {});
 
         // 页面加锁
         document.documentElement.classList.add('gate-locked');
@@ -444,6 +467,37 @@
                 unlockPwdBtn.addEventListener('click', handleUnlock);
                 unlockPwdInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') handleUnlock();
+                });
+            }
+
+            // 检查哲哲是否已从后台放行
+            const checkReleaseBtn = document.getElementById('gate-check-release-btn');
+            if (checkReleaseBtn) {
+                checkReleaseBtn.addEventListener('click', () => {
+                    const originalHtml = checkReleaseBtn.innerHTML;
+                    checkReleaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在连线哲哲的小屋后台...';
+                    checkReleaseBtn.disabled = true;
+
+                    fetch('/api/config')
+                        .then(res => res.json())
+                        .then(cfg => {
+                            checkReleaseBtn.disabled = false;
+                            checkReleaseBtn.innerHTML = originalHtml;
+                            if (cfg && cfg.daily_gate_release_date === today) {
+                                grantAccess(true, '✨ 哲哲已在后台为你放行！', '欢迎回家，珊珊宝贝！正在为你开启时光小屋～❤️');
+                            } else {
+                                if (unlockErrorMsg) {
+                                    unlockErrorMsg.textContent = '🥺 哲哲还没在后台放行哦，快发微信找臭臭放行吧～❤️';
+                                }
+                            }
+                        })
+                        .catch(() => {
+                            checkReleaseBtn.disabled = false;
+                            checkReleaseBtn.innerHTML = originalHtml;
+                            if (unlockErrorMsg) {
+                                unlockErrorMsg.textContent = '网络连接稍有波动，请稍后再试或输入密令进入～';
+                            }
+                        });
                 });
             }
         }

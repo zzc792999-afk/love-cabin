@@ -3,6 +3,11 @@
  */
 
 (function () {
+    const fallbackStorage = new Map();
+    const localStorage = {
+        getItem(key) { try { return window.localStorage.getItem(key); } catch (error) { return fallbackStorage.get(key) ?? null; } },
+        setItem(key, value) { fallbackStorage.set(key, String(value)); try { window.localStorage.setItem(key, String(value)); } catch (error) {} }
+    };
     // 默认数据
     const VAULT_KEY = 'love_cabin_vault_coins';
     const WISH_EXCHANGE_KEY = 'love_cabin_wish_orders';

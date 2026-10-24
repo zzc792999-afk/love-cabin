@@ -1,0 +1,75 @@
+/* Shared finishing touches; existing themes and component layout stay authoritative. */
+.skip-link { position: fixed; top: -80px; left: 16px; z-index: 10000002; padding: 12px 20px; background: var(--primary-dark); color: white; border-radius: 12px; }
+.skip-link:focus { top: 16px; }
+.chapter-heading { margin: 8px 0 18px; text-align: center; }
+.chapter-heading > span { color: var(--primary-dark); font-size: .65rem; font-weight: 700; letter-spacing: .22em; }
+.chapter-heading p { margin-top: 6px; color: var(--text-muted); font-size: .9rem; }
+.chapter-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
+.chapter-shortcuts > * { display: flex; align-items: center; gap: 12px; padding: 18px 16px; border-radius: 18px; border: var(--border-glass); background: var(--card-bg); color: var(--text-color); text-decoration: none; text-align: left; cursor: pointer; box-shadow: var(--shadow-glass); }
+.chapter-shortcuts > *:hover { border-color: var(--primary); }
+.chapter-shortcuts strong { display: block; font-size: .9rem; font-weight: 650; }
+.chapter-shortcuts small { display: block; font-size: .7rem; color: var(--text-muted); margin-top: 4px; }
+.chapter-shortcuts > * > span:last-child { margin-left: auto; color: var(--primary-dark); }
+.chapter-icon { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 44px; border-radius: 12px; background: var(--primary-light); font-size: 1.3rem; }
+.sticky-note-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.carousel-card img { background: var(--primary-light); }
+:root {
+    --text-muted: #79636e;
+    --card-bg: rgba(255, 255, 255, .72);
+    --shadow-glass: 0 8px 32px rgba(113, 63, 85, .07);
+}
+[data-theme="dark"] {
+    --text-muted: #b7a7b4;
+    --card-bg: rgba(27, 24, 40, .82);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, .25);
+}
+:focus-visible {
+    outline: 3px solid var(--primary-dark);
+    outline-offset: 4px;
+}
+.container { padding-top: max(20px, env(safe-area-inset-top)); }
+.main-header { margin-bottom: 28px; }
+.header-title { text-wrap: balance; letter-spacing: .035em; }
+.subtitle { line-height: 1.9; }
+.header-meta-tags { flex-wrap: wrap; gap: 8px; }
+.welcome-card { line-height: 1.95; }
+.welcome-card p + p { margin-top: 12px; }
+.glass-panel { border-color: rgba(181, 123, 147, .14); }
+.bento-card { min-width: 0; }
+.bento-num, .st-num { font-variant-numeric: tabular-nums; }
+.nav-item { min-height: 48px; cursor: pointer; }
+.nav-item.active { box-shadow: 0 4px 14px rgba(151, 79, 113, .12); }
+.nav-bar { bottom: max(12px, env(safe-area-inset-bottom)); }
+.quick-pill, .couple-loc-btn, .camera-view-btn { min-height: 44px; }
+.toast-message { max-width: calc(100vw - 32px); white-space: normal; text-align: center; }
+.daily-gate-card { max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
+.gate-pwd-row { flex-wrap: wrap; }
+.gate-pwd-input { min-width: 0; }
+.gate-error-tip { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+    .chapter-shortcuts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 22px; }
+    .chapter-shortcuts > * { padding: 13px 16px; }
+    .container { padding-left: 16px; padding-right: 16px; }
+    .main-header { padding: 28px 16px; border-radius: 24px; }
+    .header-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+    .editorial-caps-tag { letter-spacing: .12em; font-size: .65rem; }
+    .glass-panel { padding: 20px; margin-bottom: 20px; }
+    .cabin-3d-header { flex-wrap: wrap; gap: 10px; }
+    .cabin-3d-hint { line-height: 1.7; white-space: normal; }
+    .cabin-couple-bar, .cabin-camera-bar { flex-wrap: wrap; gap: 8px; }
+    input, textarea, select { font-size: 16px; }
+    footer { padding-left: 20px; padding-right: 20px; overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+    #heart-trail-canvas, #bg-canvas { display: none; }
+}
+@media (hover: none) {
+    .glass-panel { transform: none !important; }
+    .card-glare { display: none; }
+}

@@ -108,11 +108,11 @@
     let PHOTO_LIST = [
         { src: 'images/1.jpg', caption: '我们的甜蜜约定 ❤️' },
         { src: 'images/2.jpg', caption: '两颗心贴得更近 💞' },
-        { src: 'images/IMG_20260206_124425.png', caption: '美好的一天 🌸' },
-        { src: 'images/IMG_20260206_124443.png', caption: '眼里全都是你 🌟' },
-        { src: 'images/IMG_20260206_124500.png', caption: '温柔流淌的时光 ⏳' },
-        { src: 'images/IMG_20260206_124528.png', caption: '爱意溢出屏幕 💝' },
-        { src: 'images/IMG_20260206_124546.png', caption: '想陪你走过四季 🌱' },
+        { src: 'images/IMG_20260206_124425.webp', caption: '美好的一天 🌸' },
+        { src: 'images/IMG_20260206_124443.webp', caption: '眼里全都是你 🌟' },
+        { src: 'images/IMG_20260206_124500.webp', caption: '温柔流淌的时光 ⏳' },
+        { src: 'images/IMG_20260206_124528.webp', caption: '爱意溢出屏幕 💝' },
+        { src: 'images/IMG_20260206_124546.webp', caption: '想陪你走过四季 🌱' },
         { src: 'images/mmexport1770353248593.jpg', caption: '定格在这一刻 📸' }
     ];
 
@@ -152,8 +152,8 @@
     async function detectApiEndpoint() {
         // 尝试检测本地 Node 接口
         try {
-            const resNode = await fetch('/api/messages', { method: 'GET' });
-            if (resNode.ok) {
+            const resNode = await fetchWithTimeout('/api/messages', { method: 'GET' });
+            if (resNode.ok && Array.isArray(await resNode.json())) {
                 apiEndpoint = '/api/messages';
                 console.log('检测到本地 Node.js 后端留言 API!');
                 return;
@@ -162,8 +162,8 @@
 
         // 尝试检测 PHP 接口
         try {
-            const resPhp = await fetch('other/api.php', { method: 'GET' });
-            if (resPhp.ok) {
+            const resPhp = await fetchWithTimeout('other/api.php', { method: 'GET' }, 2500);
+            if (resPhp.ok && Array.isArray(await resPhp.json())) {
                 apiEndpoint = 'other/api.php';
                 console.log('检测到 PHP 后端留言 API!');
                 return;
@@ -193,6 +193,26 @@
         } catch(e) {
             console.error("推送服务出错:", e);
         }
+    }
+
+    function readArray(value, fallback = []) {
+        try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : fallback; }
+        catch (error) { return fallback; }
+    }
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+    }
+    async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            // Keep the timeout active while receiving the response body too.
+            const body = await response.arrayBuffer();
+            return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
+        } finally { clearTimeout(timer); }
     }
 
     // 兼容 iOS/Safari 的安全日期转换方法，避免 Invalid Date 或 NaN 报错
@@ -228,7 +248,7 @@
     // 🔄 异步从云数据库拉取最新全局配置并动态渲染
     async function syncGlobalConfig() {
         try {
-            const res = await fetch('/api/config');
+            const res = await fetchWithTimeout('/api/config');
             if (!res.ok) throw new Error('Fetch config failed');
             const cfg = await res.json();
             
@@ -455,10 +475,10 @@
     // 🔄 异步从云端获取最新心愿单列表
     async function loadWishlistFromServer() {
         try {
-            const res = await fetch('/api/wishlist');
+            const res = await fetchWithTimeout('/api/wishlist');
             if (res.ok) {
                 const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
+                if (Array.isArray(data)) {
                     state.wishlist = data;
                     safeSet('loveWishlist', JSON.stringify(state.wishlist));
                     const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'all';
@@ -489,51 +509,7 @@
      * ================================================================ */
     // 立即同步完成所有本地 UI 交互事件绑定（如开幕信封幕布、导航栏、主题切换等）
     // 确保即便云端数据库正在唤醒中（耗时30秒），用户依然可以瞬间点开信封进入小屋
-    (function() {
-        initThemeSystem();
-        initRoleSystem();
-        initBackgroundCanvas();
-        initWelcomeToast();
-        initNavigation();
-        initOpeningCurtain(); // 立即初始化信封拆信，防止点不动！
-        initGlobalInteraction();
-        initHeartTrail();
-        initHeartbeatStatus();
-        initReunionInteractive();
-        initLocalStorageData();
-        initTimers();
-        init3DGallery();
-        init3DTiltEffect();
 
-        // 异步进行后端检测与云端数据同步，不阻塞 UI 线程
-        detectApiEndpoint().then(async () => {
-            initWishlist();
-            initStickyNotes();
-            initChatSimulator();
-            initBgmPlayer();
-            initLoveTree();
-
-            // 📢 首先加载本地缓存展示公告栏，随后异步同步云端配置
-            const customAnn = safeGet('config_custom_announcement');
-            if (customAnn) {
-                const banner = document.getElementById('admin-custom-announcement');
-                const text = document.getElementById('announcement-text');
-                if (banner && text) {
-                    text.textContent = customAnn;
-                    banner.style.display = 'block';
-                }
-            }
-
-            // 异步同步云数据库全局配置并刷新界面
-            await syncGlobalConfig();
-
-            // 异步加载日记与决策相关的本地/云端勋章状态
-            checkDiaryAndDecisionBadges();
-
-            // 异步同步云端心愿单列表
-            await loadWishlistFromServer();
-        });
-    })();
 
     /* ================================================================
      *  数据存储与加载 (Local Storage)
@@ -556,7 +532,7 @@
         if (storedMissDate === todayStr) {
             state.missCount = parseInt(storedMissCount) || 0;
             state.missLastDate = storedMissDate;
-            state.specialMessagesShown = storedShownMessages ? JSON.parse(storedShownMessages) : [];
+            state.specialMessagesShown = readArray(storedShownMessages);
         } else {
             state.missCount = 0;
             state.missLastDate = todayStr;
@@ -571,7 +547,7 @@
 
         const storedWishlist = safeGet('loveWishlist');
         if (storedWishlist) {
-            try { state.wishlist = JSON.parse(storedWishlist); } catch(e) { state.wishlist = []; }
+            state.wishlist = readArray(storedWishlist);
         }
         if (!state.wishlist || state.wishlist.length === 0) {
             state.wishlist = PRESET_WISHES.map(w => ({ ...w, completed: false }));
@@ -579,7 +555,7 @@
 
         const storedNotes = localStorage.getItem('stickyNotes');
         if (storedNotes) {
-            state.stickyNotes = JSON.parse(storedNotes);
+            state.stickyNotes = readArray(storedNotes);
         } else {
             state.stickyNotes = [
                 {
@@ -730,6 +706,7 @@
      *  背景Canvas星空绘制
      * ================================================================ */
     function initBackgroundCanvas() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const canvas = document.getElementById('bg-canvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -758,7 +735,7 @@
         let lastStarTime = 0;
         function animate(timestamp) {
             requestAnimationFrame(animate);
-            if (timestamp - lastStarTime < 50) return; // 限制在 20fps，大幅降低显卡开销
+            if (document.hidden || timestamp - lastStarTime < 50) return; // 限制在 20fps，大幅降低显卡开销
             lastStarTime = timestamp;
 
             ctx.clearRect(0, 0, width, height);
@@ -788,6 +765,7 @@
     }
 
     function spawnFallingHeartDecoration() {
+        if (document.hidden || document.documentElement.classList.contains('gate-locked')) return;
         const hearts = ['❤️', '💕', '💖', '💗', '💝', '✨'];
         const div = document.createElement('div');
         div.className = 'falling-heart-decor';
@@ -957,7 +935,10 @@
      *  计时器逻辑
      * ================================================================ */
 
+    let timerIntervals = [];
     function initTimers() {
+        timerIntervals.forEach(clearInterval);
+        timerIntervals = [];
         const anniversaryCount = document.getElementById('meet-days-card');
         const togetherCount = document.getElementById('together-days-card');
         let hasAnimatedCounters = false;
@@ -965,6 +946,7 @@
         // 🌟 动态平滑数字滚动动效 (CountUp with Ease-Out-Expo)
         function animateCountUp(el, targetVal, duration = 1400) {
             if (!el || isNaN(targetVal)) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = targetVal; return; }
             const startTime = performance.now();
             function step(currentTime) {
                 const elapsed = currentTime - startTime;
@@ -1047,7 +1029,7 @@
         }
 
         updateCardCounters();
-        setInterval(updateCardCounters, 60000);
+        timerIntervals.push(setInterval(updateCardCounters, 60000));
 
         function calculateCountdown(targetDateStr, daysElId, hoursElId, minsElId, secsElId) {
             const daysEl = document.getElementById(daysElId);
@@ -1086,7 +1068,7 @@
             }
 
             refresh();
-            setInterval(refresh, 1000);
+            timerIntervals.push(setInterval(refresh, 1000));
         }
 
         const currentYear = new Date().getFullYear();
@@ -1540,8 +1522,8 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <div class="wishlist-item-content">
-                    <div class="item-index">#${item.id}</div>
-                    <div class="item-title">${item.title}</div>
+                    <div class="item-index">#${escapeHtml(item.id)}</div>
+                    <div class="item-title">${escapeHtml(item.title)}</div>
                     <span class="item-tag ${tagClass}">${tagLabel}</span>
                 </div>
             `;
@@ -1609,11 +1591,12 @@
     async function loadStickyNotesFromServer() {
         if (!apiEndpoint) return;
         try {
-            const res = await fetch(apiEndpoint);
+            const res = await fetchWithTimeout(apiEndpoint);
             if (res.ok) {
                 const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
+                if (Array.isArray(data)) {
                     state.stickyNotes = data;
+                    localStorage.setItem('stickyNotes', JSON.stringify(data));
                     renderStickyNotes();
                 }
             }
@@ -1691,8 +1674,12 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newNote)
                     }).then(res => {
-                        if (res.ok) console.log("云端留言保存成功！");
-                    }).catch(err => console.error("同步留言至云端出错:", err));
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        showToastMessage('💌 悄悄话已同步至云端！');
+                    }).catch(err => {
+                        console.error("同步留言至云端出错:", err);
+                        showToastMessage('留言已保存在本机，云端同步失败，请稍后重试。');
+                    });
                 }
 
                 // 触发手机推送通知给祖哲
@@ -1700,7 +1687,7 @@
 
                 textarea.value = '';
                 renderStickyNotes();
-                showToastMessage('💌 悄悄话已挂到便签墙上，并同步至云端！');
+                showToastMessage(apiEndpoint ? '💌 留言已保存，正在同步…' : '💌 留言已保存在本机。');
 
                 state.treePoints += 2;
                 safeSet('treePoints', String(state.treePoints));
@@ -1745,12 +1732,12 @@
 
             div.innerHTML = `
                 <div class="sticky-note-header">
-                    <span>${note.emoji} 便签</span>
+                    <span>${escapeHtml(note.emoji)} 便签</span>
                     <i class="fas fa-trash-alt note-delete" title="撕掉它"></i>
                 </div>
-                <div class="sticky-note-content">${note.text}</div>
+                <div class="sticky-note-content">${escapeHtml(note.text)}</div>
                 <div class="sticky-note-footer">
-                    —— ${note.author} (${note.date})
+                    —— ${escapeHtml(note.author)} (${escapeHtml(note.date)})
                 </div>
             `;
 
@@ -1895,7 +1882,9 @@
     /* ================================================================
      *  3D 相册卡片堆叠
      * ================================================================ */
+    let cleanupGallery = () => {};
     function init3DGallery() {
+        cleanupGallery();
         const carousel = document.getElementById('carousel-3d');
         if (!carousel) return;
 
@@ -1904,10 +1893,23 @@
         PHOTO_LIST.forEach((photo, idx) => {
             const card = document.createElement('div');
             card.className = 'carousel-card';
-            card.innerHTML = `
-                <img src="${photo.src}" alt="${photo.caption}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'250\\' height=\\'260\\'><rect width=\\'250\\' height=\\'260\\' fill=\\'%23f3f0f3\\'/><text x=\\'125\\' y=\\'130\\' text-anchor=\\'middle\\' fill=\\'%23b1a1b1\\'>图片加载中...</text></svg>'">
-                <div class="caption">${photo.caption}</div>
-            `;
+            card.setAttribute('role', 'button');
+            card.tabIndex = 0;
+            card.setAttribute('aria-label', `查看照片：${photo.caption || '我们的回忆'}`);
+            const image = document.createElement('img');
+            image.loading = idx === 0 ? 'eager' : 'lazy';
+            image.decoding = 'async';
+            image.alt = String(photo.caption || '我们的回忆');
+            const source = String(photo.src || '');
+            image.src = /^(?:https?:|images\/|\/images\/)/i.test(source) ? source : 'images/1.jpg';
+            image.addEventListener('error', () => {
+                image.removeAttribute('src');
+                image.alt = '这张照片暂时无法加载';
+            }, { once: true });
+            const caption = document.createElement('div');
+            caption.className = 'caption';
+            caption.textContent = String(photo.caption || '我们的回忆');
+            card.append(image, caption);
 
             card.addEventListener('click', function() {
                 const currentIdx = parseInt(this.getAttribute('data-index'));
@@ -1922,7 +1924,10 @@
             carousel.appendChild(card);
         });
 
-        const cards = document.querySelectorAll('.carousel-card');
+        const cards = carousel.querySelectorAll('.carousel-card');
+        if (!cards.length) return;
+        const listeners = new AbortController();
+        const signal = listeners.signal;
         let centerIndex = 0;
 
         function layoutCarousel() {
@@ -1965,7 +1970,7 @@
         }
 
         let startX = 0;
-        carousel.addEventListener('mousedown', e => startX = e.clientX);
+        carousel.addEventListener('mousedown', e => startX = e.clientX, { signal });
         carousel.addEventListener('mouseup', e => {
             const endX = e.clientX;
             if (startX - endX > 50) {
@@ -1975,9 +1980,9 @@
                 centerIndex = (centerIndex - 1 + cards.length) % cards.length;
                 layoutCarousel();
             }
-        });
+        }, { signal });
 
-        carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
+        carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true, signal });
         carousel.addEventListener('touchend', e => {
             const endX = e.changedTouches[0].clientX;
             if (startX - endX > 40) {
@@ -1987,19 +1992,20 @@
                 centerIndex = (centerIndex - 1 + cards.length) % cards.length;
                 layoutCarousel();
             }
-        });
+        }, { signal });
 
         layoutCarousel();
 
-        setInterval(() => {
+        const interval = setInterval(() => {
             const lightbox = document.getElementById('lightbox');
-            if (state.activeTab === 'album' && (!lightbox || !lightbox.classList.contains('active'))) {
+            if (!document.hidden && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !carousel.matches(':hover, :focus-within') && state.activeTab === 'album' && (!lightbox || !lightbox.classList.contains('active'))) {
                 centerIndex = (centerIndex + 1) % cards.length;
                 layoutCarousel();
             }
         }, 5000);
 
-        window.addEventListener('resize', layoutCarousel);
+        window.addEventListener('resize', layoutCarousel, { signal });
+        cleanupGallery = () => { clearInterval(interval); listeners.abort(); };
     }
 
     function openLightbox(src, caption) {
@@ -2651,6 +2657,7 @@
 
     // 2. 鼠标/触屏粉心流光粒子
     function initHeartTrail() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const canvas = document.getElementById('heart-trail-canvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -2816,17 +2823,7 @@
     }
 
     // 📱 PWA / 安卓 App Service Worker 自动注册与强制升级
-    if ('caches' in window) {
-        // 清理旧版本缓存
-        caches.keys().then((keys) => {
-            keys.forEach((key) => {
-                if (key !== 'love-cabin-v3.8') {
-                    caches.delete(key);
-                }
-            });
-        });
-    }
-
+    // Cache migration belongs to the service worker activate event.
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js').then((reg) => {
@@ -2835,5 +2832,51 @@
             }).catch(() => {});
         });
     }
+
+    (function() {
+        initLocalStorageData();
+        initThemeSystem();
+        initRoleSystem();
+        initBackgroundCanvas();
+        initWelcomeToast();
+        initNavigation();
+        initOpeningCurtain(); // 立即初始化信封拆信，防止点不动！
+        initGlobalInteraction();
+        initHeartTrail();
+        initHeartbeatStatus();
+        initReunionInteractive();
+        initTimers();
+        init3DGallery();
+        init3DTiltEffect();
+
+        // Bind every local control immediately, independently of network availability.
+        initWishlist();
+        initStickyNotes();
+        initChatSimulator();
+        initBgmPlayer();
+        initLoveTree();
+        detectApiEndpoint().then(async () => {
+            loadStickyNotesFromServer();
+            // 📢 首先加载本地缓存展示公告栏，随后异步同步云端配置
+            const customAnn = safeGet('config_custom_announcement');
+            if (customAnn) {
+                const banner = document.getElementById('admin-custom-announcement');
+                const text = document.getElementById('announcement-text');
+                if (banner && text) {
+                    text.textContent = customAnn;
+                    banner.style.display = 'block';
+                }
+            }
+
+            // 异步同步云数据库全局配置并刷新界面
+            await syncGlobalConfig();
+
+            // 异步加载日记与决策相关的本地/云端勋章状态
+            checkDiaryAndDecisionBadges();
+
+            // 异步同步云端心愿单列表
+            await loadWishlistFromServer();
+        });
+    })();
 
 })();

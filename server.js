@@ -2,6 +2,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const assets = require('./server-assets');
 
 // 🌤️ 平阳天气服务端代理缓存 (让国内手机客户端免受海外 API 波动影响)
 let serverPingyangWeatherCache = null;
@@ -22,7 +23,13 @@ function getFallbackPingyangWeather() {
     };
 }
 
-function getLivePingyangWeather(cb) {
+function getLivePingyangWeather(callback) {
+    let completed = false;
+    const cb = (...args) => {
+        if (completed) return;
+        completed = true;
+        callback(...args);
+    };
     if (serverPingyangWeatherCache && (Date.now() - serverPingyangWeatherTime < 10 * 60 * 1000)) {
         return cb(null, serverPingyangWeatherCache);
     }
@@ -361,8 +368,17 @@ function getMimeType(filePath) {
 const server = http.createServer((req, res) => {
     // 允许跨域 (CORS) 方便开发与部署后的前后端分离调用
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    try {
+        const parsed = new URL(req.url, 'http://localhost');
+        decodeURIComponent(parsed.pathname);
+    } catch (error) {
+        res.writeHead(400); res.end('Invalid request URL'); return;
+    }
 
     // 自动清除网页、API 数据及样式脚本的浏览器缓存，保证每次打开都是从云端拉取最新的控制数据
     const isStaticMedia = req.url.match(/\.(mp3|wav|mp4|png|jpg|jpeg|webp|gif|ico|svg|pdf|woff|woff2|ttf|zip)$/i);
@@ -1357,7 +1373,7 @@ const server = http.createServer((req, res) => {
     // 4. 获取全局配置
     if (pathname === '/api/config' && req.method === 'GET') {
         let finished = false;
-        
+
         // 10秒超时防护：防止 MongoDB Atlas 冷启动查询挂起导致前端控制台死锁
         const timer = setTimeout(() => {
             if (!finished) {
@@ -1496,7 +1512,7 @@ const server = http.createServer((req, res) => {
                 const newConfig = JSON.parse(body);
                 // 过滤掉 _id 字段防止 mongodb 报错
                 delete newConfig._id;
-                
+
                 // 1. 双向写回本地 config.json 做热备份缓存，防止云数据库超时降级读取时数据不同步
                 ensureConfigFile();
                 fs.readFile(CONFIG_FILE, 'utf8', (err, data) => {
@@ -1543,7 +1559,12 @@ const server = http.createServer((req, res) => {
     // ==========================================
     // 静态资源托管
     // ==========================================
-    let filePath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
+    const filePath = assets.resolvePublicPath(__dirname, pathname);
+    if (!filePath) {
+        res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('此文件不可公开访问');
+        return;
+    }
 
     // 如果路径是目录，默认读取 index.html
     fs.stat(filePath, (err, stats) => {
@@ -1567,51 +1588,7 @@ const server = http.createServer((req, res) => {
 
 // 文件发送处理（支持大文件 HTTP Range 分块加载）
 function serveFile(filePath, req, res) {
-    const contentType = getMimeType(filePath);
-    
-    fs.stat(filePath, (err, stats) => {
-        if (err) {
-            res.writeHead(404);
-            res.end();
-            return;
-        }
-        
-        const fileSize = stats.size;
-        const range = req.headers.range;
-        
-        if (range) {
-            // 处理大音视频 Range 请求，支持浏览器拖动进度条
-            const parts = range.replace(/bytes=/, "").split("-");
-            const start = parseInt(parts[0], 10);
-            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-            
-            if (start >= fileSize) {
-                res.writeHead(416, {
-                    'Content-Range': `bytes */${fileSize}`
-                });
-                res.end();
-                return;
-            }
-            
-            const chunksize = (end - start) + 1;
-            const file = fs.createReadStream(filePath, { start, end });
-            
-            res.writeHead(206, {
-                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': contentType
-            });
-            file.pipe(res);
-        } else {
-            // 普通资源直接流式返回
-            res.writeHead(200, {
-                'Content-Length': fileSize,
-                'Content-Type': contentType
-            });
-            fs.createReadStream(filePath).pipe(res);
-        }
-    });
+    return assets.serveFile(filePath, req, res, getMimeType(filePath));
 }
 
 // ================================================================
@@ -1620,14 +1597,14 @@ function serveFile(filePath, req, res) {
 function checkQuarrelBlock(req, res, next) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = decodeURIComponent(url.pathname);
-    
+
     // 如果是请求 HTML 页面（首页或子页面），且不是 admin 管理后台
     const isHtmlRequest = pathname === '/' || pathname.endsWith('.html') || pathname.endsWith('/');
     const isAdminRequest = pathname.includes('admin.html');
 
     if (isHtmlRequest && !isAdminRequest) {
         let finished = false;
-        
+
         // 2秒超时防挂：若云数据库查询在2秒内没响应，则自动降级执行本地配置文件校验，防止数据库卡顿导致网页打不开
         const timer = setTimeout(() => {
             if (!finished) {
@@ -1703,13 +1680,13 @@ function renderQuarrelPage(customText) {
             --primary: #ff4757;
             --secondary: #ffa502;
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             background: var(--bg-color);
             color: var(--text-color);
@@ -1739,7 +1716,7 @@ function renderQuarrelPage(customText) {
             0% { transform: scale(1); }
             100% { transform: scale(1.05); }
         }
-        
+
         .card {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(25px);
@@ -1840,7 +1817,7 @@ function renderQuarrelPage(customText) {
     `;
 }
 
-server.listen(PORT, () => {
+if (require.main === module) server.listen(PORT, () => {
     console.log(`==================================================`);
     console.log(`❤️ 时光小屋云/本地 Node 后端服务已启动！`);
     console.log(`🌐 监听端口: ${PORT}`);

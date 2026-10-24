@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>留言时光回廊 · 珊珊 & 祖哲</title>
     <!-- FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -410,7 +410,7 @@
             // 降级使用本地 LocalStorage
             const stored = localStorage.getItem('stickyNotes');
             if (stored) {
-                stickyNotes = JSON.parse(stored);
+                try { const data = JSON.parse(stored); stickyNotes = Array.isArray(data) ? data : []; } catch (error) { stickyNotes = []; }
             } else {
                 stickyNotes = [];
             }
@@ -439,6 +439,11 @@
         }
 
         // 渲染页面
+        function escapeHtml(value) {
+            const element = document.createElement('span');
+            element.textContent = String(value ?? '');
+            return element.innerHTML;
+        }
         function renderNotes() {
             const timeline = document.getElementById('notes-timeline');
             const countEl = document.getElementById('notes-count');
@@ -465,23 +470,24 @@
                 item.className = 'timeline-item';
                 
                 // 便签颜色映射
-                const bgClass = `note-bg-${note.color || 'pink'}`;
+                const bgClass = `note-bg-${['pink', 'yellow', 'blue', 'green', 'purple'].includes(note.color) ? note.color : 'pink'}`;
 
                 item.innerHTML = `
                     <div class="timeline-dot"></div>
                     <div class="note-card ${bgClass}">
                         <div class="note-header">
-                            <span class="note-emoji-tag">${note.emoji || '💖'} 悄悄话</span>
-                            <button class="note-delete-btn" onclick="deleteNote(${note.id})" title="彻底撕掉">
+                            <span class="note-emoji-tag">${escapeHtml(note.emoji || '💖')} 悄悄话</span>
+                            <button class="note-delete-btn"  title="彻底撕掉">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
-                        <div class="note-text">${note.text}</div>
+                        <div class="note-text">${escapeHtml(note.text)}</div>
                         <div class="note-footer">
-                            —— ${note.author || '匿名'} (${note.date || ''})
+                            —— ${escapeHtml(note.author || '匿名')} (${escapeHtml(note.date || '')})
                         </div>
                     </div>
                 `;
+                item.querySelector('.note-delete-btn').addEventListener('click', () => deleteNote(note.id));
                 timeline.appendChild(item);
             });
         }

@@ -164,7 +164,12 @@
         camera.lookAt(0, 1.2, 0);
 
         // 3. 轻量极速渲染器 (无昂贵阴影，1.0 像素比，保证零卡顿)
-        renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "high-performance" });
+        try {
+            renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "default" });
+        } catch (error) {
+            container.textContent = '当前设备暂不支持 3D 显示，你仍可使用下方按钮和其他功能。';
+            return;
+        }
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.0));
         renderer.shadowMap.enabled = false;
@@ -2445,6 +2450,12 @@
     // 渲染循环 (极速按需渲染，静止时 0% 负载)
     function animate() {
         animationFrameId = requestAnimationFrame(animate);
+        // Do not update or render a hidden cabin, an inactive tab, or the locked entrance.
+        const viewport = document.getElementById('cabin-3d-viewport');
+        if (document.hidden || !viewport || !viewport.getClientRects().length ||
+            document.documentElement.classList.contains('gate-locked')) return;
+        const bounds = viewport.getBoundingClientRect();
+        if (bounds.bottom < 0 || bounds.top > window.innerHeight) return;
 
         // 0. 电影级平滑运镜视角补间
         if (isCameraAnimating) {

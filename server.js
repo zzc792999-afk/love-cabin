@@ -3,6 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const assets = require('./server-assets');
+const {connectStorage} = require('./cabin-storage.cjs');
 
 // 🌤️ 平阳天气服务端代理缓存 (让国内手机客户端免受海外 API 波动影响)
 let serverPingyangWeatherCache = null;
@@ -98,7 +99,29 @@ const POLAROIDS_FILE = path.join(__dirname, 'other', 'polaroids.json');
 const FOOD_MENU_FILE = path.join(__dirname, 'other', 'food_menu.json');
 const FOOD_ORDERS_FILE = path.join(__dirname, 'other', 'food_orders.json');
 
-if (mongoURI && MongoClient) {
+const postgresURI = process.env.DATABASE_URL || '';
+let postgresStorage = null;
+let postgresInitError = null;
+const databaseReady = postgresURI ? connectStorage(postgresURI).then(storage => {
+    postgresStorage = storage;
+    dbClient = storage;
+    messagesCollection = storage.collection('messages');
+    configCollection = storage.collection('config');
+    wishlistCollection = storage.collection('wishlist');
+    diaryCollection = storage.collection('diary');
+    decisionsCollection = storage.collection('decisions');
+    polaroidsCollection = storage.collection('polaroids');
+    foodMenuCollection = storage.collection('food_menu');
+    foodOrdersCollection = storage.collection('food_orders');
+    console.log('PostgreSQL connected: all eight data collections use persistent cloud storage.');
+    return storage;
+}).catch(error => {
+    postgresInitError = error;
+    console.error('PostgreSQL initialization failed:', error.code || error.name);
+    return null;
+}) : Promise.resolve(null);
+
+if (!postgresURI && mongoURI && MongoClient) {
     console.log("检测到 MONGODB_URI，正在建立云数据库连接...");
     MongoClient.connect(mongoURI)
         .then(client => {
@@ -129,6 +152,10 @@ if (mongoURI && MongoClient) {
 
 // 🔐 等待数据库连接成功的 Promise 辅助方法，防止冷启动期间由于异步建立连接延迟导致 collection 变量为 null
 function getDatabaseCollection(collectionName) {
+    if (postgresURI) return databaseReady.then(storage => {
+        if (!storage) throw postgresInitError || new Error('Database unavailable');
+        return storage.collection(collectionName);
+    });
     return new Promise((resolve) => {
         // 如果没有配置连接串，直接降级
         if (!mongoURI) {
@@ -394,6 +421,12 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    if (postgresURI && !postgresStorage) {
+        res.writeHead(503, {'Content-Type':'application/json; charset=utf-8','Retry-After':'10'});
+        res.end(JSON.stringify({error:'云数据库暂时不可用，请稍后重试；本次操作未写入临时文件。'}));
+        return;
+    }
+
     checkQuarrelBlock(req, res, () => {
         const url = new URL(req.url, `http://${req.headers.host}`);
         const pathname = decodeURIComponent(url.pathname);
@@ -402,6 +435,22 @@ const server = http.createServer((req, res) => {
         if (pathname === '/ping') {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('ok');
+            return;
+        }
+
+        if (pathname === '/api/storage/health' && req.method === 'GET') {
+            if (postgresStorage) {
+                postgresStorage.health().then(() => {
+                    res.writeHead(200, {'Content-Type':'application/json'});
+                    res.end(JSON.stringify({ok:true,storage:'postgresql',persistent:true}));
+                }).catch(() => {
+                    res.writeHead(503, {'Content-Type':'application/json'});
+                    res.end(JSON.stringify({ok:false,storage:'postgresql',persistent:true}));
+                });
+            } else {
+                res.writeHead(200, {'Content-Type':'application/json'});
+                res.end(JSON.stringify({ok:true,storage:messagesCollection?'mongodb':'local-json',persistent:!!messagesCollection}));
+            }
             return;
         }
 
@@ -1478,6 +1527,11 @@ const server = http.createServer((req, res) => {
             });
 
         function serveLocalConfig() {
+            if (postgresURI) {
+                res.writeHead(503, {'Content-Type':'application/json; charset=utf-8'});
+                res.end(JSON.stringify({error:'云配置暂时不可用，请稍后重试'}));
+                return;
+            }
             ensureConfigFile();
             fs.readFile(CONFIG_FILE, 'utf8', (err, data) => {
                 if (err) {
@@ -1612,7 +1666,7 @@ function checkQuarrelBlock(req, res, next) {
                 console.warn("Quarrel check database call timed out, falling back to local configuration.");
                 checkLocalQuarrel(next);
             }
-        }, 2000);
+        }, postgresURI ? 10000 : 2000);
 
         if (configCollection) {
             configCollection.findOne({ id: "global" })
@@ -1645,6 +1699,11 @@ function checkQuarrelBlock(req, res, next) {
     }
 
     function checkLocalQuarrel(nextCallback) {
+        if (postgresURI) {
+            res.writeHead(503, {'Content-Type':'text/plain; charset=utf-8'});
+            res.end('云配置暂时不可用，请稍后重试。');
+            return;
+        }
         ensureConfigFile();
         fs.readFile(CONFIG_FILE, 'utf8', (err, data) => {
             if (!err && data) {
@@ -1817,16 +1876,20 @@ function renderQuarrelPage(customText) {
     `;
 }
 
-if (require.main === module) server.listen(PORT, () => {
-    console.log(`==================================================`);
-    console.log(`❤️ 时光小屋云/本地 Node 后端服务已启动！`);
-    console.log(`🌐 监听端口: ${PORT}`);
-    if (mongoURI) {
-        console.log(`☁️ 留言持久化机制: MongoDB 云端数据库储存`);
-    } else {
-        console.log(`📁 留言持久化机制: 本地 JSON 降级文件储存`);
-    }
-    console.log(`==================================================`);
+server.ready = databaseReady;
+server.on('close', () => {
+    if (postgresStorage) postgresStorage.close().catch(() => {});
+    else if (dbClient && typeof dbClient.close === 'function') dbClient.close().catch(() => {});
 });
-
+if (require.main === module) databaseReady.then(storage => {
+    if (postgresURI && !storage) { process.exitCode = 1; return; }
+    if (process.env.RENDER && !postgresURI && !mongoURI) {
+        console.error('Render requires DATABASE_URL or MONGODB_URI for persistent data.');
+        process.exitCode = 1; return;
+    }
+    server.listen(PORT, () => {
+        console.log('Love Cabin listening on port ' + PORT);
+        console.log('Storage: ' + (postgresURI ? 'PostgreSQL' : mongoURI ? 'MongoDB' : 'local JSON (development only)'));
+    });
+});
 module.exports = server;

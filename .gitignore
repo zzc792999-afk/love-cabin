@@ -3,3 +3,8 @@ node_modules/
 *.log
 
 /music.mp3
+
+.env
+.env.*
+!.env.example
+.neon

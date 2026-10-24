@@ -1,6 +1,7 @@
 const {connectStorage}=require('../cabin-storage.cjs');
 (async()=>{
     if(!process.env.DATABASE_URL)throw new Error('DATABASE_URL is required');
+    process.stdin.setEncoding('utf8');
     let input='';for await(const chunk of process.stdin)input+=chunk;
     const snapshot=JSON.parse(input);
     const storage=await connectStorage(process.env.DATABASE_URL);

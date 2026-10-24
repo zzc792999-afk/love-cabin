@@ -393,6 +393,8 @@ function getMimeType(filePath) {
 }
 
 const server = http.createServer((req, res) => {
+    // Decode across chunk boundaries so Chinese text and emoji remain intact.
+    req.setEncoding('utf8');
     // 允许跨域 (CORS) 方便开发与部署后的前后端分离调用
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, PUT, DELETE, OPTIONS');
@@ -1024,6 +1026,11 @@ const server = http.createServer((req, res) => {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify(docs));
                     } catch (e) {
+                        if (postgresURI) {
+                            res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
+                            res.end(JSON.stringify({ error: '读取云端菜单失败，请稍后重试' }));
+                            return;
+                        }
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify(DEFAULT_FOOD_MENU));
                     }
@@ -1049,6 +1056,11 @@ const server = http.createServer((req, res) => {
                 }
             })
             .catch(err => {
+                if (postgresURI) {
+                    res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ error: '读取云端菜单失败，请稍后重试' }));
+                    return;
+                }
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(DEFAULT_FOOD_MENU));
             });

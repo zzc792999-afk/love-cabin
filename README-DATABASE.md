@@ -68,3 +68,7 @@ npm test 执行静态文件访问限制、PostgreSQL 集合读写、数据类型
 一次性迁移脚本：node --env-file=.env scripts/migrate-postgres.cjs，从标准输入读取受控快照。必须包含 messages、config、wishlist、diary、decisions、polaroids、food_menu、food_orders 八个数据分组。脚本只在迁移标记不存在时导入，不覆盖已有记录。
 
 切勿删除数据库或 cabin_migrations 表来“修复”连接问题。重要数据请定期导出独立备份。浏览器中仅用于界面偏好的本地设置不在这八组服务端数据之外另行同步。
+
+## V6.1 雾玫瑰粉主题
+
+登录页、首页、相册、便签、心愿、食堂和设置统一为雾玫瑰粉主题，采用低饱和渐变、轻透卡片、细边框及柔和阴影；暗色模式使用深玫瑰配色。保留原有数据、共享口令和全部业务接口。设置增加明确的“高级管理后台”入口，指向 /other/admin.html，沿用原有后台密码。

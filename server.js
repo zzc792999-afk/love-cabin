@@ -1,3 +1,4 @@
+const {createNext}=require('./cabin-next.cjs');
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -392,11 +393,12 @@ function getMimeType(filePath) {
     return mimeTypes[ext] || 'application/octet-stream';
 }
 
-const server = http.createServer((req, res) => {
+const nextApp=createNext(getDatabaseCollection);
+const server = http.createServer(async (req, res) => {
     // Decode across chunk boundaries so Chinese text and emoji remain intact.
     req.setEncoding('utf8');
     // 允许跨域 (CORS) 方便开发与部署后的前后端分离调用
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Private APIs use same-origin cookie authentication.
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -429,7 +431,12 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    checkQuarrelBlock(req, res, () => {
+    if(new URL(req.url,'http://localhost').pathname==='/'||new URL(req.url,'http://localhost').pathname==='/index.html'){
+        res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        res.setHeader('X-Frame-Options','DENY');
+    }
+    if(await nextApp(req,res))return;
+    const routeRequest = () => {
         const url = new URL(req.url, `http://${req.headers.host}`);
         const pathname = decodeURIComponent(url.pathname);
 
@@ -1649,7 +1656,10 @@ const server = http.createServer((req, res) => {
             serveFile(filePath, req, res);
         }
     });
-    });
+    };
+    // The rebuilt home remains reachable during a legacy cooling-off mode.
+    const pagePath=new URL(req.url,'http://localhost').pathname;
+    if(pagePath==='/'||pagePath==='/index.html')routeRequest();else checkQuarrelBlock(req,res,routeRequest);
 });
 
 // 文件发送处理（支持大文件 HTTP Range 分块加载）

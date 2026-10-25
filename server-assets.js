@@ -49,6 +49,7 @@ function serveFile(filePath, req, res, contentType) {
             res.removeHeader('Expires');
             headers['Cache-Control'] = /\.(css|js|json)$/i.test(filePath) ? 'public, max-age=0, must-revalidate' : 'public, max-age=86400';
         }
+        if(req.cabinPrivate){headers['Cache-Control']='private, no-store';}
         if (req.headers['if-none-match'] === etag && !/\.html$/i.test(filePath)) {
             res.writeHead(304, headers); return res.end();
         }

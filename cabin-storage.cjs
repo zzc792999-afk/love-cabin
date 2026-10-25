@@ -37,6 +37,17 @@ async function createStorage(pool){
                 try{await client.query('BEGIN');for(const doc of docs){const r=await client.query('INSERT INTO cabin_documents(collection,key,document) VALUES($1,$2,$3::jsonb) ON CONFLICT DO NOTHING',[name,documentKey(doc),JSON.stringify(doc)]);insertedCount+=r.rowCount}await client.query('COMMIT');return {acknowledged:true,insertedCount}}
                 catch(error){await client.query('ROLLBACK');throw error}finally{client.release()}
             },
+            async modifyDocument(filter,transform){
+                const client=await pool.connect();
+                try{
+                    await client.query('BEGIN');
+                    await client.query('INSERT INTO cabin_documents(collection,key,document) VALUES($1,$2,$3::jsonb) ON CONFLICT DO NOTHING',[name,documentKey(filter),JSON.stringify(filter)]);
+                    const {rows}=await client.query('SELECT document FROM cabin_documents WHERE collection=$1 AND key=$2 FOR UPDATE',[name,documentKey(filter)]);
+                    const next=transform(rows[0].document);
+                    await client.query('UPDATE cabin_documents SET document=$3::jsonb WHERE collection=$1 AND key=$2',[name,documentKey(filter),JSON.stringify(next)]);
+                    await client.query('COMMIT');return next;
+                }catch(error){await client.query('ROLLBACK');throw error}finally{client.release()}
+            },
             async updateOne(filter,update,options={}){
                 if(filter.id===undefined||!update.$set)throw new Error('Expected id and $set');
                 const patch={...update.$set,id:filter.id};

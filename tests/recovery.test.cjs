@@ -1,0 +1,11 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const {recoverablePool}=require('../cabin-storage.cjs');
+const reset=()=>Object.assign(Error('Connection terminated unexpectedly'),{code:'ECONNRESET'});
+test('transport recovery retries only standalone reads and never replays writes or transaction statements',async()=>{
+ let nativeCalls=0,fallbackCalls=0;const native={query:async()=>{nativeCalls++;throw reset()},end:async()=>{}};const fallback={query:async()=>{fallbackCalls++;return {rows:[{ok:1}]}},end:async()=>{}};
+ const read=recoverablePool(native,async()=>fallback);assert.equal((await read.query('SELECT 1')).rows[0].ok,1);assert.equal(nativeCalls,1);assert.equal(fallbackCalls,1);await read.end();
+ nativeCalls=0;fallbackCalls=0;const write=recoverablePool(native,async()=>fallback);await assert.rejects(write.query('INSERT INTO anything VALUES(1)'),/terminated/);assert.equal(fallbackCalls,0);await write.query('SELECT 1');assert.equal(fallbackCalls,1);await write.end();
+ let transactionReplay=0,released=false;const transactional={connect:async()=>({query:async()=>{throw reset()},release:()=>released=true}),end:async()=>{}};const safeFallback={query:async()=>{transactionReplay++;return {rows:[]}},end:async()=>{}};const tx=recoverablePool(transactional,async()=>safeFallback),client=await tx.connect();await assert.rejects(client.query('SELECT * FROM important FOR UPDATE'),/terminated/);assert.equal(transactionReplay,0);client.release();assert.equal(released,true);await tx.end();
+});
+test('SQL errors are not treated as a connection outage',async()=>{let promoted=0;const pool=recoverablePool({query:async()=>{throw Object.assign(Error('bad SQL'),{code:'42601'})},end:async()=>{}},async()=>{promoted++;return {end:async()=>{}}});await assert.rejects(pool.query('SELECT bad'),/bad SQL/);assert.equal(promoted,0);await pool.end()});
+
+test('simultaneous failed reads share one transport recovery',async()=>{let switches=0,reads=0;const native={query:async()=>{throw reset()},end:async()=>{}};const fallback={query:async()=>{reads++;return {rows:[{ok:1}]}},end:async()=>{}};const pool=recoverablePool(native,async()=>{switches++;return fallback});const result=await Promise.all([pool.query('SELECT 1'),pool.query('SELECT 2')]);assert.equal(result.length,2);assert.equal(switches,1);assert.equal(reads,2);await pool.end()});

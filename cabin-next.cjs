@@ -33,9 +33,10 @@ function createNext(getCollection,options={}){
    }
    if(!authenticated){if(isApi){send(res,401,{error:'请先输入小屋口令'});return true}res.writeHead(302,{Location:'/?next='+encodeURIComponent(p+url.search)});res.end();return true}
    req.cabinPrivate=true;
-   const adminHash=(await col.findOne({id:'private_cabin_admin_auth'}))?.hash||options.adminPasswordHash||process.env.CABIN_ADMIN_PASSWORD_HASH||'';
+   const needsAdmin=p.startsWith('/api/v2/admin/')||p==='/api/v2/logout'||(p==='/api/food/orders'&&['PUT','DELETE'].includes(req.method))||(p==='/api/food/menu'&&['POST','DELETE'].includes(req.method));
+   const adminHash=needsAdmin?(await col.findOne({id:'private_cabin_admin_auth'}))?.hash||options.adminPasswordHash||process.env.CABIN_ADMIN_PASSWORD_HASH||'':'';
    const adminToken=/(?:^|;\s*)cabin_admin_session=([a-f0-9]{64})(?:;|$)/.exec(req.headers.cookie||'')?.[1];
-   const adminRecord=adminToken?await col.findOne({id:'v2_admin_session:'+hash(adminToken)}):null;
+   const adminRecord=needsAdmin&&adminToken?await col.findOne({id:'v2_admin_session:'+hash(adminToken)}):null;
    const adminVersion=hash(adminHash+':'+current);
    const isAdmin=!!(adminHash&&adminRecord&&adminRecord.expires>Date.now()&&adminRecord.version===adminVersion);
    const adminCookie=(value,age)=>res.appendHeader('Set-Cookie',`cabin_admin_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secure()?'; Secure':''}`);
@@ -49,6 +50,11 @@ function createNext(getCollection,options={}){
    if(p==='/api/v2/admin/logout'&&req.method==='POST'){if(adminToken)await col.deleteOne({id:'v2_admin_session:'+hash(adminToken)});adminCookie('',0);return send(res,200,{ok:true}),true}
    const foodManagement=(p==='/api/food/orders'&&['PUT','DELETE'].includes(req.method))||(p==='/api/food/menu'&&['POST','DELETE'].includes(req.method));
    if(foodManagement&&!isAdmin)return send(res,403,{error:'此操作仅限管理员，请进入餐厅管理后台'}),true;
+   if(p==='/api/v2/admin/kitchen'&&req.method==='GET'){
+    if(!isAdmin)return send(res,403,{error:'请先登录餐厅管理员'}),true;
+    const [orders,menu]=await Promise.all(['food_orders','food_menu'].map(async name=>{const c=await getCollection(name);if(!c)throw Error('Cloud storage required');return c.find({}).toArray()}));
+    return send(res,200,{orders,menu}),true;
+   }
    if(p==='/api/food/orders'&&req.method==='PUT'){
     const b=await readJson(req);if(typeof b.id!=='string'||!['pending','cooking','delivering','completed'].includes(b.status))return send(res,400,{error:'订单或状态无效'}),true;
     const orders=await getCollection('food_orders');if(!orders)return send(res,503,{error:'请先连接云数据库'}),true;const order=await orders.findOne({id:b.id});if(!order)return send(res,404,{error:'订单不存在'}),true;
@@ -66,6 +72,45 @@ function createNext(getCollection,options={}){
    }
    if(p==='/api/food/menu'&&req.method==='DELETE'){
     const dishes=await getCollection('food_menu');if(!dishes)return send(res,503,{error:'请先连接云数据库'}),true;const id=url.searchParams.get('id'),dish=(await dishes.find({}).toArray()).find(d=>String(d.id)===id);if(!dish)return send(res,404,{error:'菜品不存在'}),true;await dishes.deleteOne({id:dish.id});return send(res,200,{success:true}),true;
+   }
+   const legacyFiles={config:'config.json',messages:'messages.json',wishlist:'wishlist.json',diary:'diary.json',decisions:'decisions.json',polaroids:'polaroids.json',food_menu:'food_menu.json',food_orders:'food_orders.json'};
+   const records=async(name,filter={},without=[])=>{
+    const c=await getCollection(name);
+    if(c){if(without.length&&typeof c.withoutFields==='function')return c.withoutFields(filter,without);return c.find(filter).toArray()}
+    const file=path.join(options.root||__dirname,'other',legacyFiles[name]);if(!fs.existsSync(file))return [];
+    const value=JSON.parse(fs.readFileSync(file,'utf8'));return Array.isArray(value)?value:[value];
+   };
+   if(p==='/api/v2/snapshot'&&req.method==='GET'){
+    const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const [configs,messages,wishes,diary,decisions,photos,menu,orders,moods,events]=await Promise.all([
+     records('config',{id:'global'}),records('messages'),records('wishlist',{id:'global_wishlist'}),records('diary'),records('decisions'),records('polaroids',{},['imgData','image','src']),records('food_menu'),records('food_orders'),col.find({kind:'v2_mood',day:today}).toArray(),col.find({kind:'v2_event'}).toArray()]);
+    const cfg=configs.find(x=>x.id==='global')||configs[0]||{};
+    const keys=['config_partner_a','config_partner_b','config_meet_date','config_countdown_title','config_countdown_target','config_custom_announcement','config_photo_list'];
+    const config=Object.fromEntries(keys.filter(k=>Object.hasOwn(cfg,k)).map(k=>[k,cfg[k]]));
+    const polaroids=photos.map(x=>{const {imgData,image,src,...meta}=x;return {...meta,src:'/api/v2/photos/'+encodeURIComponent(String(x.id))}});
+    return send(res,200,{config,messages,wishlist:wishes[0]?.items||(!await getCollection('wishlist')?wishes:[]),diary,decisions,polaroids,menu,orders,next:{moods,events}}),true;
+   }
+   const photo=/^\/api\/v2\/photos\/([^/]{1,160})$/.exec(p);
+   if(photo&&['GET','HEAD'].includes(req.method)){
+    const c=await getCollection('polaroids');let item=c?await c.findOne({id:photo[1]}):(await records('polaroids')).find(x=>String(x.id)===photo[1]);if(!item&&c&&/^\d+$/.test(photo[1]))item=await c.findOne({id:Number(photo[1])});
+    if(!item)return send(res,404,{error:'照片已移除'}),true;
+    const source=item.imgData||item.image||item.src||'';if(typeof source!=='string'||!source.trim())return send(res,404,{error:'照片链接无效'}),true;if(source.length>17*1024*1024)return send(res,413,{error:'照片数据过大'}),true;
+    const match=/^data:image\/(jpeg|png|webp|gif);base64,([a-z0-9+/=\s]+)$/i.exec(source);
+    if(match){const bytes=Buffer.from(match[2].replace(/\s/g,''),'base64');if(!bytes.length||bytes.length>12*1024*1024)return send(res,413,{error:'照片数据过大或无效'}),true;res.writeHead(200,{'Content-Type':'image/'+match[1].toLowerCase(),'Content-Length':bytes.length,'Cache-Control':'private, no-store'});res.end(req.method==='HEAD'?undefined:bytes);return true}
+    try{const target=new URL(source,'http://'+req.headers.host+'/');if(!['http:','https:'].includes(target.protocol)||(target.host===req.headers.host&&target.pathname===p))throw Error();const location=target.host===req.headers.host?target.pathname+target.search+target.hash:target.href;res.writeHead(302,{Location:location,'Cache-Control':'private, no-store'});res.end();return true}catch{return send(res,404,{error:'照片链接无效'}),true}
+   }
+   if(p==='/api/v2/orders'&&req.method==='POST'){
+    const b=await readJson(req);
+    if(typeof b.id!=='string'||!/^ord_[a-f0-9-]{36}$/.test(b.id)||!['zuzhe','shanshan'].includes(b.role)||typeof b.note!=='string'||b.note.length>100||!Array.isArray(b.items)||!b.items.length||b.items.length>30||b.items.some(i=>!i||!['string','number'].includes(typeof i.id)||!Number.isInteger(i.quantity)||i.quantity<1||i.quantity>20)||new Set(b.items.map(i=>JSON.stringify(i.id))).size!==b.items.length)return send(res,400,{error:'请检查餐单和数量，每道菜最多 20 份'}),true;
+    const orders=await getCollection('food_orders'),dishes=await getCollection('food_menu');if(!orders||!dishes)return send(res,503,{error:'需要连接云数据库才能下单'}),true;
+    const requestHash=hash(JSON.stringify({role:b.role,note:b.note.trim(),items:[...b.items].sort((a,b)=>String(a.id).localeCompare(String(b.id)))}));
+    const existing=await orders.findOne({id:b.id});if(existing)return send(res,existing.requestHash===requestHash?200:409,existing.requestHash===requestHash?{success:true,order:existing}:{error:'餐单内容已变化，请重新确认后下单'}),true;
+    const menu=await dishes.find({}).toArray();const items=[];
+    for(const line of b.items){const dish=menu.find(d=>d.id===line.id&&d.available!==false);if(!dish)return send(res,409,{error:'有菜品已下架，请刷新菜单后再确认'}),true;items.push({id:dish.id,name:dish.name,emoji:dish.emoji,price:Number(dish.price)||0,quantity:line.quantity})}
+    const cfg=await col.findOne({id:'global'})||{},customer=b.role==='zuzhe'?(cfg.config_partner_a||'陈祖哲'):(cfg.config_partner_b||'白珊珊');
+    const order={id:b.id,customer,author:customer,items,note:b.note.trim(),total:Math.round(items.reduce((n,x)=>n+x.price*x.quantity,0)*100)/100,status:'pending',timestamp:Date.now(),requestHash};
+    await orders.insertOne(order);const saved=await orders.findOne({id:b.id});if(saved.requestHash!==requestHash)return send(res,409,{error:'这份餐单已提交过不同内容，请重新确认'}),true;
+    return send(res,200,{success:true,order:saved}),true;
    }
    const state=async()=>({moods:await col.find({kind:'v2_mood'}).toArray(),events:await col.find({kind:'v2_event'}).toArray()});
    if(p==='/api/v2/state'&&req.method==='GET')return send(res,200,await state()),true;

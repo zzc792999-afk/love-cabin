@@ -27,6 +27,11 @@ async function createStorage(pool){
         }
         return {
             find,
+            async withoutFields(filter,fields){
+                if(!Array.isArray(fields)||fields.some(x=>typeof x!=='string'))throw Error('Invalid projection');
+                const result=await pool.query('SELECT document - $3::text[] AS document FROM cabin_documents WHERE collection=$1 AND document @> $2::jsonb ORDER BY sequence ASC',[name,JSON.stringify(filter),fields]);
+                return result.rows.map(row=>row.document);
+            },
             async findOne(filter){return (await find(filter).limit(1).toArray())[0]||null},
             async insertOne(doc){
                 const result=await pool.query('INSERT INTO cabin_documents(collection,key,document) VALUES($1,$2,$3::jsonb) ON CONFLICT DO NOTHING',[name,documentKey(doc),JSON.stringify(doc)]);
@@ -91,22 +96,29 @@ async function createStorage(pool){
         close:()=>pool.end()
     };
 }
-async function connectStorage(connectionString){
-    const options={connectionString,max:5,connectionTimeoutMillis:15000,idleTimeoutMillis:30000,query_timeout:15000};
-    async function initialize(pool){
-        pool.on('error',()=>console.error('PostgreSQL connection interrupted; subsequent requests will retry.'));
-        try{return await createStorage(pool)}catch(error){await pool.end();throw error}
+const networkFailure=error=>['ECONNRESET','ETIMEDOUT','ECONNREFUSED','EPIPE','ENETUNREACH','57P01','57P02','57P03'].includes(error?.code)||/terminated unexpectedly|connection terminated|connection timeout|query read timeout|socket hang up/i.test(error?.message||'');
+function recoverablePool(initial,createFallback){
+    let active=initial,promoting;const pools=new Set([initial]),closing=new Map();
+    const close=pool=>{if(!closing.has(pool))closing.set(pool,Promise.resolve().then(()=>pool.end()).catch(()=>{}));return closing.get(pool)};
+    async function promote(error){
+        if(!networkFailure(error)||!createFallback)throw error;if(active!==initial)return active;
+        if(!promoting)promoting=Promise.resolve().then(createFallback).then(pool=>{pools.add(pool);active=pool;close(initial);console.warn('PostgreSQL network interrupted; subsequent queries use the same database over secure WebSocket.');return pool}).catch(e=>{promoting=null;throw e});
+        return promoting;
     }
-    try{return await initialize(new Pool(options))}catch(error){
-        const isNeon=/(^|\.)neon\.tech$/.test(new URL(connectionString).hostname);
-        const networkFailure=['ECONNRESET','ETIMEDOUT','ECONNREFUSED'].includes(error.code)||/terminated unexpectedly|timeout/i.test(error.message);
-        if(!isNeon||!networkFailure)throw error;
-        // Some networks block native PostgreSQL TCP. The secure WebSocket transport
-        // reaches the exact same database and retains transaction semantics.
-        const {Pool:WebSocketPool,neonConfig}=require('@neondatabase/serverless');
-        neonConfig.webSocketConstructor=globalThis.WebSocket;
-        console.warn('PostgreSQL TCP unavailable; retrying the same Neon database over secure WebSocket.');
-        return initialize(new WebSocketPool(options));
-    }
+    return {
+        async query(sql,args){const pool=active;try{return await pool.query(sql,args)}catch(error){if(pool!==initial||!networkFailure(error))throw error;const fallback=await promote(error);if(/^\s*SELECT\b/i.test(typeof sql==='string'?sql:sql.text||''))return fallback.query(sql,args);throw error}},
+        async connect(){let client;try{client=await active.connect()}catch(error){client=await (await promote(error)).connect()}
+            return {async query(sql,args){try{return await client.query(sql,args)}catch(error){if(networkFailure(error)&&active===initial)await promote(error).catch(()=>{});throw error}},release:(...args)=>client.release(...args)};
+        },
+        async end(){await Promise.all([...pools].map(close))}
+    };
 }
-module.exports={createStorage,connectStorage,COLLECTIONS};
+async function connectStorage(connectionString){
+    const options={connectionString,max:5,connectionTimeoutMillis:15000,idleTimeoutMillis:10000,query_timeout:15000,keepAlive:true,keepAliveInitialDelayMillis:1000};
+    const isNeon=/(^|\.)neon\.tech$/.test(new URL(connectionString).hostname);
+    const listen=pool=>{pool.on('error',()=>console.error('PostgreSQL connection interrupted; subsequent requests will reconnect.'));return pool};
+    const websocket=()=>{const {Pool:WebSocketPool,neonConfig}=require('@neondatabase/serverless');neonConfig.webSocketConstructor=globalThis.WebSocket;return listen(new WebSocketPool(options))};
+    const pool=recoverablePool(listen(new Pool(options)),isNeon?websocket:null);
+    try{return await createStorage(pool)}catch(error){await pool.end();if(!isNeon||!networkFailure(error))throw error;console.warn('PostgreSQL TCP unavailable; initializing the same database over secure WebSocket.');const fallback=websocket();try{return await createStorage(fallback)}catch(e){await fallback.end();throw e}}
+}
+module.exports={createStorage,connectStorage,COLLECTIONS,recoverablePool};

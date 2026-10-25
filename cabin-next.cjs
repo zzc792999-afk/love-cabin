@@ -9,9 +9,9 @@ function localCollection(root){const file=path.join(root,'.private','cabin-next.
 function createNext(getCollection,options={}){
  const fallback=localCollection(options.root||__dirname);const collection=async()=>await getCollection('config')||fallback;const attempts=new Map();const secure=()=>process.env.NODE_ENV==='production'||!!process.env.RENDER;
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data))};
- const cookie=(res,value,age)=>res.setHeader('Set-Cookie',`cabin_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secure()?'; Secure':''}`);
+ const cookie=(res,value,age)=>res.appendHeader('Set-Cookie',`cabin_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secure()?'; Secure':''}`);
  return async(req,res)=>{
-  const url=new URL(req.url,'http://localhost'),p=url.pathname;
+  const url=new URL(req.url,'http://localhost'),p=decodeURIComponent(url.pathname);
   if(p==='/ping'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:'ok');return true}
   const publicFiles=['/','/index.html','/manifest.json','/sw.js','/js/cabin-next.js','/js/cabin-next.css','/images/icon-192.png','/images/icon-512.png'];
   const isAuth=p.startsWith('/api/v2/'),isApi=p.startsWith('/api/');
@@ -33,9 +33,39 @@ function createNext(getCollection,options={}){
    }
    if(!authenticated){if(isApi){send(res,401,{error:'请先输入小屋口令'});return true}res.writeHead(302,{Location:'/?next='+encodeURIComponent(p+url.search)});res.end();return true}
    req.cabinPrivate=true;
-   if(p==='/api/v2/logout'&&req.method==='POST'){if(token)await col.deleteOne({id:'v2_session:'+hash(token)});cookie(res,'',0);return send(res,200,{ok:true}),true}
+   const adminHash=(await col.findOne({id:'private_cabin_admin_auth'}))?.hash||options.adminPasswordHash||process.env.CABIN_ADMIN_PASSWORD_HASH||'';
+   const adminToken=/(?:^|;\s*)cabin_admin_session=([a-f0-9]{64})(?:;|$)/.exec(req.headers.cookie||'')?.[1];
+   const adminRecord=adminToken?await col.findOne({id:'v2_admin_session:'+hash(adminToken)}):null;
+   const adminVersion=hash(adminHash+':'+current);
+   const isAdmin=!!(adminHash&&adminRecord&&adminRecord.expires>Date.now()&&adminRecord.version===adminVersion);
+   const adminCookie=(value,age)=>res.appendHeader('Set-Cookie',`cabin_admin_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${secure()?'; Secure':''}`);
+   if(p==='/api/v2/admin/session'&&req.method==='GET')return send(res,200,{authenticated:isAdmin,configured:!!adminHash}),true;
+   if(p==='/api/v2/admin/login'&&req.method==='POST'){
+    if(!adminHash)return send(res,503,{error:'管理员登录尚未配置，请联系维护者'}),true;
+    const key='admin:'+(req.socket.remoteAddress||'global'),now=Date.now();let a=attempts.get(key);if(!a||now-a.start>900000){a={start:now,count:0};attempts.set(key,a)}if(++a.count>15)return send(res,429,{error:'管理员登录尝试过多，请 15 分钟后重试'}),true;
+    const b=await readJson(req);if(!await verify(b.password,adminHash))return send(res,401,{error:'管理员密码不正确'}),true;
+    const session=randomBytes(32).toString('hex');await col.updateOne({id:'v2_admin_session:'+hash(session)},{$set:{kind:'v2_admin_session',expires:now+8*3600000,version:adminVersion}},{upsert:true});adminCookie(session,8*3600);attempts.delete(key);for(const row of await col.find({kind:'v2_admin_session'}).toArray())if(row.expires<now)await col.deleteOne({id:row.id});return send(res,200,{ok:true}),true;
+   }
+   if(p==='/api/v2/admin/logout'&&req.method==='POST'){if(adminToken)await col.deleteOne({id:'v2_admin_session:'+hash(adminToken)});adminCookie('',0);return send(res,200,{ok:true}),true}
+   const foodManagement=(p==='/api/food/orders'&&['PUT','DELETE'].includes(req.method))||(p==='/api/food/menu'&&['POST','DELETE'].includes(req.method));
+   if(foodManagement&&!isAdmin)return send(res,403,{error:'此操作仅限管理员，请进入餐厅管理后台'}),true;
+   if(p==='/api/food/orders'&&req.method==='PUT'){
+    const b=await readJson(req);if(typeof b.id!=='string'||!['pending','cooking','delivering','completed'].includes(b.status))return send(res,400,{error:'订单或状态无效'}),true;
+    const orders=await getCollection('food_orders');if(!orders)return send(res,503,{error:'请先连接云数据库'}),true;const order=await orders.findOne({id:b.id});if(!order)return send(res,404,{error:'订单不存在'}),true;
+    await orders.updateOne({id:b.id},{$set:{status:b.status,updateTime:Date.now()}});return send(res,200,{success:true,id:b.id,status:b.status}),true;
+   }
+
+   if(p==='/api/v2/logout'&&req.method==='POST'){if(adminToken)await col.deleteOne({id:'v2_admin_session:'+hash(adminToken)});adminCookie('',0);if(token)await col.deleteOne({id:'v2_session:'+hash(token)});cookie(res,'',0);return send(res,200,{ok:true}),true}
    if(p==='/api/v2/password'&&req.method==='PUT'){
     const b=await readJson(req);if(!await verify(b.currentPassword,current))return send(res,403,{error:'原口令不正确'}),true;if(typeof b.password!=='string'||b.password.length<12||b.password.length>128)return send(res,400,{error:'新口令需要 12–128 个字符'}),true;await col.updateOne({id:'private_cabin_auth'},{$set:{hash:await passwordHash(b.password)}},{upsert:true});cookie(res,'',0);return send(res,200,{ok:true}),true;
+   }
+   if(p==='/api/food/menu'&&req.method==='POST'){
+    const b=await readJson(req);if(typeof b.name!=='string'||!b.name.trim()||b.name.length>50||typeof b.desc!=='string'||b.desc.length>160||typeof b.emoji!=='string'||b.emoji.length>12||typeof b.category!=='string'||!b.category.trim()||b.category.length>30||!Number.isFinite(b.price)||b.price<0||b.price>9999)return send(res,400,{error:'请检查菜名、图标、分类和价格'}),true;
+    const dishes=await getCollection('food_menu');if(!dishes)return send(res,503,{error:'请先连接云数据库'}),true;if((await dishes.find({}).toArray()).length>=100)return send(res,409,{error:'菜单最多 100 道菜，请先整理'}),true;
+    const dish={id:'dish_'+randomUUID(),name:b.name.trim(),desc:b.desc.trim(),emoji:b.emoji,category:b.category.trim(),price:b.price,available:true};await dishes.insertOne(dish);return send(res,200,{success:true,dish}),true;
+   }
+   if(p==='/api/food/menu'&&req.method==='DELETE'){
+    const dishes=await getCollection('food_menu');if(!dishes)return send(res,503,{error:'请先连接云数据库'}),true;const id=url.searchParams.get('id'),dish=(await dishes.find({}).toArray()).find(d=>String(d.id)===id);if(!dish)return send(res,404,{error:'菜品不存在'}),true;await dishes.deleteOne({id:dish.id});return send(res,200,{success:true}),true;
    }
    const state=async()=>({moods:await col.find({kind:'v2_mood'}).toArray(),events:await col.find({kind:'v2_event'}).toArray()});
    if(p==='/api/v2/state'&&req.method==='GET')return send(res,200,await state()),true;

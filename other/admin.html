@@ -721,7 +721,7 @@
             <div class="header-title">
                 <h1><i class="fas fa-toolbox"></i> 时光小屋上帝管理控制台</h1>
             </div>
-            <a href="../index.html" class="btn-home"><i class="fas fa-home"></i> 返回小屋首页</a>
+            <a href="/kitchen-admin.html" class="btn-home">餐厅管理后台 ↗</a><a href="../index.html" class="btn-home"><i class="fas fa-home"></i> 返回小屋首页</a>
         </header>
 
         <!-- 标签选择器 -->
@@ -1398,8 +1398,6 @@
     <div id="admin-toast"></div>
 
     <script>
-        // 🔑 后台登录密码 (设为: zuzhe0118)
-        const ADMIN_PWD = 'zuzhe0118';
 
         // 🎫 预设扭蛋奖品列表
         const DEFAULT_PRIZES = [
@@ -1512,23 +1510,14 @@
         const adminPanel = document.getElementById('admin-panel');
 
         // 验证动作
-        function attemptLogin() {
-            if (loginPass.value === ADMIN_PWD) {
-                // 解锁成功
-                loginOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loginOverlay.style.display = 'none';
-                    adminPanel.style.display = 'flex';
-                    initAdminData();
-                }, 500);
-            } else {
-                loginError.style.opacity = '1';
-                loginPass.value = '';
-                loginPass.focus();
-                setTimeout(() => {
-                    loginError.style.opacity = '0';
-                }, 2000);
-            }
+        async function attemptLogin() {
+            loginSubmit.disabled=true;
+            try {
+                const response=await fetch('/api/v2/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:loginPass.value})});
+                if(!response.ok)throw Error('login');
+                loginPass.value='';loginOverlay.style.display='none';adminPanel.style.display='flex';initAdminData();
+            } catch(error) {loginError.style.opacity='1';loginPass.value='';loginPass.focus();setTimeout(()=>loginError.style.opacity='0',2000)}
+            finally {loginSubmit.disabled=false}
         }
 
         loginSubmit.addEventListener('click', attemptLogin);

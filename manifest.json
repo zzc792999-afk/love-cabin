@@ -4,8 +4,8 @@
   "description": "属于两个人的时光小屋，收藏每个平凡又珍贵的日常。",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#fff3f7",
-  "theme_color": "#fff3f7",
+  "background_color": "#fdfafb",
+  "theme_color": "#fdfafb",
   "orientation": "portrait",
   "icons": [
     {

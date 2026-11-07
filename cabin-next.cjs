@@ -13,7 +13,7 @@ function createNext(getCollection,options={}){
  return async(req,res)=>{
   const url=new URL(req.url,'http://localhost'),p=decodeURIComponent(url.pathname);
   if(p==='/ping'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:'ok');return true}
-  const publicFiles=['/','/index.html','/manifest.json','/sw.js','/js/cabin-next.js','/js/cabin-next.css','/images/icon-192.png','/images/icon-512.png'];
+  const publicFiles=['/','/index.html','/dongzhi.html','/other/dongzhi.html','/manifest.json','/sw.js','/js/cabin-next.js','/js/cabin-next.css','/images/icon-192.png','/images/icon-512.png'];
   const isAuth=p.startsWith('/api/v2/'),isApi=p.startsWith('/api/');
   if(publicFiles.includes(p))return false;
   try{

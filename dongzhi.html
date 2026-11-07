@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d111a">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>冬至长夜 · 哲哲 🐂 ✕ 珊珊 🐰</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-night: #0a0e17;
+            --bg-card: rgba(22, 28, 42, 0.72);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --border-glass: rgba(255, 255, 255, 0.12);
+            --border-glow: rgba(245, 158, 11, 0.35);
+            
+            --amber-warm: #fbbf24;
+            --amber-deep: #d97706;
+            --amber-glow: rgba(251, 191, 36, 0.28);
+            
+            --rose-soft: #fda4af;
+            --rose-glow: rgba(253, 164, 175, 0.25);
+            
+            --frost-blue: #bae6fd;
+            --snow-white: #f8fafc;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-night);
+            background-image: 
+                radial-gradient(ellipse 90% 60% at 50% 0%, rgba(30, 58, 102, 0.35) 0%, transparent 75%),
+                radial-gradient(ellipse 80% 50% at 50% 100%, rgba(88, 28, 54, 0.2) 0%, transparent 80%),
+                linear-gradient(180deg, #090d16 0%, #0d121d 50%, #080c14 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: calc(50px + env(safe-area-inset-bottom, 20px));
+        }
+
+        /* ❄️ 全屏沉浸式漫天落雪画布 */
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 顶部安全区与浮动控制栏 */
+        .top-navbar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            padding: calc(env(safe-area-inset-top, 12px) + 8px) 20px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(10, 14, 23, 0.65);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--rose-soft);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(253, 164, 175, 0.1);
+            border: 1px solid rgba(253, 164, 175, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .audio-toggle-btn {
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: var(--amber-warm);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.84rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        .audio-toggle-btn.playing {
+            background: rgba(251, 191, 36, 0.25);
+            box-shadow: 0 0 16px var(--amber-glow);
+        }
+
+        /* 主体内容容器 */
+        .container {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 20px 18px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 🌌 顶部诗意开篇 */
+        .hero-section {
+            text-align: center;
+            padding: 24px 10px 32px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.78rem;
+            color: var(--frost-blue);
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            line-height: 1.38;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(180deg, #ffffff 10%, #fde68a 65%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.7;
+            font-weight: 300;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        .hero-couples {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+            font-size: 0.88rem;
+            color: var(--rose-soft);
+        }
+        .hero-couples .heart-beat {
+            color: #f43f5e;
+            animation: heartPulse 1.8s infinite;
+        }
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.22); }
+        }
+
+        /* 🧊 卡片通用玻璃拟态 */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 22px 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--snow-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        /* 🌘 模块一：昼夜消长与白昼倒计时 */
+        .solstice-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--snow-white);
+        }
+        .stat-value.amber { color: var(--amber-warm); }
+        .stat-value.blue { color: var(--frost-blue); }
+
+        .stat-unit {
+            font-size: 0.75rem;
+            font-weight: normal;
+            color: var(--text-sub);
+            margin-left: 2px;
+        }
+
+        .light-progress-wrap {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .light-progress-title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: var(--text-sub);
+        }
+
+        .light-bar-outer {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .light-bar-inner {
+            height: 100%;
+            width: 43%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24, #f43f5e);
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .light-note {
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        /* 🪟 模块二：互动擦拭起雾车窗玻璃 (Interactive Foggy Window) */
+        .frost-window-container {
+            position: relative;
+            width: 100%;
+            height: 270px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: #0d131f;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+            touch-action: none;
+        }
+
+        /* 窗外底层的浪漫告白画面 */
+        .window-underlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            background: 
+                radial-gradient(circle at 50% 40%, rgba(251, 191, 36, 0.18) 0%, transparent 60%),
+                linear-gradient(180deg, #131929 0%, #1f182c 100%);
+            z-index: 1;
+        }
+
+        .underlay-moon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.6));
+        }
+
+        .underlay-poem {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.6;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .underlay-sub {
+            font-size: 0.82rem;
+            color: var(--rose-soft);
+            letter-spacing: 0.5px;
+        }
+
+        .underlay-signature {
+            font-size: 0.75rem;
+            color: var(--amber-warm);
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* 覆盖在上面的起雾画布 */
+        #fog-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .window-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .window-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--frost-blue);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .window-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 🍲 模块三：冬至暖胃小食堂 (Interactive Steaming Bowls) */
+        .delicacy-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .delicacy-tab {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .delicacy-tab.active {
+            background: rgba(251, 191, 36, 0.14);
+            border-color: rgba(251, 191, 36, 0.45);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .delicacy-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .delicacy-name {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            display: block;
+        }
+        .delicacy-tab.active .delicacy-name {
+            color: var(--amber-warm);
+            font-weight: 600;
+        }
+
+        .steaming-bowl-stage {
+            background: radial-gradient(circle at 50% 65%, rgba(245, 158, 11, 0.12) 0%, transparent 65%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+        }
+
+        .steam-particles {
+            font-size: 1.2rem;
+            animation: riseSteam 2.5s infinite ease-in;
+            opacity: 0.7;
+            display: inline-block;
+        }
+        @keyframes riseSteam {
+            0% { transform: translateY(6px) scale(0.9); opacity: 0; }
+            50% { opacity: 0.85; }
+            100% { transform: translateY(-16px) scale(1.15); opacity: 0; }
+        }
+
+        .current-bowl-emoji {
+            font-size: 3.4rem;
+            display: block;
+            margin: 4px 0 12px;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bowl-taste-desc {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--snow-white);
+            margin-bottom: 6px;
+        }
+
+        .bowl-whisper {
+            font-size: 0.85rem;
+            color: var(--amber-warm);
+            line-height: 1.5;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .feed-btn {
+            margin-top: 14px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: none;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+            transition: all 0.25s ease;
+        }
+        .feed-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 💌 模块四：长夜情书（真实细腻，零AI味） */
+        .letter-card {
+            background: linear-gradient(175deg, rgba(255, 250, 240, 0.08) 0%, rgba(25, 20, 32, 0.8) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            position: relative;
+        }
+        .letter-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--amber-warm), transparent);
+        }
+
+        .letter-heading {
+            font-size: 0.92rem;
+            color: var(--rose-soft);
+            margin-bottom: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .letter-body {
+            font-size: 0.93rem;
+            line-height: 1.85;
+            color: #f1f5f9;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+        .letter-body p {
+            margin-bottom: 14px;
+            text-indent: 1.5em;
+        }
+        .letter-body p.no-indent {
+            text-indent: 0;
+        }
+        .letter-highlight {
+            color: var(--amber-warm);
+            font-weight: 500;
+        }
+
+        .letter-footer {
+            margin-top: 24px;
+            text-align: right;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 14px;
+        }
+        .letter-author {
+            font-size: 0.92rem;
+            color: var(--rose-soft);
+            font-weight: 600;
+        }
+        .letter-date {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* 🧤 模块五：长按把手塞进口袋暖手 (Tactile Hand-Warming) */
+        .pocket-stage {
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .pocket-touch-area {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(244, 63, 94, 0.22) 0%, rgba(255, 255, 255, 0.04) 70%);
+            border: 2px dashed rgba(244, 63, 94, 0.45);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            touch-action: none;
+        }
+        .pocket-touch-area.holding {
+            border-color: #f43f5e;
+            background: radial-gradient(circle, rgba(244, 63, 94, 0.45) 0%, rgba(251, 191, 36, 0.2) 75%);
+            box-shadow: 0 0 35px rgba(244, 63, 94, 0.5);
+            transform: scale(1.06);
+        }
+
+        .pocket-icon {
+            font-size: 2.6rem;
+            margin-bottom: 4px;
+            transition: transform 0.2s;
+        }
+        .pocket-touch-area.holding .pocket-icon {
+            transform: scale(1.18);
+        }
+
+        .pocket-temp-display {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--amber-warm);
+            margin-bottom: 6px;
+        }
+
+        .pocket-tip {
+            font-size: 0.84rem;
+            color: var(--text-sub);
+            min-height: 24px;
+        }
+
+        /* 🌸 模块六：冬至九九消寒九瓣花 */
+        .nine-petals-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        .petal-item {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .petal-item.lit {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.6);
+            color: var(--amber-warm);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+            font-weight: 700;
+        }
+
+        /* 底部操作与心跳标记 */
+        .footer-action-row {
+            text-align: center;
+            margin-top: 28px;
+        }
+        .footer-cabin-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .footer-cabin-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: var(--rose-soft);
+        }
+
+        /* 吐司提示框 */
+        #toast-notice {
+            position: fixed;
+            bottom: calc(30px + env(safe-area-inset-bottom, 10px));
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid var(--border-glow);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 999;
+            white-space: nowrap;
+        }
+        #toast-notice.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ❄️ 漫天慢速柔和雪花粒子 -->
+    <canvas id="snow-canvas"></canvas>
+
+    <!-- 顶部导航 -->
+    <header class="top-navbar">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-home"></i> 返回时光小屋
+        </a>
+        <button id="toggle-fireplace-btn" class="audio-toggle-btn" type="button">
+            <i class="fas fa-fire"></i> <span>壁炉白噪音</span>
+        </button>
+    </header>
+
+    <main class="container">
+        
+        <!-- 🌌 顶部标题 -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                <i class="fas fa-snowflake"></i> 2026 冬至专属 · 岁暮长夜
+            </div>
+            <h1 class="hero-title">在夜最长的一天<br>想你最深</h1>
+            <p class="hero-subtitle">
+                北半球日照最短的这一天，每一缕微风都在提醒我：<br>
+                这个冬天有你在，手心里就一直有温度。
+            </p>
+            <div class="hero-couples">
+                <span>处女座笨笨牛 🐂 哲哲</span>
+                <i class="fas fa-heart heart-beat"></i>
+                <span>白羊座小兔 🐰 珊珊</span>
+            </div>
+        </section>
+
+        <!-- 🌘 模块一：昼夜消长与光之倒计时 -->
+        <section class="glass-card">
+            <div class="card-header-row">
+                <div class="card-title">
+                    <i class="fas fa-moon" style="color: var(--amber-warm);"></i> 极夜与回春
+                </div>
+                <div class="card-subtitle">温州平阳 · 冬至节气</div>
+            </div>
+
+            <div class="solstice-stat-grid">
+                <div class="stat-item">
+                    <div class="stat-label">今日最短白昼</div>
+                    <div class="stat-value amber">10<span class="stat-unit">小时</span>18<span class="stat-unit">分</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">今晚最长黑夜</div>
+                    <div class="stat-value blue">13<span class="stat-unit">小时</span>42<span class="stat-unit">分</span></div>
+                </div>
+            </div>
+
+            <div class="light-progress-wrap">
+                <div class="light-progress-title">
+                    <span>从明天起 · 白昼重长</span>
+                    <span id="light-increase-text">+1分42秒 / 天</span>
+                </div>
+                <div class="light-bar-outer">
+                    <div class="light-bar-inner"></div>
+                </div>
+                <p class="light-note">
+                    ✨ “黑夜不会一直漫长下去。从明天清晨开始，每一天的太阳都会比前一天多陪你一会儿——就像我想你一样，一日深过一日。”
+                </p>
+            </div>
+        </section>
+
+        <!-- 🪟 模块二：互动擦拭起雾车窗玻璃 (Scratch to Reveal Love Message) -->
+        <section class="glass-card">
+            <div class="card-header-row">
+                <div class="card-title">
+                    <i class="fas fa-hand-sparkles" style="color: var(--rose-soft);"></i> 擦开起雾的窗
+                </div>
+                <div class="card-subtitle">用手指抹去窗霜</div>
+            </div>
+
+            <div class="frost-window-container" id="window-container">
+                <!-- 窗底告白图景 -->
+                <div class="window-underlay">
+                    <div class="underlay-moon">🌕✨</div>
+                    <div class="underlay-poem">“外面下着雪，<br>但我的手在替你暖着口袋。”</div>
+                    <div class="underlay-sub">珊珊宝贝，冬至快乐 ❤️</div>
+                    <div class="underlay-signature">—— 永远守护你的笨笨牛 🐂</div>
+                </div>
+                <!-- 雾气画布 -->
+                <canvas id="fog-canvas"></canvas>
+            </div>
+
+            <div class="window-toolbar">
+                <span>👈 手指或鼠标在玻璃上擦拭有惊喜</span>
+                <button type="button" id="btn-refrost" class="window-btn">
+                    <i class="fas fa-wind"></i> 再哈一口热气
+                </button>
+            </div>
+        </section>
+
+        <!-- 🍲 模块三：冬至暖胃小食堂 (Feed Interaction) -->
+        <section class="glass-card">
+            <div class="card-header-row">
+                <div class="card-title">
+                    <i class="fas fa-bowl-rice" style="color: var(--amber-warm);"></i> 暖冬小食堂
+                </div>
+                <div class="card-subtitle">趁热吃，甜到心坎里</div>
+            </div>
+
+            <!-- 四味选择器 -->
+            <div class="delicacy-selector">
+                <div class="delicacy-tab active" data-type="tangyuan">
+                    <span class="delicacy-icon">⚪</span>
+                    <span class="delicacy-name">黑芝麻汤圆</span>
+                </div>
+                <div class="delicacy-tab" data-type="xiaoyuanzi">
+                    <span class="delicacy-icon">🍯</span>
+                    <span class="delicacy-name">红糖小圆子</span>
+                </div>
+                <div class="delicacy-tab" data-type="jiaozi">
+                    <span class="delicacy-icon">🥟</span>
+                    <span class="delicacy-name">热气水饺</span>
+                </div>
+                <div class="delicacy-tab" data-type="hongshu">
+                    <span class="delicacy-icon">🍠</span>
+                    <span class="delicacy-name">烤红薯奶茶</span>
+                </div>
+            </div>
+
+            <!-- 热气舞台 -->
+            <div class="steaming-bowl-stage">
+                <div class="steam-particles">♨️ ♨️ ♨️</div>
+                <span class="current-bowl-emoji" id="current-food-emoji">⚪🥣</span>
+                <div class="bowl-taste-desc" id="current-food-title">黑芝麻流心汤圆</div>
+                <div class="bowl-whisper" id="current-food-whisper">
+                    “咬开一口是浓浓的芝麻香，第一口必须给珊珊，因为你比甜汤还要甜～”
+                </div>
+                <button type="button" class="feed-btn" id="btn-feed-action">
+                    <i class="fas fa-heart"></i> 投喂珊珊一口
+                </button>
+            </div>
+        </section>
+
+        <!-- 🧤 模块四：长按把手塞进口袋暖手 (Tactile Interaction) -->
+        <section class="glass-card">
+            <div class="card-header-row">
+                <div class="card-title">
+                    <i class="fas fa-mitten" style="color: var(--rose-soft);"></i> 大衣口袋里的暖意
+                </div>
+                <div class="card-subtitle">长按感受手心温度</div>
+            </div>
+
+            <div class="pocket-stage">
+                <div class="pocket-touch-area" id="pocket-touch-area">
+                    <span class="pocket-icon">🧤</span>
+                    <span style="font-size:0.75rem; color:#f8fafc; font-weight:600;">长按暖手</span>
+                </div>
+                <div class="pocket-temp-display" id="pocket-temp-val">15.0 ℃</div>
+                <p class="pocket-tip" id="pocket-tip-text">按住上方口袋不松开，哲哲的大衣口袋为你升温～</p>
+            </div>
+        </section>
+
+        <!-- 🌸 模块五：九九消寒 · 待春归 -->
+        <section class="glass-card">
+            <div class="card-header-row">
+                <div class="card-title">
+                    <i class="fas fa-spa" style="color: var(--amber-warm);"></i> 九九消寒 · 待春归
+                </div>
+                <div class="card-subtitle">点亮属于我们的暖冬小灯</div>
+            </div>
+
+            <p style="font-size:0.84rem; color:var(--text-sub); line-height: 1.6;">
+                冬至交节，数九寒天开始。每过九天点亮一盏灯，等九朵花瓣全部点亮，我们相约的第一缕春风就要吹来了。
+            </p>
+
+            <div class="nine-petals-grid" id="petals-grid">
+                <!-- 9个格子动态渲染 -->
+            </div>
+        </section>
+
+        <!-- 返回主站按钮 -->
+        <div class="footer-action-row">
+            <a href="index.html" class="footer-cabin-btn">
+                <i class="fas fa-heart"></i> 回到属于我们俩的时光小屋
+            </a>
+        </div>
+
+    </main>
+
+    <!-- 吐司通知条 -->
+    <div id="toast-notice"></div>
+
+    <script>
+        // ==========================================
+        // 1. ❄️ Canvas 漫天落雪柔和粒子特效
+        // ==========================================
+        (function initSnow() {
+            const canvas = document.getElementById('snow-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            const flakes = [];
+            const flakeCount = 45; // 保持性能与纯粹浪漫感，不卡顿
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < flakeCount; i++) {
+                flakes.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 2.2 + 0.8,
+                    d: Math.random() * flakeCount,
+                    speed: Math.random() * 0.6 + 0.4,
+                    opacity: Math.random() * 0.5 + 0.25,
+                    swing: Math.random() * 1.5
+                });
+            }
+
+            let angle = 0;
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                angle += 0.01;
+                for (let i = 0; i < flakeCount; i++) {
+                    const f = flakes[i];
+                    f.y += f.speed;
+                    f.x += Math.sin(angle + f.d) * 0.5;
+
+                    if (f.y > h + 10) {
+                        f.y = -10;
+                        f.x = Math.random() * w;
+                    }
+
+                    ctx.beginPath();
+                    ctx.fillStyle = `rgba(248, 250, 252, ${f.opacity})`;
+                    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, false);
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ==========================================
+        // 2. 🪟 互动起雾玻璃擦拭 (Frosted Window Scratch)
+        // ==========================================
+        (function initFrostWindow() {
+            const canvas = document.getElementById('fog-canvas');
+            const container = document.getElementById('window-container');
+            const btnRefrost = document.getElementById('btn-refrost');
+            if (!canvas || !container) return;
+
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let scratchedRatio = 0;
+
+            function initCanvas() {
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                refrost();
+            }
+
+            function refrost() {
+                ctx.globalCompositeOperation = 'source-over';
+                // 绘制带微冷雾感与磨砂水汽质感的雾层
+                ctx.fillStyle = 'rgba(28, 38, 56, 0.94)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 添加微弱水汽反光
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+                grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)');
+                grad.addColorStop(1, 'rgba(186, 230, 253, 0.1)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 绘制初雪霜花小点点
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                for (let i = 0; i < 40; i++) {
+                    const rx = Math.random() * canvas.width;
+                    const ry = Math.random() * canvas.height;
+                    const rr = Math.random() * 2;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, rr, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // 在雾气中央隐约写一个可爱提示
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('❄️ 起雾啦 · 用手指擦擦看 ❄️', canvas.width / 2, canvas.height / 2);
+            }
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function scratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 22, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+
+            function onStart(e) {
+                isDrawing = true;
+                const pos = getPos(e);
+                scratch(pos.x, pos.y);
+            }
+
+            function onMove(e) {
+                if (!isDrawing) return;
+                const pos = getPos(e);
+                scratch(pos.x, pos.y);
+            }
+
+            function onEnd() {
+                isDrawing = false;
+            }
+
+            canvas.addEventListener('mousedown', onStart);
+            canvas.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            canvas.addEventListener('touchstart', onStart, { passive: true });
+            canvas.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
+
+            if (btnRefrost) {
+                btnRefrost.addEventListener('click', () => {
+                    refrost();
+                    showToast('💨 哈了一口热气，窗户又起雾啦～');
+                });
+            }
+
+            window.addEventListener('resize', initCanvas);
+            setTimeout(initCanvas, 100);
+        })();
+
+        // ==========================================
+        // 3. 🍲 冬至小食堂互动投喂逻辑
+        // ==========================================
+        (function initFoodSection() {
+            const FOOD_DATA = {
+                tangyuan: {
+                    emoji: '⚪🥣',
+                    title: '黑芝麻流心汤圆',
+                    whisper: '“白白软软的汤圆出锅啦！吹一吹再咬，第一口必须给珊珊，因为你比甜汤还要甜～”'
+                },
+                xiaoyuanzi: {
+                    emoji: '🍯🥣',
+                    title: '暖胃红糖酒酿桂花小圆子',
+                    whisper: '“深冬夜晚喝一口热热的红糖甜汤，胃里暖洋洋的。臭臭会一直照顾好珊珊宝贝！”'
+                },
+                jiaozi: {
+                    emoji: '🥟🥢',
+                    title: '热气腾腾的水饺',
+                    whisper: '“冬至吃水饺，不怕冻耳朵～哲哲已经替小兔把每一个水饺吹凉啦，快张嘴！mua~”'
+                },
+                hongshu: {
+                    emoji: '🍠☕',
+                    title: '刚出炉的烤红薯与热可可',
+                    whisper: '“烤得流蜜的红薯捧在手心里烫烫的，像极了我见到你时加速跳动的心脏～”'
+                }
+            };
+
+            const tabs = document.querySelectorAll('.delicacy-tab');
+            const emojiEl = document.getElementById('current-food-emoji');
+            const titleEl = document.getElementById('current-food-title');
+            const whisperEl = document.getElementById('current-food-whisper');
+            const feedBtn = document.getElementById('btn-feed-action');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const type = tab.getAttribute('data-type');
+                    const d = FOOD_DATA[type];
+                    if (!d) return;
+
+                    emojiEl.style.transform = 'scale(0.7)';
+                    setTimeout(() => {
+                        emojiEl.textContent = d.emoji;
+                        titleEl.textContent = d.title;
+                        whisperEl.textContent = d.whisper;
+                        emojiEl.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            if (feedBtn) {
+                feedBtn.addEventListener('click', () => {
+                    emojiEl.style.transform = 'scale(1.25) rotate(6deg)';
+                    setTimeout(() => {
+                        emojiEl.style.transform = 'scale(1) rotate(0deg)';
+                    }, 350);
+                    showToast('🥄 投喂成功！珊珊把热气腾腾的爱意吃进肚子里啦 ❤️');
+                });
+            }
+        })();
+
+        // ==========================================
+        // 4. 🧤 长按大衣口袋暖手互动 (Tactile Temperature)
+        // ==========================================
+        (function initPocketTouch() {
+            const area = document.getElementById('pocket-touch-area');
+            const tempVal = document.getElementById('pocket-temp-val');
+            const tipText = document.getElementById('pocket-tip-text');
+            if (!area || !tempVal) return;
+
+            let timer = null;
+            let currentTemp = 15.0;
+            const targetTemp = 52.0; // 52.0℃ 象征我爱你
+
+            function startWarming() {
+                area.classList.add('holding');
+                tipText.textContent = '🔥 哲哲的大衣口袋正在为你发热中……不要松开哦！';
+                tipText.style.color = '#f43f5e';
+
+                if (navigator.vibrate) {
+                    try { navigator.vibrate([40, 60, 40]); } catch(e) {}
+                }
+
+                clearInterval(timer);
+                timer = setInterval(() => {
+                    if (currentTemp < targetTemp) {
+                        currentTemp = Math.min(targetTemp, +(currentTemp + 1.2).toFixed(1));
+                        tempVal.textContent = currentTemp.toFixed(1) + ' ℃';
+                        
+                        if (currentTemp >= 52.0) {
+                            tipText.textContent = '❤️ 52.0℃ 心动沸点！哲哲已经紧紧握住珊珊的手啦～';
+                            if (navigator.vibrate) {
+                                try { navigator.vibrate([60, 100, 60, 100, 120]); } catch(e) {}
+                            }
+                        }
+                    }
+                }, 80);
+            }
+
+            function stopWarming() {
+                area.classList.remove('holding');
+                clearInterval(timer);
+                if (currentTemp < 52.0) {
+                    tipText.textContent = '手拿出来了，温度慢慢散开啦。冷了随时再伸进哲哲的口袋！';
+                    tipText.style.color = 'var(--text-sub)';
+                    timer = setInterval(() => {
+                        if (currentTemp > 15.0) {
+                            currentTemp = Math.max(15.0, +(currentTemp - 2.5).toFixed(1));
+                            tempVal.textContent = currentTemp.toFixed(1) + ' ℃';
+                        } else {
+                            clearInterval(timer);
+                        }
+                    }, 100);
+                }
+            }
+
+            area.addEventListener('mousedown', startWarming);
+            window.addEventListener('mouseup', stopWarming);
+
+            area.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startWarming();
+            }, { passive: false });
+            window.addEventListener('touchend', stopWarming);
+            window.addEventListener('touchcancel', stopWarming);
+        })();
+
+        // ==========================================
+        // 5. 🌸 九九消寒图（点亮冬至九瓣花瓣）
+        // ==========================================
+        (function initNinePetals() {
+            const grid = document.getElementById('petals-grid');
+            if (!grid) return;
+
+            const savedLit = JSON.parse(localStorage.getItem('dongzhi_petals_lit') || '[0]');
+
+            for (let i = 0; i < 9; i++) {
+                const item = document.createElement('div');
+                item.className = 'petal-item' + (savedLit.includes(i) ? ' lit' : '');
+                item.textContent = ['一九', '二九', '三九', '四九', '五九', '六九', '七九', '八九', '九九'][i];
+                item.title = `第 ${i+1} 九`;
+
+                item.addEventListener('click', () => {
+                    item.classList.toggle('lit');
+                    const nowLit = [];
+                    grid.querySelectorAll('.petal-item').forEach((el, idx) => {
+                        if (el.classList.contains('lit')) nowLit.push(idx);
+                    });
+                    localStorage.setItem('dongzhi_petals_lit', JSON.stringify(nowLit));
+                    showToast(`✨ 点亮了属于我们的【${item.textContent}】春之期盼！`);
+                });
+
+                grid.appendChild(item);
+            }
+        })();
+
+        // ==========================================
+        // 6. 🔥 纯净 Web Audio API 合成壁炉火焰白噪音
+        // ==========================================
+        (function initFireplaceAudio() {
+            const btn = document.getElementById('toggle-fireplace-btn');
+            if (!btn) return;
+
+            let audioCtx = null;
+            let isPlaying = false;
+            let noiseNode = null;
+            let gainNode = null;
+
+            function startFireplaceSound() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                // 创建粉红噪声模拟壁炉燃烧声
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+                    b6 = white * 0.115926;
+                }
+
+                noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = buffer;
+                noiseNode.loop = true;
+
+                // 滤波器削减高频，呈现炉火低沉暖意
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 600;
+
+                gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.35, audioCtx.currentTime);
+
+                noiseNode.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                noiseNode.start();
+                isPlaying = true;
+                btn.classList.add('playing');
+                btn.innerHTML = '<i class="fas fa-fire-flame-curved"></i> <span>壁炉温暖中</span>';
+                showToast('🔥 已点燃冬夜壁炉，静静听着柴火的声音～');
+            }
+
+            function stopFireplaceSound() {
+                if (noiseNode) {
+                    try { noiseNode.stop(); noiseNode.disconnect(); } catch(e) {}
+                }
+                isPlaying = false;
+                btn.classList.remove('playing');
+                btn.innerHTML = '<i class="fas fa-fire"></i> <span>壁炉白噪音</span>';
+            }
+
+            btn.addEventListener('click', () => {
+                if (isPlaying) {
+                    stopFireplaceSound();
+                } else {
+                    startFireplaceSound();
+                }
+            });
+        })();
+
+        // ==========================================
+        // 7. 吐司消息提醒
+        // ==========================================
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notice');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2600);
+        }
+    </script>
+</body>
+</html>

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>300天纪念 · 笨笨牛 🐂 守护 珊珊小兔 🐰💖</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>我们的第 300 天 · 哲哲和珊珊</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -26,7 +25,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', 'OPPOSans', 'OPlusSans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
@@ -743,6 +742,77 @@
         #story-finale p { margin-bottom: 14px; color: var(--text-sub); line-height: 1.8; }
         #story-letter-button { border: 0; border-radius: 30px; background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold)); padding: 12px 24px; color: #2b1836; font-weight: 800; cursor: pointer; }
         @media (prefers-reduced-motion: reduce) { #story-progress-fill { transition: none; } }
+
+        /* 像一本私人纪念册：纸张、墨色和一点手写感 */
+        :root {
+            --rose-gold: #8d5b53;
+            --pink-accent: #a97065;
+            --text-main: #292825;
+            --text-sub: #68615a;
+            --glass-bg: #fffdf8;
+            --glass-border: #dfd6ca;
+        }
+        * { user-select: text; }
+        body { background: #f5f0e8; background-size: auto; animation: none; }
+        #bg-canvas, #sparkle-canvas { display: none; }
+        #main-container { max-width: 860px; padding-top: 22px; }
+        .hero-banner, .story-journey, .synergy-board, .game-panel-card, .wish-section {
+            box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+        }
+        .hero-banner {
+            min-height: 320px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+            text-align: left; padding: clamp(32px, 7vw, 62px); border: 1px solid #dfd6ca;
+            border-radius: 4px; background: #eae0d3; position: relative; overflow: hidden;
+        }
+        .hero-signatures { display: flex; align-items: center; gap: 15px; margin-top: 22px; opacity: .85; }
+        .hero-signatures img { width: 130px; max-height: 55px; object-fit: contain; mix-blend-mode: multiply; }
+        .hero-signatures img:first-child { width: 160px; }
+        .hero-signatures span { font-family: Georgia, serif; font-style: italic; color: #8d5b53; }
+        .banner-tag { background: none; color: #785a51; padding: 0; border-radius: 0; font-size: .76rem; letter-spacing: .12em; font-weight: 600; }
+        .big-300-title { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(6rem, 18vw, 10rem); font-weight: 400; letter-spacing: -.09em; background: none; -webkit-text-fill-color: #292825; text-shadow: none; margin: 0 0 9px; }
+        .banner-subtitle { color: #544d46; font-size: .95rem; font-weight: 400; }
+        .story-journey { background: #fffdf8; border-radius: 4px; padding: clamp(30px, 6vw, 60px); }
+        .story-journey::before { display: none; }
+        .story-kicker, .story-date { color: #8d5b53; }
+        .story-journey h2, .story-chapter h3 { font-family: Georgia, 'Songti SC', 'SimSun', serif; color: #292825; font-weight: 400; }
+        .story-lead, .story-chapter p { color: #68615a; }
+        .story-progress { color: #8d5b53; }
+        .story-progress-track { background: #e6dbcd; }
+        #story-progress-fill { background: #9e695d; }
+        .story-chapters::before { background: #d7c3b3; }
+        .story-chapter { background: #faf7f1; border-color: #e5dace; border-radius: 3px; box-shadow: none; }
+        .story-chapter::before { border-color: #fffdf8; background: #9e695d; box-shadow: 0 0 0 1px #9e695d; }
+        .story-open { color: #8d5b53; border-color: #a97065; }
+        .story-open:hover { color: #513b33; }
+        .story-hidden { background: #f1e8dc; border-color: #a97065; border-radius: 0; }
+        #story-finale { background: #f1e8dc; border-radius: 3px; }
+        #story-letter-button, .action-btn, .wish-add-btn, .pwd-submit-btn { background: #8d5b53; color: #fff; box-shadow: none; }
+        #lock-screen { background: #f5f0e8; backdrop-filter: none; }
+        .avatar-circle { box-shadow: none; border: 1px solid #d8c8b8; background: #eee2d4; animation: none; }
+        .lock-title { background: none; -webkit-text-fill-color: #292825; }
+        .lock-subtitle { color: #68615a; }
+        .pwd-input-field { background: #fffdf8; border-color: #d8c8b8; color: #292825; }
+        .pwd-input-field:focus { box-shadow: none; }
+        .game-nav-tabs { margin-top: 20px; }
+        .game-tab-btn { background: #fffdf8; color: #544d46; border-color: #dfd6ca; backdrop-filter: none; box-shadow: none; }
+        .game-tab-btn.active, .game-tab-btn:hover { background: #8d5b53; color: #fff; border-color: #8d5b53; box-shadow: none; }
+        .game-panel-card, .wish-section, .synergy-board, .profile-card { background: #fffdf8; border: 1px solid #dfd6ca; border-radius: 4px; }
+        .game-panel-header h3, .synergy-header h3, .profile-info h4 { color: #292825; }
+        .game-panel-header p, .syn-title, .profile-info p { color: #68615a; }
+        .wish-input-field { background: #faf7f1; border-color: #dfd6ca; color: #292825; }
+        .wish-bubble { background: #faf7f1; border-color: #dfd6ca; }
+        #letter-container { background: #fffdf8; border: 1px solid #dfd6ca; border-radius: 4px; box-shadow: none; backdrop-filter: none; padding: clamp(28px, 6vw, 58px); }
+        .letter-title { color: #8d5b53; text-align: left; font-weight: 600; }
+        .letter-content { color: #39352f; line-height: 2.1; text-align: left; user-select: text; }
+        .letter-sign-block { color: #8d5b53; }
+        .tool-circle-btn { background: #fffdf8; color: #544d46; border-color: #dfd6ca; box-shadow: none; }
+        .tool-circle-btn:hover { background: #eee2d4; }
+        .extras { margin-bottom: 24px; }
+        .extras > summary { cursor: pointer; list-style: none; padding: 18px 21px; background: #eae0d3; border: 1px solid #dfd6ca; border-radius: 3px; color: #544d46; font-size: .92rem; }
+        .extras > summary::-webkit-details-marker { display: none; }
+        .extras > summary::after { content: '+'; float: right; font-size: 1.3rem; line-height: .8; }
+        .extras[open] > summary::after { content: '−'; }
+        @media (max-width: 600px) { .hero-banner { min-height: 270px; } .hero-signatures img { width: 90px; } .hero-signatures img:first-child { width: 110px; } .story-journey { padding: 25px 20px; } }
     </style>
 </head>
 <body>
@@ -761,12 +831,12 @@
             <div style="font-size: 1.6rem;">💖</div>
             <div class="avatar-circle avatar-rabbit" title="白珊珊 · 珊珊小兔 🐰">🐰</div>
         </div>
-        <div class="lock-title">🔐 笨笨牛 🐂 守护 珊珊小兔 🐰💖</div>
-        <div class="lock-subtitle">输入专属密码，解锁属于哲哲与珊珊的 300 天浪漫宇宙</div>
+        <div class="lock-title">我们的第 300 天</div>
+        <div class="lock-subtitle">输入页面口令，继续往下看。</div>
         <div class="pwd-input-group">
             <input type="password" id="pwd-field" class="pwd-input-field" maxlength="6" inputmode="numeric" placeholder="••••••" autofocus>
-            <button class="pwd-submit-btn" onclick="checkUnlockPassword()">解锁 300 天浪漫 💖</button>
-            <div id="pwd-err-text" class="pwd-err-msg">密码有误，请重新输入哦 💔</div>
+            <button class="pwd-submit-btn" onclick="checkUnlockPassword()">打开页面</button>
+            <div id="pwd-err-text" class="pwd-err-msg">口令不对，请重试。</div>
         </div>
     </div>
 
@@ -775,110 +845,78 @@
 
         <!-- 顶部 300 天英雄卡片 -->
         <div class="hero-banner">
-            <div class="banner-tag">🌸 处女座笨笨牛 ✕ 白羊座珊珊兔 💖</div>
+            <div class="banner-tag">笨笨牛和珊珊兔 · 2026.11.13</div>
             <div class="big-300-title">300</div>
-            <div class="banner-subtitle">在一起第 300 天 · 专属浪漫里程碑</div>
+            <div class="banner-subtitle">2026 年 11 月 13 日，是重新在一起的第 300 天。</div>
+            <div class="hero-signatures"><img src="images/1.jpg" alt="哲哲的手写名字"><span>&amp;</span><img src="images/2.jpg" alt="珊珊的手写名字"></div>
         </div>
 
         <section class="story-journey" aria-labelledby="story-title">
-            <p class="story-kicker">OUR STORY · 从相遇到今天</p>
-            <h2 id="story-title">把 300 天，<br>翻成我们的故事。</h2>
-            <p class="story-lead">从初次相识，到重新牵起手，再到每一个普通的今天。轻点四个章节，最后有一封写给你的信。</p>
+            <p class="story-kicker">留给以后的我们</p>
+            <h2 id="story-title">这页先从<br>我们认识那天写起。</h2>
+            <p class="story-lead">有些细节我还没写下来。先记住三个日期，剩下的，等我们一起慢慢补。</p>
             <div class="story-progress" aria-live="polite"><span id="story-progress-text">已翻开 0 / 4 章</span><div class="story-progress-track" aria-hidden="true"><span id="story-progress-fill"></span></div></div>
             <div class="story-chapters">
                 <article class="story-chapter">
-                    <span class="story-date">2024.05.03 · 故事的开头</span>
-                    <h3>第一次，我们走进彼此的生活</h3>
-                    <p>有些日子当时看起来普通，后来却成了故事的第一页。</p>
+                    <span class="story-date">2024.05.03</span>
+                    <h3>第一次认识</h3>
+                    <p>先把这天记下来。</p>
                     <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-1">翻开这一页 ↗</button>
-                    <div class="story-hidden" id="story-memory-1" hidden><p>2024 年 5 月 3 日，笨笨牛与珊珊兔初次相识。我们也许还不知道，往后会有这么多值得一起记住的日子。</p></div>
+                    <div class="story-hidden" id="story-memory-1" hidden><p>那天的天气、第一句话、是谁先笑的……这些细节，想留给我们自己来写。</p></div>
                 </article>
                 <article class="story-chapter">
-                    <span class="story-date">2026.01.18 · 新的一页</span>
-                    <h3>这一次，重新牵起你的手</h3>
-                    <p>重新靠近，是我们给彼此的一次认真选择。</p>
+                    <span class="story-date">2026.01.18</span>
+                    <h3>我们重新在一起</h3>
+                    <p>300 天从这里开始算。</p>
                     <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-2">翻开这一页 ↗</button>
-                    <div class="story-hidden" id="story-memory-2" hidden><p>从 2026 年 1 月 18 日起，我们又开始并肩往前走。之后的 300 天，每一天都在续写这个选择。</p></div>
+                    <div class="story-hidden" id="story-memory-2" hidden><p>这一天比漂亮的话更重要。我们又选择了彼此。</p></div>
                 </article>
                 <article class="story-chapter">
-                    <span class="story-date">第 1 天 — 第 299 天 · 日常</span>
-                    <h3>喜欢，藏在许多小事里</h3>
-                    <p>不是每一天都有大事发生，但一起走过的日常，本身就很珍贵。</p>
+                    <span class="story-date">中间的日子</span>
+                    <h3>那些还没写下来的事</h3>
+                    <p>这里先留一页空白。</p>
                     <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-3">翻开这一页 ↗</button>
-                    <div class="story-hidden" id="story-memory-3" hidden><p>分享心情、想念对方、把一件小事讲给对方听。那些只有我们懂的瞬间，慢慢变成了“我们”的样子。</p></div>
+                    <div class="story-hidden" id="story-memory-3" hidden><p>以后可以放一张照片，也可以只写一句话。真正发生过的小事，比任何现成的情话都好。</p></div>
                 </article>
                 <article class="story-chapter">
-                    <span class="story-date">2026.11.13 · 第 300 天</span>
-                    <h3>今天，故事还在继续</h3>
-                    <p>300 天是一个值得停下来拥抱的路标，也是下一段故事的起点。</p>
+                    <span class="story-date">2026.11.13</span>
+                    <h3>第 300 天</h3>
+                    <p>做了这张页面，想把这一天留住。</p>
                     <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-4">翻开这一页 ↗</button>
-                    <div class="story-hidden" id="story-memory-4" hidden><p>谢谢你一直在这里。笨笨牛与珊珊兔的故事，已经写到第 300 天；未来还有很多空白页，想和你一起慢慢填满。</p></div>
+                    <div class="story-hidden" id="story-memory-4" hidden><p>等再过一阵子回来看，希望我们还能记起这一天的样子。</p></div>
                 </article>
             </div>
-            <div id="story-finale" hidden><p>四个章节都翻开了。故事的最后，还有一封只写给你的信。</p><button id="story-letter-button" type="button">拆开 300 天的信 💌</button></div>
+            <div id="story-finale" hidden><p>翻完了。还有一封信。</p><button id="story-letter-button" type="button">读那封信 →</button></div>
         </section>
 
+        <details class="extras" id="extras">
+            <summary>想玩一会儿？这里还有胡萝卜、八音盒和许愿瓶</summary>
         <!-- 🎮 互动玩法导航标签 -->
         <div class="game-nav-tabs">
-            <button class="game-tab-btn active" onclick="switchGameMode('arcade')">🎮 抓胡萝卜街机</button>
-            <button class="game-tab-btn" onclick="switchGameMode('pull')">🌾 拔胡萝卜说情话</button>
-            <button class="game-tab-btn" onclick="switchGameMode('slot')">🎰 恋爱摇奖大冒险</button>
-            <button class="game-tab-btn" onclick="switchGameMode('piano')">🎹 八音盒弹奏</button>
-            <button class="game-tab-btn" onclick="switchGameMode('wishes')">🌟 许愿瓶</button>
+            <button class="game-tab-btn active" onclick="switchGameMode('arcade')">接胡萝卜</button>
+            <button class="game-tab-btn" onclick="switchGameMode('pull')">拔胡萝卜</button>
+            <button class="game-tab-btn" onclick="switchGameMode('slot')">今天做什么</button>
+            <button class="game-tab-btn" onclick="switchGameMode('piano')">八音盒</button>
+            <button class="game-tab-btn" onclick="switchGameMode('wishes')">许愿瓶</button>
         </div>
 
-        <!-- 🐮 & 🐰 个人档案卡 -->
-        <div class="profiles-grid">
-            <div class="profile-card card-zuzhe">
-                <div class="profile-header">
-                    <div class="profile-icon">🐮</div>
-                    <div class="profile-info">
-                        <h4>陈祖哲 (哲哲) 👨</h4>
-                        <p>2009年09月22日 生</p>
-                    </div>
-                </div>
-                <div class="badges-list">
-                    <span class="mini-tag">🐂 属牛 (踏实深情)</span>
-                    <span class="mini-tag">♍ 处女座 (细腻包容)</span>
-                </div>
-            </div>
-            <div class="profile-card card-shanshan">
-                <div class="profile-header">
-                    <div class="profile-icon">🐰</div>
-                    <div class="profile-info">
-                        <h4>白珊珊 (珊珊) 🌸</h4>
-                        <p>2011年04月17日 生</p>
-                    </div>
-                </div>
-                <div class="badges-list">
-                    <span class="mini-tag">🐰 属兔 (灵动可爱)</span>
-                    <span class="mini-tag">♈ 白羊座 (热情真诚)</span>
-                    <span class="mini-tag">💖 最爱粉色</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 天数与契约仪表盘 -->
+        <!-- 只留下与这段故事有关的日期 -->
         <div class="synergy-board">
             <div class="synergy-header">
-                <h3>💖 笨笨牛 ✕ 珊珊兔 的心动契约仪表盘</h3>
+                <h3>三个日期</h3>
             </div>
             <div class="synergy-items">
                 <div class="syn-box">
-                    <div class="syn-title">初次相识 (2024-05-03)</div>
+                    <div class="syn-title">第一次认识 · 2024.05.03</div>
                     <div class="syn-value" id="disp-meet-days">0 天</div>
                 </div>
                 <div class="syn-box">
-                    <div class="syn-title">重新复合 (2026-01-18)</div>
+                    <div class="syn-title">重新在一起 · 2026.01.18</div>
                     <div class="syn-value" id="disp-reunion-days">0 天</div>
                 </div>
                 <div class="syn-box">
-                    <div class="syn-title">300 天倒计时 (2026-11-13)</div>
+                    <div class="syn-title">第 300 天 · 2026.11.13</div>
                     <div class="syn-value" id="disp-countdown" style="font-size: 1.05rem; line-height: 1.4;">计算中...</div>
-                </div>
-                <div class="syn-box">
-                    <div class="syn-title">生肖契约度</div>
-                    <div class="syn-value" style="color: var(--rose-gold);">100% 默契绝配</div>
                 </div>
             </div>
         </div>
@@ -886,8 +924,8 @@
         <!-- 🎮 玩法一：接胡萝卜 Canvas 街机 -->
         <div id="mode-arcade" class="game-panel-card game-block">
             <div class="game-panel-header">
-                <h3><i class="fas fa-gamepad" style="color: var(--rose-gold);"></i> 小牛接胡萝卜街机大作战 🐮🥕</h3>
-                <p>左右控制小牛 🐮 接住落下的胡萝卜 🥕 与爱心 💖，避开小闹钟 ⏰！拿到 100 分解锁真心话情书！</p>
+                <h3>接胡萝卜</h3>
+                <p>左右移动接胡萝卜和爱心，避开小闹钟。100 分也能打开那封信。</p>
             </div>
             <div id="arcade-canvas-box">
                 <canvas id="arcade-canvas"></canvas>
@@ -906,8 +944,8 @@
         <!-- 🌾 玩法二：拔胡萝卜听甜言蜜语 -->
         <div id="mode-pull" class="game-panel-card game-block" style="display: none;">
             <div class="game-panel-header">
-                <h3><i class="fas fa-carrot" style="color: var(--pink-accent);"></i> 帮处女座小牛 🐮 给珊珊小兔 🐰 拔胡萝卜！</h3>
-                <p>依次拔出农场里的 8 根爱心胡萝卜 🥕，听听属于你们的甜言蜜语！</p>
+                <h3>拔胡萝卜</h3>
+                <p>八根胡萝卜，八张小纸条。都拔完也能打开那封信。</p>
             </div>
             <div class="carrot-field" id="carrot-grid">
                 <!-- 动态渲染 -->
@@ -920,8 +958,8 @@
         <!-- 🎰 玩法三：摇奖机 -->
         <div id="mode-slot" class="game-panel-card game-block" style="display: none;">
             <div class="game-panel-header">
-                <h3><i class="fas fa-dice" style="color: var(--rose-gold);"></i> 处女座 ✕ 白羊座 恋爱大冒险摇奖机 🎰</h3>
-                <p>拉动摇杆，摇出今天属于你们两人的甜蜜大冒险挑战！</p>
+                <h3>今天做什么</h3>
+                <p>拿不定主意的时候，抽一件简单的小事。</p>
             </div>
             <div class="slot-machine-box">
                 <div class="slot-display" id="slot-result-display">
@@ -934,8 +972,8 @@
         <!-- 🎹 玩法四：真实物理八音盒与乐谱指南 (手机横排适配) -->
         <div id="mode-piano" class="game-panel-card game-block" style="display: none;">
             <div class="game-panel-header">
-                <h3><i class="fas fa-music" style="color: var(--pink-accent);"></i> 笨笨牛与珊珊兔的物理晶体八音盒 🎹</h3>
-                <p>采用标准 C4-C5 十二平均律精准音高 & 真实晶体叮咚音色 decay 包络</p>
+                <h3>八音盒</h3>
+                <p>随便按几下，也可以跟着下面的简谱弹。</p>
             </div>
 
             <!-- 琴键行 (适配手机宽与触摸) -->
@@ -990,8 +1028,8 @@
 
         <!-- 🌟 玩法五：许愿瓶 -->
         <div id="mode-wishes" class="wish-section game-block" style="display: none;">
-            <h3 style="color: var(--pink-accent); font-size: 1.15rem; margin-bottom: 6px;"><i class="fas fa-magic"></i> 300 天许愿瓶</h3>
-            <p style="font-size: 0.8rem; color: var(--text-sub);">写入你想对珊珊/哲哲许下的 300 天愿望</p>
+            <h3 style="color: var(--pink-accent); font-size: 1.15rem; margin-bottom: 6px;">许愿瓶</h3>
+            <p style="font-size: 0.8rem; color: var(--text-sub);">想一起做的事，先放在这里。</p>
             <div class="wish-input-box">
                 <input type="text" id="wish-input" class="wish-input-field" placeholder="许下一个美好的愿望..." maxlength="50">
                 <button class="wish-add-btn" onclick="addWishToBottle()">塞入星瓶 ✨</button>
@@ -1001,15 +1039,16 @@
             </div>
         </div>
 
-        <!-- 💌 影院级真心话情书面板 -->
+        </details>
+        <!-- 留给珊珊的一封信 -->
         <div id="letter-container">
             <div class="letter-title">
-                💌 处女座小牛写给白羊座珊珊兔的 300 天真心话
+                给珊珊的一封信
             </div>
             <div class="letter-content" id="letter-text-box"></div><span class="typing-cursor" id="cursor-element"></span>
             <div class="letter-sign-block" id="sign-box">
-                永远守护珊珊的笨笨牛 哲哲 🐮💖<br>
-                <span style="font-size: 0.82rem; color: var(--text-sub);">2026年11月13日 · 300天纪念</span>
+                哲哲<br>
+                <span style="font-size: 0.82rem; color: var(--text-sub);">2026.11.13</span>
             </div>
         </div>
 
@@ -1034,24 +1073,24 @@
         const DATE_300_MILESTONE = new Date('2026-11-13T00:00:00+08:00');
 
         const CARROT_QUOTES = [
-            "白羊座珊珊小兔的直率与冲动，永远有处女座小牛默默包容 💖",
-            "小牛不善言辞，但把所有的温柔与细致都给了他的珊珊兔 🐮🐰",
-            "属牛的坚韧与属兔的灵动，注定是相守一生的绝配！✨",
-            "2009年的小牛遇上2011年的珊珊，这是时间最美的安排 🌸",
-            "小牛最喜欢看珊珊抱着美食开心大快朵颐的样子 🍲",
-            "不管未来走多远，笨笨牛永远是珊珊小兔最坚实的依靠 🛡️",
-            "300天只是个起点，小牛要陪珊珊走过接下来的3000天！🚀",
-            "哲哲永远超级超级喜欢珊珊宝贝！mua~~ 💋"
+            "2024 年 5 月 3 日，我们第一次认识。",
+            "2026 年 1 月 18 日，我们重新在一起。",
+            "有些话我说得慢，但一直很在意你。",
+            "看到你吃喜欢的东西时开心，我也会跟着开心。",
+            "今天是第 300 天，先把这天记下来。",
+            "如果今天很累，就先休息一下。",
+            "还有些照片和小事，想以后慢慢放进这页。",
+            "珊珊，300 天快乐。"
         ];
 
         const SLOT_EVENTS = [
-            "💋 处女座小牛要连续亲珊珊小兔的额头 3 次！",
-            "🥤 珊珊小兔可以无条件命令小牛去买一杯奶茶！",
-            "👑 今天小牛要当珊珊 10 分钟的专属听话小仆人！",
-            "抱 长达 60 秒以上的超深熊抱补充爱意能量！",
-            "🍕 小牛今晚要给珊珊点一份超级美味的爱心夜宵！",
-            "📸 两人一起拍一组超级搞怪的粉色表情包合照留念！",
-            "🧸 小牛要无条件把珊珊哄开心，不准还嘴哦！"
+            "一起挑一张最喜欢的旧照片。",
+            "去喝一杯喜欢的饮料。",
+            "各说一件今天还不错的小事。",
+            "认真跟对方说一次谢谢。",
+            "有空时一起散一小段步。",
+            "拍一张不需要摆好姿势的合照。",
+            "给对方推荐一首最近喜欢的歌。"
         ];
 
         const FREQ_MAP = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
@@ -1153,13 +1192,9 @@
             setTimeout(() => {
                 lockScreen.style.visibility = 'hidden';
                 mainContainer.style.display = 'block';
-                initBackgroundParticles();
-                initMouseTrailSparkles();
                 renderCalculatedStats();
                 initCarrotGame();
-                initArcadeGame();
                 loadWishes();
-                toggleAudio(true);
             }, 800);
         }
 
@@ -1281,7 +1316,7 @@
             function updateCountdown() {
                 const diff = DATE_300_MILESTONE - new Date();
                 if (diff <= 0) {
-                    document.getElementById('disp-countdown').textContent = '🎉 300天已经到达！';
+                    document.getElementById('disp-countdown').textContent = '2026.11.13 · 第 300 天';
                     return;
                 }
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -1442,7 +1477,7 @@
 
         function unlockLoveLetter() {
             playMusicBoxNote(950, '解密', 7);
-            showToast('💖 成就解锁！处女座小牛的 300 天真心话情书已开启');
+            showToast('信打开了。');
             const letterBox = document.getElementById('letter-container');
             letterBox.style.display = 'block';
             letterBox.scrollIntoView({ behavior: 'smooth' });
@@ -1452,15 +1487,17 @@
         /* ================================================================
          * 10. 💌 打字机真心话情书
          * ================================================================ */
-        const CUSTOM_LETTER = `亲爱的珊珊宝贝（我的白羊座小兔）：
+        const CUSTOM_LETTER = `珊珊：
 
-展信佳。不知不觉，从我们 2026年1月18日 重新牵起彼此的手算起，我们已经携手走过了整整 300 天。
+今天是 11 月 13 日。从 1 月 18 日到现在，整整 300 天。
 
-我是个 2009年9月22日 出生的处女座笨笨牛 🐂，习惯把所有的深情与关心藏在生活细节里，偶尔笨拙，却无比坚定；而你是 2011年4月17日 出生的白羊座珊珊兔 🐰，天真烂漫，像一束温暖的阳光直接照亮了我的世界。
+我们第一次认识是在 2024 年 5 月 3 日。中间的故事太长了，一张网页写不完。我先把这几个日期留下，其他的，等我们以后慢慢补。
 
-这 300 天里，白羊座珊珊兔的直率与可爱，让每一个平淡的日子都变得闪闪发光；而处女座小牛的细致与沉稳，永远会在你身后为你遮风挡雨，给你最坚实的肩膀。
+谢谢你愿意和我重新在一起。我很珍惜你，也很珍惜这些普通的日子。
 
-谢谢你给我的所有信任与温柔。300 天只是我们漫长幸福岁月里的小小里程碑。我向你保证，笨笨牛会永远守护他的珊珊小兔，爱你的接下来的 3000 天、30000 天，直到永远！`;
+以后再打开这页，也许会觉得它做得有点认真。但今天想把你和这个日子记下来，是真的。
+
+300 天快乐。`;
 
         let typingStarted = false;
         function startTypewriterEffect() {
@@ -1569,6 +1606,9 @@
             });
         });
         document.getElementById('story-letter-button').addEventListener('click', unlockLoveLetter);
+        document.getElementById('extras').addEventListener('toggle', (event) => {
+            if (event.target.open) initArcadeGame();
+        });
     </script>
 </body>
 </html>

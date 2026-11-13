@@ -705,6 +705,44 @@
 
         .tool-circle-btn:hover { transform: scale(1.1); background: rgba(244, 172, 183, 0.35); }
         .spinning { animation: spin 4s linear infinite; }
+
+        /* 让互动沿着真实时间线展开 */
+        .story-journey {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(24px, 6vw, 52px);
+            margin-bottom: 24px;
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(255,229,236,.15), rgba(255,229,236,.035));
+            box-shadow: 0 18px 45px rgba(0,0,0,.16);
+        }
+        .story-journey::before {
+            content: '✦'; position: absolute; top: -90px; right: -35px;
+            font-size: 250px; line-height: 1; color: rgba(255,202,212,.07);
+            pointer-events: none;
+        }
+        .story-kicker { color: var(--rose-gold); font-size: .7rem; font-weight: 800; letter-spacing: .22em; }
+        .story-journey h2 { margin: 12px 0; font-size: clamp(1.8rem, 5vw, 3.3rem); line-height: 1.28; font-weight: 600; }
+        .story-lead { max-width: 630px; line-height: 1.9; color: var(--text-sub); font-size: .95rem; }
+        .story-progress { display: flex; align-items: center; gap: 14px; margin: 27px 0 36px; color: var(--rose-gold); font-size: .78rem; }
+        .story-progress-track { flex: 1; max-width: 320px; height: 4px; border-radius: 4px; background: rgba(255,202,212,.18); overflow: hidden; }
+        #story-progress-fill { display: block; width: 0; height: 100%; background: var(--pink-accent); transition: width .35s; }
+        .story-chapters { position: relative; display: grid; gap: 18px; padding-left: 28px; }
+        .story-chapters::before { content: ''; position: absolute; left: 7px; top: 25px; bottom: 25px; width: 1px; background: linear-gradient(var(--pink-accent), transparent); }
+        .story-chapter { position: relative; padding: 21px 23px; border: 1px solid rgba(255,202,212,.22); border-radius: 18px; background: rgba(20,12,28,.34); }
+        .story-chapter::before { content: ''; position: absolute; left: -27px; top: 28px; width: 11px; height: 11px; border: 3px solid #2d1836; border-radius: 50%; background: var(--pink-accent); box-shadow: 0 0 0 1px var(--pink-accent); }
+        .story-date { display: block; margin-bottom: 10px; font-size: .7rem; letter-spacing: .14em; font-weight: 800; color: var(--pink-accent); }
+        .story-chapter h3 { font-size: clamp(1.1rem, 3.4vw, 1.55rem); font-weight: 600; margin-bottom: 9px; }
+        .story-chapter p { color: var(--text-sub); line-height: 1.85; font-size: .86rem; }
+        .story-open { display: inline-flex; min-height: 40px; align-items: center; border: 0; border-bottom: 1px solid var(--pink-accent); background: transparent; color: var(--rose-gold); font-size: .8rem; font-weight: 700; margin-top: 12px; cursor: pointer; }
+        .story-open:hover { color: white; }
+        .story-hidden { margin-top: 17px; padding: 18px 20px; background: rgba(255,229,236,.09); border-left: 2px solid var(--pink-accent); border-radius: 0 12px 12px 0; }
+        .story-hidden[hidden], #story-finale[hidden] { display: none; }
+        #story-finale { margin-top: 28px; padding: 24px; border: 1px solid var(--glass-border); border-radius: 18px; text-align: center; background: rgba(255,202,212,.12); }
+        #story-finale p { margin-bottom: 14px; color: var(--text-sub); line-height: 1.8; }
+        #story-letter-button { border: 0; border-radius: 30px; background: linear-gradient(135deg, var(--pink-accent), var(--rose-gold)); padding: 12px 24px; color: #2b1836; font-weight: 800; cursor: pointer; }
+        @media (prefers-reduced-motion: reduce) { #story-progress-fill { transition: none; } }
     </style>
 </head>
 <body>
@@ -741,6 +779,44 @@
             <div class="big-300-title">300</div>
             <div class="banner-subtitle">在一起第 300 天 · 专属浪漫里程碑</div>
         </div>
+
+        <section class="story-journey" aria-labelledby="story-title">
+            <p class="story-kicker">OUR STORY · 从相遇到今天</p>
+            <h2 id="story-title">把 300 天，<br>翻成我们的故事。</h2>
+            <p class="story-lead">从初次相识，到重新牵起手，再到每一个普通的今天。轻点四个章节，最后有一封写给你的信。</p>
+            <div class="story-progress" aria-live="polite"><span id="story-progress-text">已翻开 0 / 4 章</span><div class="story-progress-track" aria-hidden="true"><span id="story-progress-fill"></span></div></div>
+            <div class="story-chapters">
+                <article class="story-chapter">
+                    <span class="story-date">2024.05.03 · 故事的开头</span>
+                    <h3>第一次，我们走进彼此的生活</h3>
+                    <p>有些日子当时看起来普通，后来却成了故事的第一页。</p>
+                    <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-1">翻开这一页 ↗</button>
+                    <div class="story-hidden" id="story-memory-1" hidden><p>2024 年 5 月 3 日，笨笨牛与珊珊兔初次相识。我们也许还不知道，往后会有这么多值得一起记住的日子。</p></div>
+                </article>
+                <article class="story-chapter">
+                    <span class="story-date">2026.01.18 · 新的一页</span>
+                    <h3>这一次，重新牵起你的手</h3>
+                    <p>重新靠近，是我们给彼此的一次认真选择。</p>
+                    <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-2">翻开这一页 ↗</button>
+                    <div class="story-hidden" id="story-memory-2" hidden><p>从 2026 年 1 月 18 日起，我们又开始并肩往前走。之后的 300 天，每一天都在续写这个选择。</p></div>
+                </article>
+                <article class="story-chapter">
+                    <span class="story-date">第 1 天 — 第 299 天 · 日常</span>
+                    <h3>喜欢，藏在许多小事里</h3>
+                    <p>不是每一天都有大事发生，但一起走过的日常，本身就很珍贵。</p>
+                    <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-3">翻开这一页 ↗</button>
+                    <div class="story-hidden" id="story-memory-3" hidden><p>分享心情、想念对方、把一件小事讲给对方听。那些只有我们懂的瞬间，慢慢变成了“我们”的样子。</p></div>
+                </article>
+                <article class="story-chapter">
+                    <span class="story-date">2026.11.13 · 第 300 天</span>
+                    <h3>今天，故事还在继续</h3>
+                    <p>300 天是一个值得停下来拥抱的路标，也是下一段故事的起点。</p>
+                    <button class="story-open" type="button" aria-expanded="false" aria-controls="story-memory-4">翻开这一页 ↗</button>
+                    <div class="story-hidden" id="story-memory-4" hidden><p>谢谢你一直在这里。笨笨牛与珊珊兔的故事，已经写到第 300 天；未来还有很多空白页，想和你一起慢慢填满。</p></div>
+                </article>
+            </div>
+            <div id="story-finale" hidden><p>四个章节都翻开了。故事的最后，还有一封只写给你的信。</p><button id="story-letter-button" type="button">拆开 300 天的信 💌</button></div>
+        </section>
 
         <!-- 🎮 互动玩法导航标签 -->
         <div class="game-nav-tabs">
@@ -1474,6 +1550,25 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
+
+        const openedStoryChapters = new Set();
+        document.querySelectorAll('.story-open').forEach((button, index) => {
+            button.addEventListener('click', () => {
+                const memory = document.getElementById(button.getAttribute('aria-controls'));
+                const isOpen = button.getAttribute('aria-expanded') === 'true';
+                memory.hidden = isOpen;
+                button.setAttribute('aria-expanded', String(!isOpen));
+                button.textContent = isOpen ? '翻开这一页 ↗' : '收起这一页 ↖';
+                if (!isOpen) {
+                    openedStoryChapters.add(index);
+                    playMusicBoxNote(523.25 + index * 65, '故事翻页', index);
+                    document.getElementById('story-progress-text').textContent = `已翻开 ${openedStoryChapters.size} / 4 章`;
+                    document.getElementById('story-progress-fill').style.width = `${openedStoryChapters.size * 25}%`;
+                    if (openedStoryChapters.size === 4) document.getElementById('story-finale').hidden = false;
+                }
+            });
+        });
+        document.getElementById('story-letter-button').addEventListener('click', unlockLoveLetter);
     </script>
 </body>
 </html>
